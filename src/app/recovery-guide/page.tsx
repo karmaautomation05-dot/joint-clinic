@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useEffect } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   Bone,
@@ -10,16 +8,15 @@ import {
   HeartPulse,
   Stethoscope,
   Sparkles,
-  Phone,
   ArrowRight,
-  CheckCircle2,
-  AlertCircle,
-  Calendar,
-  HelpCircle,
   ChevronRight,
+  Phone,
   Clock,
+  CheckCircle2,
+  Calendar,
+  HeartHandshake,
 } from "lucide-react";
-import { RECOVERY_GUIDES, CategoryRecoveryGuide } from "@/data/recoveryGuides";
+import { RECOVERY_GUIDES } from "@/data/recoveryGuides";
 import { PRIMARY_CONTACT } from "@/data/clinics";
 
 const ICON_MAP: Record<string, typeof Bone> = {
@@ -32,36 +29,42 @@ const ICON_MAP: Record<string, typeof Bone> = {
   Sparkles: Sparkles,
 };
 
-export default function RecoveryGuidePage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+const RECOVERY_TO_TREATMENT_MAP: Record<string, { id: string; name: string }> = {
+  "knee-recovery": { id: "knee-care", name: "Knee Care & Surgery" },
+  "hip-recovery": { id: "hip-care", name: "Hip Care & Surgery" },
+  "sports-recovery": { id: "sports-injury", name: "Sports Injury & Arthroscopy" },
+  "shoulder-recovery": { id: "shoulder-care", name: "Shoulder & Arm Care" },
+  "spine-recovery": { id: "spine-care", name: "Spine & Sciatica Care" },
+  "prp-recovery": { id: "non-surgical", name: "Non-Surgical Joint Care & PRP" },
+  "trauma-recovery": { id: "fractures-trauma", name: "Bone Fractures & Trauma" },
+};
 
-  useEffect(() => {
-    const handleNavigation = () => {
-      const hash = window.location.hash.replace("#", "");
-      if (hash && RECOVERY_GUIDES.some((g) => g.id === hash)) {
-        setSelectedCategory(hash);
-        setTimeout(() => {
-          const el = document.getElementById(hash);
-          if (el) el.scrollIntoView({ behavior: "smooth" });
-        }, 100);
-        return;
-      }
-      const params = new URLSearchParams(window.location.search);
-      const cat = params.get("category");
-      if (cat && RECOVERY_GUIDES.some((g) => g.id === cat)) {
-        setSelectedCategory(cat);
-      }
-    };
-    handleNavigation();
-    window.addEventListener("hashchange", handleNavigation);
-    return () => window.removeEventListener("hashchange", handleNavigation);
-  }, []);
+export const metadata: Metadata = {
+  title: "Patient Recovery Guides & Rehabilitation Milestones | Joint Clinic Kanpur",
+  description:
+    "Explore 7 specialty recovery guides by Dr. Gaurav Bhargava in Kanpur. Step-by-step healing timelines for Knee, Hip, Sports/ACL, Shoulder, Spine, PRP, and Trauma recovery.",
+  keywords: [
+    "Recovery Guide Kanpur",
+    "Knee Surgery Recovery",
+    "Hip Replacement Recovery Timeline",
+    "ACL Rehabilitation Protocol",
+    "Dr Gaurav Bhargava Patient Recovery",
+    "Joint Clinic Kanpur",
+  ],
+  alternates: {
+    canonical: "https://jointclinic.in/recovery-guide",
+  },
+  openGraph: {
+    title: "Patient Recovery Guides | Joint Clinic Kanpur",
+    description: "Reassuring, step-by-step patient recovery timelines by Dr. Gaurav Bhargava.",
+    url: "https://jointclinic.in/recovery-guide",
+    siteName: "Joint Clinic Kanpur",
+    locale: "en_IN",
+    type: "website",
+  },
+};
 
-  const displayedGuides: CategoryRecoveryGuide[] =
-    selectedCategory === "all"
-      ? RECOVERY_GUIDES
-      : RECOVERY_GUIDES.filter((g) => g.id === selectedCategory);
-
+export default function RecoveryGuideIndexPage() {
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -88,6 +91,16 @@ export default function RecoveryGuidePage() {
         name: "Patient Recovery Guides & Rehabilitation Milestones | Joint Clinic Kanpur",
         description:
           "Step-by-step patient recovery timelines for Knee, Hip, Sports/ACL, Shoulder, Spine, PRP, and Trauma Care by Dr. Gaurav Bhargava in Kanpur.",
+        mainEntity: {
+          "@type": "ItemList",
+          itemListElement: RECOVERY_GUIDES.map((guide, idx) => ({
+            "@type": "ListItem",
+            position: idx + 1,
+            name: guide.title,
+            description: guide.overview,
+            url: `https://jointclinic.in/recovery-guide/${guide.id}`,
+          })),
+        },
       },
     ],
   };
@@ -98,6 +111,7 @@ export default function RecoveryGuidePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
+
       {/* Hero Header */}
       <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
@@ -113,290 +127,155 @@ export default function RecoveryGuidePage() {
             </nav>
 
             <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
-              Step-by-Step Patient Recovery Portals
+              7 Patient Recovery Portals
             </span>
             <h1 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
-              Your Complete Recovery Roadmap
+              Patient Recovery Guides
             </h1>
             <p className="text-lg sm:text-xl text-white/90 mt-4 leading-relaxed font-sans">
-              Guidance from <strong className="text-white">Dr. Gaurav Bhargava</strong>: Clear, reassuring, and practical recovery timelines.
-              From Day 1 hospital milestones to home exercises, safe mobility, and active living — explained in friendly patient language.
+              Reassuring, structured recovery timelines from <strong className="text-white">Dr. Gaurav Bhargava</strong>.
+              Select a specialty below to view step-by-step healing milestones, home preparation checklists, exercises, and safety precautions.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Sticky Category Tabs (Matching /treatments) */}
-      <div className="sticky top-16 sm:top-20 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 py-3 shadow-xs">
-        <div className="container">
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-1">
-            <button
-              onClick={() => setSelectedCategory("all")}
-              className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
-                selectedCategory === "all"
-                  ? "bg-[#059B8F] text-white shadow-md shadow-[#059B8F]/20"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              All Categories ({RECOVERY_GUIDES.length})
-            </button>
-            {RECOVERY_GUIDES.map((guide) => {
-              const IconComp = ICON_MAP[guide.iconName] || Bone;
-              const isSelected = selectedCategory === guide.id;
-              return (
-                <button
-                  key={guide.id}
-                  onClick={() => setSelectedCategory(guide.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
-                    isSelected
-                      ? "bg-[#059B8F] text-white shadow-md shadow-[#059B8F]/20"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                  }`}
-                >
-                  <IconComp size={15} />
-                  <span>{guide.category}</span>
-                </button>
-              );
-            })}
-          </div>
+      {/* Recovery Category Cards Grid */}
+      <div className="container mt-12 sm:mt-16">
+        <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block mb-2">
+            Rehabilitation Portals
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-slate-900">
+            Select a Recovery Specialty
+          </h2>
+          <p className="text-sm sm:text-base text-slate-600 mt-3 leading-relaxed">
+            Click on your procedure category to open its complete recovery roadmap — from Day 1 hospital care to independent daily mobility.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {RECOVERY_GUIDES.map((guide) => {
+            const GuideIcon = ICON_MAP[guide.iconName] || Bone;
+            const treatmentCategory = RECOVERY_TO_TREATMENT_MAP[guide.id] || {
+              id: "knee-care",
+              name: "Knee Care",
+            };
+
+            return (
+              <div
+                key={guide.id}
+                className="bg-white rounded-3xl border border-slate-200/90 hover:border-brand-300 p-6 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
+              >
+                <div>
+                  {/* Top Badge & Icon */}
+                  <div className="flex items-center justify-between gap-3 mb-5">
+                    <div className="w-12 h-12 rounded-2xl bg-brand-50 flex items-center justify-center text-[#059B8F] group-hover:bg-[#059B8F] group-hover:text-white transition-colors">
+                      <GuideIcon size={24} />
+                    </div>
+                    <span className="text-xs font-bold text-[#059B8F] px-3 py-1 rounded-full bg-brand-50/70 border border-brand-100">
+                      {guide.phases.length} Phases
+                    </span>
+                  </div>
+
+                  {/* Title & Tagline */}
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 group-hover:text-brand-700 transition-colors mb-2">
+                    {guide.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm font-semibold text-[#059B8F] mb-3">
+                    {guide.tagline}
+                  </p>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+                    {guide.overview}
+                  </p>
+
+                  {/* Phases Preview Box */}
+                  <div className="bg-slate-50/70 rounded-2xl p-4 border border-slate-100/90 mb-6 space-y-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                      Key Roadmap Milestones:
+                    </span>
+                    {guide.phases.slice(0, 3).map((p, pIdx) => (
+                      <div
+                        key={pIdx}
+                        className="flex items-center gap-2 text-xs text-slate-700 font-medium py-0.5"
+                      >
+                        <CheckCircle2 size={13} className="text-[#059B8F] shrink-0" />
+                        <span className="truncate">{p.title} ({p.phase.split("(")[0].trim()})</span>
+                      </div>
+                    ))}
+                    {guide.phases.length > 3 && (
+                      <span className="text-[11px] text-[#0A7C97] font-semibold block pt-1">
+                        + {guide.phases.length - 3} more progressive phases
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Card Actions */}
+                <div className="pt-4 border-t border-slate-100 space-y-2.5">
+                  <Link
+                    href={`/recovery-guide/${guide.id}`}
+                    className="w-full btn-primary py-2.5 px-4 text-xs font-bold flex items-center justify-center gap-2 shadow-xs group-hover:shadow-md"
+                  >
+                    <span>Open {guide.category.split(" ")[0]} Recovery Guide</span>
+                    <ArrowRight size={14} />
+                  </Link>
+
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 px-1">
+                    <Link
+                      href={`/treatments/category/${treatmentCategory.id}`}
+                      className="font-bold text-[#0A7C97] hover:underline flex items-center gap-1"
+                    >
+                      <span>{treatmentCategory.name}</span>
+                      <ArrowRight size={11} />
+                    </Link>
+                    <a
+                      href={`tel:${PRIMARY_CONTACT.phone}`}
+                      className="font-semibold text-slate-600 hover:text-[#059B8F]"
+                    >
+                      Call Helpline
+                    </a>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* Main Content Container */}
-      <div className="container mt-10 space-y-16">
-        {/* If 'all' is selected, show an introduction directory */}
-        {selectedCategory === "all" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {RECOVERY_GUIDES.map((guide) => {
-              const IconComp = ICON_MAP[guide.iconName] || Bone;
-              return (
-                <div
-                  key={guide.id}
-                  onClick={() => setSelectedCategory(guide.id)}
-                  className="group bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs hover:shadow-lg hover:border-brand-300 transition-all cursor-pointer flex flex-col justify-between"
-                >
-                  <div className="space-y-3">
-                    <div className="w-12 h-12 rounded-2xl bg-brand-50 flex items-center justify-center text-[#059B8F] group-hover:bg-[#059B8F] group-hover:text-white transition-colors">
-                      <IconComp className="w-6 h-6" />
-                    </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#059B8F]">
-                      {guide.category}
-                    </span>
-                    <h3 className="text-xl font-serif font-bold text-slate-900 group-hover:text-[#059B8F] transition-colors">
-                      {guide.title}
-                    </h3>
-                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-3">
-                      {guide.overview}
-                    </p>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#059B8F]">
-                    <span>View {guide.phases.length}-Phase Roadmap</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Category-by-Category Deep Dives */}
-        {displayedGuides.map((guide) => {
-          const IconComp = ICON_MAP[guide.iconName] || Bone;
-          return (
-            <div
-              key={guide.id}
-              id={guide.id}
-              className="scroll-mt-36 space-y-10 border-b border-slate-200 pb-16 last:border-b-0"
-            >
-              {/* Category Header Banner */}
-              <div className="bg-gradient-to-r from-brand-50/80 via-white to-brand-50/50 rounded-3xl p-6 sm:p-10 border border-brand-100 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xs">
-                <div className="flex items-start gap-4 sm:gap-5">
-                  <div className="w-14 h-14 rounded-2xl bg-white shadow-xs border border-brand-200 flex items-center justify-center text-[#059B8F] shrink-0">
-                    <IconComp className="w-7 h-7" />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] bg-white px-3 py-1 rounded-full border border-brand-200">
-                        {guide.category}
-                      </span>
-                      <span className="text-xs font-semibold text-slate-500">
-                        {guide.tagline}
-                      </span>
-                    </div>
-                    <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
-                      {guide.title}
-                    </h2>
-                    <p className="text-sm text-slate-600 max-w-2xl leading-relaxed pt-1">
-                      {guide.overview}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 shrink-0 self-end md:self-center">
-                  <Link
-                    href="/appointment"
-                    className="px-5 py-2.5 rounded-full bg-[#059B8F] hover:bg-[#04877c] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
-                  >
-                    <span>Consult Doctor</span>
-                    <ArrowRight size={13} />
-                  </Link>
-                </div>
-              </div>
-
-              {/* 1. Pre-Op / Home Preparation Checklist */}
-              <div className="bg-white rounded-[2rem] border border-slate-200/80 p-6 sm:p-10 shadow-xs space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center text-[#059B8F] shrink-0">
-                    <ShieldCheck className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
-                      Home Preparation Checklist
-                    </h3>
-                    <p className="text-xs text-slate-500">
-                      Simple, practical preparations so your home is safe and ready for smooth healing.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-1">
-                  {guide.homePrep.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 space-y-2 hover:bg-brand-50/40 hover:border-brand-200 transition-colors"
-                    >
-                      <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-900">
-                        <CheckCircle2 className="w-4 h-4 text-[#059B8F] shrink-0" />
-                        <span>{item.title}</span>
-                      </div>
-                      <p className="text-xs text-slate-600 leading-relaxed pl-6">
-                        {item.desc}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 2. Step-by-Step Healing Timeline */}
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block mb-1">
-                      Step-by-Step Progression
-                    </span>
-                    <h3 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
-                      Phased Healing Milestones
-                    </h3>
-                  </div>
-                  <span className="text-xs font-semibold text-slate-500 hidden sm:inline-block">
-                    Personalized pacing with Dr. Bhargava
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 gap-5">
-                  {guide.phases.map((phase, pIdx) => (
-                    <div
-                      key={pIdx}
-                      className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 shadow-xs space-y-4 hover:shadow-md hover:border-brand-200 transition-all"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#059B8F] px-3 py-1 rounded-full bg-brand-50 border border-brand-100 w-fit">
-                          {phase.phase}
-                        </span>
-                        <span className="text-xs font-semibold text-slate-500">
-                          {phase.focus}
-                        </span>
-                      </div>
-
-                      <h4 className="text-xl font-serif font-bold text-slate-900">
-                        {phase.title}
-                      </h4>
-
-                      <div className="space-y-2.5 pt-1">
-                        {phase.actions.map((action, aIdx) => (
-                          <div
-                            key={aIdx}
-                            className="flex items-start gap-3 text-xs sm:text-sm text-slate-700 leading-relaxed"
-                          >
-                            <span className="w-2 h-2 rounded-full bg-[#059B8F] shrink-0 mt-1.5" />
-                            <span>{action}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Patient Care Tip */}
-                      <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/80 text-xs sm:text-sm text-amber-950 flex items-start gap-2.5">
-                        <AlertCircle className="w-4 h-4 text-[#F18712] shrink-0 mt-0.5" />
-                        <span>
-                          <strong className="font-bold text-[#F18712]">Patient Advice:</strong>{" "}
-                          {phase.tip}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* 3. When to Contact Dr. Bhargava / Red Flags */}
-              <div className="bg-rose-50/60 border border-rose-200 rounded-3xl p-6 sm:p-8 space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 shrink-0">
-                    <AlertCircle className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="text-base sm:text-lg font-serif font-bold text-slate-900">
-                      When to Call Joint Clinic (Helpful Checkpoints)
-                    </h4>
-                    <p className="text-xs text-slate-600">
-                      Recovery is typically smooth, but reach out right away if you notice any of the following:
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-                  {guide.whenToCall.map((item, cIdx) => (
-                    <div
-                      key={cIdx}
-                      className="p-3.5 rounded-xl bg-white/80 border border-rose-100 text-xs text-slate-800 flex items-start gap-2"
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0 mt-1.5" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+      {/* Patient Reassurance & Helpline Banner */}
+      <div className="container mt-20">
+        <div className="bg-gradient-to-r from-brand-50 to-teal-50/50 rounded-3xl p-8 sm:p-12 border border-brand-100 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2 mb-2">
+              <HeartHandshake className="w-5 h-5 text-[#059B8F]" />
+              <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F]">
+                Continuous Support
+              </span>
             </div>
-          );
-        })}
-
-        {/* 24/7 Patient Support Card */}
-        <div className="bg-gradient-to-r from-[#059B8F] to-[#0A7C97] text-white rounded-[2.5rem] p-8 sm:p-12 text-center space-y-5 relative overflow-hidden shadow-xl">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="relative z-10">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-2">
-              We Are With You Every Step of the Way
-            </span>
-            <h3 className="text-3xl sm:text-4xl font-serif font-bold">
-              Have a Recovery Question or Need a Follow-up?
+            <h3 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 mb-2">
+              Questions During Your Recovery?
             </h3>
-            <p className="text-sm sm:text-base text-white/90 max-w-xl mx-auto leading-relaxed mt-2">
-              Dr. Gaurav Bhargava and our dedicated clinical team at Swaroop Nagar &amp; Kidwai Nagar are just a phone call or WhatsApp message away.
+            <p className="text-sm sm:text-base text-slate-600">
+              Our clinical care team is here to support you at every stage of your healing.
+              Whether you need guidance on exercises, swelling management, or medication, reach out to us directly.
             </p>
-            <div className="pt-6 flex flex-col sm:flex-row justify-center gap-4">
-              <Link
-                href="/appointment"
-                className="px-8 py-3.5 rounded-full bg-[#F18712] hover:bg-[#d96e00] text-white text-sm font-bold transition-colors shadow-md"
-              >
-                Book Recovery Review Visit
-              </Link>
-              <a
-                href={`tel:${PRIMARY_CONTACT.phone}`}
-                className="px-8 py-3.5 rounded-full bg-white text-[#059B8F] hover:bg-slate-50 text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-md"
-              >
-                <Phone size={16} className="text-[#059B8F]" />
-                <span>Call Us: +91 73090 38872</span>
-              </a>
-            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0">
+            <a
+              href={`tel:${PRIMARY_CONTACT.phone}`}
+              className="btn-primary py-3 px-6 text-sm font-bold flex items-center justify-center gap-2"
+            >
+              <Phone size={16} className="text-[#F5CD09]" />
+              <span>Call Helpline: +91 73090 38872</span>
+            </a>
+            <Link
+              href="/appointment"
+              className="btn-secondary py-3 px-6 text-sm font-bold text-center"
+            >
+              Book Follow-up
+            </Link>
           </div>
         </div>
       </div>

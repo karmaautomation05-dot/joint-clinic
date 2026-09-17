@@ -50,14 +50,17 @@ const TREATMENTS_FAQS = [
   },
 ];
 
+const CATEGORY_TO_RECOVERY_MAP: Record<string, string> = {
+  "knee-care": "knee-recovery",
+  "hip-care": "hip-recovery",
+  "sports-injury": "sports-recovery",
+  "shoulder-care": "shoulder-recovery",
+  "spine-care": "spine-recovery",
+  "non-surgical": "prp-recovery",
+  "fractures-trauma": "trauma-recovery",
+};
+
 export default function TreatmentsPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-
-  const filteredCategories =
-    selectedCategory === "all"
-      ? TREATMENT_CATEGORIES
-      : TREATMENT_CATEGORIES.filter((c) => c.id === selectedCategory);
-
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -81,9 +84,9 @@ export default function TreatmentsPage() {
       {
         "@type": "MedicalWebPage",
         "@id": "https://jointclinic.in/treatments#webpage",
-        name: "Common Orthopedic Treatments & Surgeries | Joint Clinic Kanpur",
+        name: "Orthopedic Specialties & Treatments by Category | Joint Clinic Kanpur",
         description:
-          "Complete directory of 24+ orthopedic treatments in Kanpur across Knee, Hip, Sports/ACL, Shoulder, Spine, PRP, and Trauma Care by Dr. Gaurav Bhargava.",
+          "Explore 7 clinical orthopedic categories covering 24+ specialized treatments by Dr. Gaurav Bhargava across Knee, Hip, Sports/ACL, Shoulder, Spine, PRP, and Trauma Care in Kanpur.",
         mainEntity: {
           "@type": "ItemList",
           itemListElement: TREATMENT_CATEGORIES.map((cat, idx) => ({
@@ -91,6 +94,7 @@ export default function TreatmentsPage() {
             position: idx + 1,
             name: cat.name,
             description: cat.description,
+            url: `https://jointclinic.in/treatments/category/${cat.id}`,
           })),
         },
       },
@@ -130,187 +134,112 @@ export default function TreatmentsPage() {
             </nav>
 
             <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
-              Patient-First Orthopedic Care
+              7 Clinical Specialties
             </span>
             <h1 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
-              Common Treatments &amp; Surgeries
+              Orthopedic Treatments &amp; Surgeries
             </h1>
             <p className="text-lg sm:text-xl text-white/90 mt-4 leading-relaxed font-sans">
               Find clear, simple explanations for your joint, bone, and ligament concerns.
-              Every treatment is tailored to help you return to pain-free, active living without unnecessary confusion.
+              Select a specialty category below to explore all available surgical and non-surgical procedures tailored to your condition.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Category Filter Tabs */}
-      <div className="sticky top-16 sm:top-20 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 py-3 shadow-xs">
-        <div className="container">
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-1">
-            <button
-              onClick={() => setSelectedCategory("all")}
-              className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
-                selectedCategory === "all"
-                  ? "bg-[#059B8F] text-white shadow-md shadow-[#059B8F]/20"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-              }`}
-            >
-              All Categories ({TREATMENT_CATEGORIES.reduce((acc, c) => acc + c.items.length, 0)})
-            </button>
-            {TREATMENT_CATEGORIES.map((cat) => {
-              const IconComp = ICON_MAP[cat.iconName] || Bone;
-              const isSelected = selectedCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all ${
-                    isSelected
-                      ? "bg-[#059B8F] text-white shadow-md shadow-[#059B8F]/20"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                  }`}
-                >
-                  <IconComp size={15} />
-                  <span>{cat.name}</span>
-                  <span
-                    className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                      isSelected
-                        ? "bg-white/20 text-white"
-                        : "bg-slate-200 text-slate-600"
-                    }`}
-                  >
-                    {cat.items.length}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+      {/* Category Cards Grid */}
+      <div className="container mt-12 sm:mt-16">
+        <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block mb-2">
+            Specialized Portals
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-slate-900">
+            Select an Orthopedic Specialty
+          </h2>
+          <p className="text-sm sm:text-base text-slate-600 mt-3 leading-relaxed">
+            Click any category below to view all treatment procedures, symptoms treated, clinical techniques, and recovery expectations.
+          </p>
         </div>
-      </div>
 
-      {/* Categorized Content */}
-      <div className="container mt-12 space-y-16">
-        {filteredCategories.map((category) => {
-          const CatIcon = ICON_MAP[category.iconName] || Bone;
-          return (
-            <section
-              key={category.id}
-              id={category.id}
-              className="scroll-mt-36"
-            >
-              {/* Category Header */}
-              <div className="border-b border-slate-200 pb-6 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {TREATMENT_CATEGORIES.map((category) => {
+            const CatIcon = ICON_MAP[category.iconName] || Bone;
+            const recoverySlug = CATEGORY_TO_RECOVERY_MAP[category.id] || "knee-recovery";
+            return (
+              <div
+                key={category.id}
+                className="bg-white rounded-3xl border border-slate-200/90 hover:border-brand-300 p-6 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
+              >
                 <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center text-[#059B8F]">
-                      <CatIcon size={22} />
+                  {/* Top Badge & Icon */}
+                  <div className="flex items-center justify-between gap-3 mb-5">
+                    <div className="w-12 h-12 rounded-2xl bg-brand-50 flex items-center justify-center text-[#059B8F] group-hover:bg-[#059B8F] group-hover:text-white transition-colors">
+                      <CatIcon size={24} />
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F]">
-                      {category.tagline}
+                    <span className="text-xs font-bold text-[#059B8F] px-3 py-1 rounded-full bg-brand-50/70 border border-brand-100">
+                      {category.items.length} Treatments
                     </span>
                   </div>
-                  <h2 className="text-2xl sm:text-4xl font-serif font-bold text-slate-900">
+
+                  {/* Title & Tagline */}
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 group-hover:text-brand-700 transition-colors mb-2">
                     {category.name}
-                  </h2>
-                  <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl">
+                  </h3>
+                  <p className="text-xs sm:text-sm font-semibold text-[#059B8F] mb-3">
+                    {category.tagline}
+                  </p>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
                     {category.description}
                   </p>
-                </div>
-                <Link
-                  href="/appointment"
-                  className="btn-secondary py-2 px-4 text-xs font-bold flex items-center gap-2 w-fit shrink-0"
-                >
-                  <Calendar size={14} className="text-[#F18712]" />
-                  <span>Consult for {category.name.split(" ")[0]}</span>
-                </Link>
-              </div>
 
-              {/* Items Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                {category.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs hover:shadow-xl hover:border-brand-300 transition-all flex flex-col justify-between group"
-                  >
-                    <div>
-                      {/* Top Badges */}
-                      <div className="flex items-center justify-between gap-2 mb-4">
-                        <span className="text-xs font-bold text-[#059B8F] px-3 py-1 rounded-full bg-brand-50 border border-brand-100">
-                          {category.name}
-                        </span>
-                        {item.badge && (
-                          <span className="text-[11px] font-bold text-[#F18712] px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200">
-                            {item.badge}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Title & Short Description */}
-                      <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 group-hover:text-brand-700 transition-colors mb-2">
-                        {item.name}
-                      </h3>
-                      <p className="text-sm text-slate-600 leading-relaxed mb-6 font-medium">
-                        {item.shortDesc}
-                      </p>
-
-                      {/* Clear Explanations Box */}
-                      <div className="space-y-4 bg-slate-50/70 rounded-2xl p-4 sm:p-5 border border-slate-100 mb-6">
-                        <div>
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
-                            <HelpCircle size={14} className="text-[#F18712]" />
-                            <span>When is this needed?</span>
-                          </div>
-                          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                            {item.whenNeeded}
-                          </p>
-                        </div>
-
-                        <div>
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
-                            <CheckCircle2 size={14} className="text-[#059B8F]" />
-                            <span>How it helps:</span>
-                          </div>
-                          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                            {item.howHelps}
-                          </p>
-                        </div>
-
-                        <div>
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 uppercase tracking-wider mb-1">
-                            <Clock size={14} className="text-[#0A7C97]" />
-                            <span>Expected Recovery:</span>
-                          </div>
-                          <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
-                            {item.recovery}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Bottom Action Links */}
-                    <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                  {/* Procedures Preview List */}
+                  <div className="bg-slate-50/70 rounded-2xl p-4 border border-slate-100/90 mb-6 space-y-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                      Featured Procedures:
+                    </span>
+                    {category.items.map((item) => (
                       <Link
+                        key={item.id}
                         href={`/treatments/${item.slug}`}
-                        className="text-xs sm:text-sm font-bold text-[#059B8F] hover:text-[#0A7C97] flex items-center gap-1.5 transition-colors"
+                        className="flex items-center justify-between text-xs text-slate-700 hover:text-[#059B8F] font-medium transition-colors py-0.5 group/item"
                       >
-                        <span>Full Details &amp; Guide</span>
-                        <ArrowRight size={15} />
+                        <span className="truncate pr-2">• {item.name}</span>
+                        <ChevronRight size={13} className="text-slate-400 group-hover/item:text-[#059B8F] shrink-0" />
                       </Link>
-
-                      <Link
-                        href="/appointment"
-                        className="px-3.5 py-2 rounded-full bg-[#059B8F] text-white hover:bg-[#0A7C97] text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs"
-                      >
-                        <span>Book Visit</span>
-                        <ChevronRight size={13} />
-                      </Link>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+
+                {/* Card Actions */}
+                <div className="pt-4 border-t border-slate-100 space-y-2.5">
+                  <Link
+                    href={`/treatments/category/${category.id}`}
+                    className="w-full btn-primary py-2.5 px-4 text-xs font-bold flex items-center justify-center gap-2 shadow-xs group-hover:shadow-md"
+                  >
+                    <span>Explore {category.name.split(" ")[0]} Treatments ({category.items.length})</span>
+                    <ArrowRight size={14} />
+                  </Link>
+
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 px-1">
+                    <Link
+                      href={`/recovery-guide#${recoverySlug}`}
+                      className="font-bold text-[#0A7C97] hover:underline flex items-center gap-1"
+                    >
+                      <span>Recovery Roadmap</span>
+                      <ArrowRight size={11} />
+                    </Link>
+                    <Link
+                      href="/appointment"
+                      className="font-semibold text-slate-600 hover:text-[#059B8F]"
+                    >
+                      Book OPD
+                    </Link>
+                  </div>
+                </div>
               </div>
-            </section>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* Treatments FAQ Section for Search Snippets & Patient Clarity */}

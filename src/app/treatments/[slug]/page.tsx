@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import {
   Bone,
@@ -17,7 +17,7 @@ import {
   FileCheck,
   Stethoscope,
 } from "lucide-react";
-import { TREATMENTS } from "@/data/treatments";
+import { TREATMENTS, TREATMENT_CATEGORIES } from "@/data/treatments";
 import { PRIMARY_CONTACT } from "@/data/clinics";
 
 const ICON_MAP: Record<string, typeof Bone> = {
@@ -95,6 +95,10 @@ export default function TreatmentDetailPage({
 }: {
   params: { slug: string };
 }) {
+  if (TREATMENT_CATEGORIES.some((c) => c.id === params.slug)) {
+    redirect(`/treatments/category/${params.slug}`);
+  }
+
   const treatment = getTreatmentBySlug(params.slug);
 
   if (!treatment) {
