@@ -67,11 +67,61 @@ const TREATMENT_NAV_CATEGORIES = [
     icon: Stethoscope,
     badge: "24/7 Casualty",
   },
+];
+
+const RECOVERY_NAV_CATEGORIES = [
+  {
+    name: "Knee Surgery Recovery",
+    sub: "Total Knee, Robotic & Partial Replacement",
+    href: "/recovery-guide#knee-recovery",
+    icon: Bone,
+    badge: "Day 1 Walking",
+  },
+  {
+    name: "Hip Surgery Recovery",
+    sub: "Total Hip Replacement & AVN Decompression",
+    href: "/recovery-guide#hip-recovery",
+    icon: Activity,
+    badge: "Ceramic Stability",
+  },
+  {
+    name: "Sports & ACL Recovery",
+    sub: "Keyhole ACL, PCL & Meniscus Surgery",
+    href: "/recovery-guide#sports-recovery",
+    icon: ShieldCheck,
+    badge: "Sports Return",
+  },
+  {
+    name: "Shoulder & Arm Recovery",
+    sub: "Rotator Cuff, Frozen Shoulder & Dislocation",
+    href: "/recovery-guide#shoulder-recovery",
+    icon: Award,
+  },
+  {
+    name: "Spine & Sciatica Recovery",
+    sub: "Slip Disc, Sciatica Relief & Posture Habits",
+    href: "/recovery-guide#spine-recovery",
+    icon: Activity,
+  },
+  {
+    name: "PRP & Joint Injection Protocol",
+    sub: "Biological Plasma & Joint Lubrication Recovery",
+    href: "/recovery-guide#prp-recovery",
+    icon: HeartPulse,
+    badge: "Zero Downtime",
+  },
+  {
+    name: "Bone Fractures & Trauma",
+    sub: "Plaster Cast & Internal Fixation Union",
+    href: "/recovery-guide#trauma-recovery",
+    icon: Stethoscope,
+  },
 ]
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isTreatmentsOpen, setIsTreatmentsOpen] = useState(false)
+  const [isRecoveryOpen, setIsRecoveryOpen] = useState(false)
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-brand-100 shadow-xs">
@@ -202,12 +252,78 @@ export default function Navbar() {
               )}
             </div>
 
-            <Link 
-              href="/recovery-guide" 
-              className="text-xs xl:text-[13px] font-semibold text-slate-700 hover:text-brand-600 hover:bg-brand-50/60 transition-colors whitespace-nowrap px-2 xl:px-2.5 py-1.5 rounded-lg"
+            {/* Recovery Guide Dropdown */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setIsRecoveryOpen(true)}
+              onMouseLeave={() => setIsRecoveryOpen(false)}
             >
-              Recovery Protocol
-            </Link>
+              <Link 
+                href="/recovery-guide" 
+                className="flex items-center gap-1 text-xs xl:text-[13px] font-semibold text-slate-700 hover:text-brand-600 hover:bg-brand-50/60 transition-colors whitespace-nowrap px-2 xl:px-2.5 py-1.5 rounded-lg"
+              >
+                <span>Recovery Guide</span>
+                <ChevronDown size={13} className={`transition-transform duration-200 ${isRecoveryOpen ? 'rotate-180 text-brand-600' : ''}`} />
+              </Link>
+
+              {isRecoveryOpen && (
+                <div className="absolute top-full left-0 w-[360px] sm:w-[390px] bg-white rounded-2xl shadow-2xl border border-brand-100 p-3 space-y-1 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                  <div className="px-3 py-1.5 border-b border-slate-100 flex items-center justify-between mb-1">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                      Recovery Roadmaps (7)
+                    </span>
+                    <Link
+                      href="/recovery-guide"
+                      className="text-[11px] font-bold text-[#059B8F] hover:text-[#0A7C97] flex items-center gap-1"
+                    >
+                      <span>All Portals</span>
+                      <ArrowRight size={11} />
+                    </Link>
+                  </div>
+
+                  <div className="space-y-0.5">
+                    {RECOVERY_NAV_CATEGORIES.map((cat) => {
+                      const IconC = cat.icon;
+                      return (
+                        <Link
+                          key={cat.name}
+                          href={cat.href}
+                          className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-brand-50/80 transition-colors group/item"
+                        >
+                          <div className="w-7 h-7 rounded-lg bg-brand-50 flex items-center justify-center text-[#059B8F] group-hover/item:bg-[#059B8F] group-hover/item:text-white transition-colors shrink-0">
+                            <IconC size={14} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="text-xs font-bold text-slate-800 group-hover/item:text-[#059B8F] transition-colors truncate">
+                                {cat.name}
+                              </span>
+                              {cat.badge && (
+                                <span className="text-[9px] font-bold text-[#F18712] px-1.5 py-0.2 rounded-full bg-amber-50 shrink-0">
+                                  {cat.badge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[10px] text-slate-500 truncate">
+                              {cat.sub}
+                            </p>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 mt-1">
+                    <Link
+                      href="/recovery-guide"
+                      className="block text-center py-2 px-3 rounded-xl bg-brand-50/50 hover:bg-brand-100/60 text-[#059B8F] text-xs font-bold transition-colors"
+                    >
+                      View Complete Recovery Portals &rarr;
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
 
             <Link 
               href="/testimonials" 
@@ -302,9 +418,21 @@ export default function Navbar() {
                 <Link href="/treatments/complex-trauma-fractures" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• Bone Fractures &amp; 24/7 Trauma</Link>
               </div>
             </div>
-            <Link href="/recovery-guide" className="px-2 py-1.5 hover:text-brand-600 font-semibold" onClick={() => setIsMenuOpen(false)}>
-              Knee Recovery Protocol (Day 0–90)
-            </Link>
+            <div className="space-y-1">
+              <Link href="/recovery-guide" className="px-2 py-1.5 hover:text-brand-600 font-semibold flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
+                <span>Recovery Guide (7 Portals)</span>
+                <span className="text-xs text-[#059B8F] font-bold">View All &rarr;</span>
+              </Link>
+              <div className="pl-4 pr-2 space-y-1 text-xs text-slate-600">
+                <Link href="/recovery-guide#knee-recovery" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• Knee Surgery Recovery</Link>
+                <Link href="/recovery-guide#hip-recovery" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• Hip Surgery Recovery</Link>
+                <Link href="/recovery-guide#sports-recovery" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• Sports &amp; ACL Recovery</Link>
+                <Link href="/recovery-guide#shoulder-recovery" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• Shoulder Surgery Recovery</Link>
+                <Link href="/recovery-guide#spine-recovery" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• Spine &amp; Sciatica Recovery</Link>
+                <Link href="/recovery-guide#prp-recovery" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• PRP &amp; Joint Injections</Link>
+                <Link href="/recovery-guide#trauma-recovery" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• Fracture &amp; Trauma Recovery</Link>
+              </div>
+            </div>
             <Link href="/testimonials" className="px-2 py-1.5 hover:text-brand-600 font-semibold" onClick={() => setIsMenuOpen(false)}>
               Verified Patient Reviews
             </Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Bone,
@@ -34,6 +34,28 @@ const ICON_MAP: Record<string, typeof Bone> = {
 
 export default function RecoveryGuidePage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
+  useEffect(() => {
+    const handleNavigation = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (hash && RECOVERY_GUIDES.some((g) => g.id === hash)) {
+        setSelectedCategory(hash);
+        setTimeout(() => {
+          const el = document.getElementById(hash);
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+        return;
+      }
+      const params = new URLSearchParams(window.location.search);
+      const cat = params.get("category");
+      if (cat && RECOVERY_GUIDES.some((g) => g.id === cat)) {
+        setSelectedCategory(cat);
+      }
+    };
+    handleNavigation();
+    window.addEventListener("hashchange", handleNavigation);
+    return () => window.removeEventListener("hashchange", handleNavigation);
+  }, []);
 
   const displayedGuides: CategoryRecoveryGuide[] =
     selectedCategory === "all"

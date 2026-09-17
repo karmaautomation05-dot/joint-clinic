@@ -89,7 +89,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/recovery-guide" className="hover:text-[#059B8F] transition-colors">
-                  Knee Recovery Protocol (Day 0–90)
+                  Recovery Guide (All Specialties)
                 </Link>
               </li>
               <li>
