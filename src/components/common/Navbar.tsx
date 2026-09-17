@@ -3,7 +3,71 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Phone, Menu, X, Calendar, ChevronDown, MapPin } from 'lucide-react'
+import {
+  Phone,
+  Menu,
+  X,
+  Calendar,
+  ChevronDown,
+  MapPin,
+  Bone,
+  Activity,
+  ShieldCheck,
+  Award,
+  HeartPulse,
+  Stethoscope,
+  ArrowRight,
+} from 'lucide-react'
+
+const TREATMENT_NAV_CATEGORIES = [
+  {
+    name: "Knee Care & Surgery",
+    sub: "Total, Robotic & Partial Knee Replacement",
+    href: "/treatments/total-knee-replacement",
+    icon: Bone,
+    badge: "Most Popular",
+  },
+  {
+    name: "Hip Care & Surgery",
+    sub: "Total Hip Replacement & AVN Treatment",
+    href: "/treatments/hip-replacement",
+    icon: Activity,
+    badge: "Long-Life",
+  },
+  {
+    name: "Sports Injury & Arthroscopy",
+    sub: "ACL Ligament & Meniscus Keyhole Repair",
+    href: "/treatments/sports-injury-acl-treatment",
+    icon: ShieldCheck,
+    badge: "Athletic Return",
+  },
+  {
+    name: "Shoulder & Arm Care",
+    sub: "Rotator Cuff, Frozen Shoulder & Dislocation",
+    href: "/treatments/shoulder-arthroscopy",
+    icon: Award,
+  },
+  {
+    name: "Spine & Sciatica Care",
+    sub: "Slip Disc, Sciatica & Non-Surgical Decompression",
+    href: "/treatments/spine-sciatica-care",
+    icon: Activity,
+  },
+  {
+    name: "Non-Surgical Joint Care & PRP",
+    sub: "PRP Injections & Cartilage Lubrication",
+    href: "/treatments/joint-preservation-prp",
+    icon: HeartPulse,
+    badge: "Non-Surgical",
+  },
+  {
+    name: "Bone Fractures & 24/7 Trauma",
+    sub: "Emergency Fracture Care & Surgery at BMTC",
+    href: "/treatments/complex-trauma-fractures",
+    icon: Stethoscope,
+    badge: "24/7 Casualty",
+  },
+]
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -80,28 +144,60 @@ export default function Navbar() {
               </Link>
 
               {isTreatmentsOpen && (
-                <div className="absolute top-full left-0 w-72 bg-white rounded-2xl shadow-xl border border-brand-100 p-3 space-y-1 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                  <Link href="/treatments/total-knee-replacement" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
-                    Knee Replacement Surgery
-                  </Link>
-                  <Link href="/treatments/hip-replacement" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
-                    Hip Replacement Surgery
-                  </Link>
-                  <Link href="/treatments/sports-injury-acl-treatment" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
-                    Sports Injury &amp; ACL Treatment
-                  </Link>
-                  <Link href="/treatments/shoulder-arthroscopy" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
-                    Shoulder &amp; Rotator Cuff Treatment
-                  </Link>
-                  <Link href="/treatments/joint-preservation-prp" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
-                    PRP Therapy &amp; Joint Pain Care
-                  </Link>
-                  <Link href="/treatments/complex-trauma-fractures" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
-                    Bone Fracture &amp; Trauma Care
-                  </Link>
-                  <Link href="/treatments/spine-sciatica-care" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
-                    Slip Disc &amp; Sciatica Care
-                  </Link>
+                <div className="absolute top-full left-0 w-[360px] sm:w-[390px] bg-white rounded-2xl shadow-2xl border border-brand-100 p-3 space-y-1 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                  <div className="px-3 py-1.5 border-b border-slate-100 flex items-center justify-between mb-1">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                      Treatments by Category
+                    </span>
+                    <Link
+                      href="/treatments"
+                      className="text-[11px] font-bold text-[#059B8F] hover:text-[#0A7C97] flex items-center gap-1"
+                    >
+                      <span>View All (24)</span>
+                      <ArrowRight size={11} />
+                    </Link>
+                  </div>
+
+                  <div className="space-y-0.5">
+                    {TREATMENT_NAV_CATEGORIES.map((cat) => {
+                      const IconC = cat.icon;
+                      return (
+                        <Link
+                          key={cat.name}
+                          href={cat.href}
+                          className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-brand-50/80 transition-colors group/item"
+                        >
+                          <div className="w-7 h-7 rounded-lg bg-brand-50 flex items-center justify-center text-[#059B8F] group-hover/item:bg-[#059B8F] group-hover/item:text-white transition-colors shrink-0">
+                            <IconC size={14} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="text-xs font-bold text-slate-800 group-hover/item:text-[#059B8F] transition-colors truncate">
+                                {cat.name}
+                              </span>
+                              {cat.badge && (
+                                <span className="text-[9px] font-bold text-[#F18712] px-1.5 py-0.2 rounded-full bg-amber-50 shrink-0">
+                                  {cat.badge}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-[10px] text-slate-500 truncate">
+                              {cat.sub}
+                            </p>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 mt-1">
+                    <Link
+                      href="/treatments"
+                      className="block text-center py-2 px-3 rounded-xl bg-brand-50/50 hover:bg-brand-100/60 text-[#059B8F] text-xs font-bold transition-colors"
+                    >
+                      Browse Complete Treatments Directory &rarr;
+                    </Link>
+                  </div>
                 </div>
               )}
             </div>
@@ -191,9 +287,21 @@ export default function Navbar() {
             <Link href="/about" className="px-2 py-1.5 hover:text-brand-600 font-semibold" onClick={() => setIsMenuOpen(false)}>
               About Dr. Gaurav Bhargava
             </Link>
-            <Link href="/treatments" className="px-2 py-1.5 hover:text-brand-600 font-semibold" onClick={() => setIsMenuOpen(false)}>
-              Treatments &amp; Surgeries
-            </Link>
+            <div className="space-y-1">
+              <Link href="/treatments" className="px-2 py-1.5 hover:text-brand-600 font-semibold flex items-center justify-between" onClick={() => setIsMenuOpen(false)}>
+                <span>Treatments by Category</span>
+                <span className="text-xs text-[#059B8F] font-bold">View All 24 &rarr;</span>
+              </Link>
+              <div className="pl-4 pr-2 space-y-1 text-xs text-slate-600">
+                <Link href="/treatments/total-knee-replacement" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• Knee Care &amp; Replacement</Link>
+                <Link href="/treatments/hip-replacement" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• Hip Replacement &amp; AVN</Link>
+                <Link href="/treatments/sports-injury-acl-treatment" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• Sports Injury &amp; ACL Keyhole</Link>
+                <Link href="/treatments/shoulder-arthroscopy" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• Shoulder &amp; Rotator Cuff</Link>
+                <Link href="/treatments/spine-sciatica-care" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• Spine, Slip Disc &amp; Sciatica</Link>
+                <Link href="/treatments/joint-preservation-prp" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• PRP &amp; Non-Surgical Joint Care</Link>
+                <Link href="/treatments/complex-trauma-fractures" className="block py-1 hover:text-brand-600" onClick={() => setIsMenuOpen(false)}>• Bone Fractures &amp; 24/7 Trauma</Link>
+              </div>
+            </div>
             <Link href="/recovery-guide" className="px-2 py-1.5 hover:text-brand-600 font-semibold" onClick={() => setIsMenuOpen(false)}>
               Knee Recovery Protocol (Day 0–90)
             </Link>
