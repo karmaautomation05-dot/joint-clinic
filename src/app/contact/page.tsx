@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   MapPin,
   Phone,
@@ -41,8 +42,42 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://jointclinic.in",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Contact",
+            item: "https://jointclinic.in/contact",
+          },
+        ],
+      },
+      {
+        "@type": "ContactPage",
+        "@id": "https://jointclinic.in/contact#webpage",
+        name: "Contact Joint Clinic Kanpur — Swaroop Nagar & BMTC Kidwai Nagar",
+        description:
+          "Clinic timings, addresses, phone numbers, and directions for Joint Clinic Swaroop Nagar and BMTC Kidwai Nagar in Kanpur.",
+      },
+    ],
+  };
+
   return (
     <div className="bg-white pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
       {/* Header */}
       <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
@@ -50,6 +85,13 @@ export default function ContactPage() {
 
         <div className="container relative z-10">
           <div className="max-w-3xl">
+            {/* Semantic Breadcrumbs for UX & SEO */}
+            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-white/80 font-sans mb-3">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+              <span>/</span>
+              <span className="text-[#F5CD09] font-medium">Contact</span>
+            </nav>
+
             <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
               Locations &amp; Contact Details
             </span>

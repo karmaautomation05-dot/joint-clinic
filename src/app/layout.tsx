@@ -31,13 +31,17 @@ export const metadata: Metadata = {
     "Joint Clinic Kanpur",
     "Dr Gaurav Bhargava",
     "Best Orthopedic Doctor in Kanpur",
-    "Knee Replacement Surgeon Kanpur",
-    "Hip Replacement Kanpur",
+    "Best Knee Replacement Surgeon in Kanpur",
+    "Robotic Knee Replacement Kanpur",
+    "Hip Replacement Surgeon Kanpur",
     "Arthroscopy Specialist Kanpur",
-    "Joint Clinic Swaroop Nagar",
     "ACL Surgery Kanpur",
+    "Joint Clinic Swaroop Nagar",
     "BMTC Kidwai Nagar Orthopedics",
     "PRP Knee Therapy Kanpur",
+    "Slip Disc Treatment Kanpur",
+    "Fracture Hospital Kanpur",
+    "Orthopedic Doctor near me Kanpur",
   ],
   authors: [{ name: "Dr. Gaurav Bhargava" }],
   alternates: {
@@ -79,6 +83,10 @@ export const metadata: Metadata = {
   },
   other: {
     "theme-color": "#059B8F",
+    "geo.region": "IN-UP",
+    "geo.placename": "Kanpur, Uttar Pradesh, India",
+    "geo.position": "26.480358;80.310883",
+    "ICBM": "26.480358, 80.310883",
   },
 };
 

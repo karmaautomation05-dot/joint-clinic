@@ -15,7 +15,7 @@ const faqs = [
   },
   {
     q: 'What is the difference between the Swaroop Nagar and BMTC clinics?',
-    a: 'Joint Clinic in Swaroop Nagar is our specialized evening consultation center (5:00 PM – 7:00 PM, Mon–Sat) for OPD reviews and second opinions. Bhargava Medical & Trauma Centre (BMTC) in Kidwai Nagar houses our morning OPD (10:00 AM – 2:00 PM), Class-100 Modular Operation Theaters, inpatient rooms, and 24/7 trauma emergency care.'
+    a: 'Joint Clinic in Swaroop Nagar is our specialized evening consultation center (4:00 PM – 7:00 PM, Mon–Sat) for OPD reviews and second opinions. Bhargava Medical & Trauma Centre (BMTC) in Kidwai Nagar houses our morning OPD (10:00 AM – 2:00 PM), Class-100 Modular Operation Theaters, inpatient rooms, and 24/7 trauma emergency care.'
   },
   {
     q: 'Can joint arthritis be managed without surgery?',

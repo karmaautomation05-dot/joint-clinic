@@ -52,8 +52,18 @@ export async function generateMetadata({
   if (!treatment) return {};
 
   return {
-    title: `${treatment.title} in Kanpur | Dr. Gaurav Bhargava`,
-    description: `${treatment.shortDesc} Performed by Dr. Gaurav Bhargava at Joint Clinic Swaroop Nagar & BMTC Kidwai Nagar Kanpur.`,
+    title: `${treatment.title} in Kanpur | Dr. Gaurav Bhargava | Joint Clinic`,
+    description: `${treatment.shortDesc} Expert orthopedic care by Dr. Gaurav Bhargava (MAMC New Delhi) at Joint Clinic Swaroop Nagar & BMTC Kidwai Nagar Kanpur.`,
+    keywords: [
+      treatment.title,
+      `${treatment.title} in Kanpur`,
+      `Best doctor for ${treatment.title} Kanpur`,
+      `${treatment.title} Dr Gaurav Bhargava`,
+      `${treatment.title} recovery`,
+      "Joint Clinic Kanpur",
+      "BMTC Kidwai Nagar",
+      "Orthopedic Surgeon Kanpur",
+    ],
     alternates: {
       canonical: `https://jointclinic.in/treatments/${params.slug}`,
     },
@@ -61,12 +71,13 @@ export async function generateMetadata({
       title: `${treatment.title} in Kanpur | Dr. Gaurav Bhargava`,
       description: treatment.shortDesc,
       url: `https://jointclinic.in/treatments/${params.slug}`,
+      siteName: "Joint Clinic Kanpur",
       images: [
         {
           url: "/images/doctor/gaurav-bhargava.png",
           width: 800,
           height: 800,
-          alt: treatment.title,
+          alt: `${treatment.title} - Dr. Gaurav Bhargava`,
         },
       ],
     },
@@ -135,6 +146,21 @@ export default function TreatmentDetailPage({
     ],
   };
 
+  if (treatment.faqs && treatment.faqs.length > 0) {
+    (schema["@graph"] as any[]).push({
+      "@type": "FAQPage",
+      "@id": `https://jointclinic.in/treatments/${treatment.slug}#faq`,
+      mainEntity: treatment.faqs.map((faq) => ({
+        "@type": "Question",
+        name: faq.q,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: faq.a,
+        },
+      })),
+    });
+  }
+
   return (
     <div className="bg-white pb-24">
       <script
@@ -148,6 +174,15 @@ export default function TreatmentDetailPage({
 
         <div className="container relative z-10">
           <div className="max-w-3xl space-y-4">
+            {/* Semantic Breadcrumbs for UX & SEO */}
+            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-white/80 font-sans">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+              <span>/</span>
+              <Link href="/treatments" className="hover:text-white transition-colors">Treatments</Link>
+              <span>/</span>
+              <span className="text-[#F5CD09] font-medium">{treatment.title}</span>
+            </nav>
+
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs text-[#F5CD09] text-xs font-bold uppercase tracking-wider">
               <span>{treatment.category}</span>
               <span>&bull;</span>
@@ -190,6 +225,26 @@ export default function TreatmentDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Main Article & Procedures */}
           <div className="lg:col-span-8 space-y-8">
+            {/* AEO Quick Fact / Answer Box for Search Engines & Patients */}
+            <div className="bg-brand-50/60 rounded-3xl border border-brand-200/80 p-6 sm:p-8 space-y-3 shadow-xs aeo-summary">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#059B8F] text-white flex items-center justify-center shrink-0">
+                  <IconComponent className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#059B8F]">
+                    Fast Facts &amp; Clinical Summary
+                  </span>
+                  <h3 className="text-lg font-serif font-bold text-slate-900">
+                    {treatment.title} at a Glance
+                  </h3>
+                </div>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans aeo-answer">
+                <strong>{treatment.title}</strong> is performed by <strong>Dr. Gaurav Bhargava</strong> (Ex-SR Maulana Azad Medical College, New Delhi) at Joint Clinic Swaroop Nagar and BMTC Hospital Kidwai Nagar Kanpur. This treatment is recommended for patients experiencing {treatment.indications.slice(0, 2).map((i) => i.toLowerCase()).join(" or ")}. Typical surgical duration is {treatment.stats.duration}, hospital stay is {treatment.stats.hospitalStay}, and walking is resumed {treatment.stats.walkingResumed}.
+              </p>
+            </div>
+
             {/* Overview */}
             <div className="bg-white rounded-[2.5rem] border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-5">
               <h2 className="text-3xl font-serif font-bold text-slate-900">Clinical Overview</h2>

@@ -31,6 +31,25 @@ const ICON_MAP: Record<string, typeof Bone> = {
   Stethoscope: Stethoscope,
 };
 
+const TREATMENTS_FAQS = [
+  {
+    q: "How do I know if I need surgery or non-surgical joint care?",
+    a: "Dr. Gaurav Bhargava follows a conservative-first approach. For mild-to-moderate arthritis, tendonitis, or early disc issues, non-surgical options like PRP biological therapy, joint lubrication, and physical therapy are prioritized. Surgery is advised only for end-stage cartilage loss, severe mechanical instability, or progressive nerve compression.",
+  },
+  {
+    q: "Can I bring my existing MRI or X-ray reports for a second opinion?",
+    a: "Yes, absolutely. Many patients visit Joint Clinic with previous scans to get an objective second opinion before deciding on surgery. Dr. Bhargava will review your images and clinical exam thoroughly.",
+  },
+  {
+    q: "Where are surgical operations performed in Kanpur?",
+    a: "All surgical procedures (including Knee/Hip Replacements, Arthroscopy, and Fracture Fixation) are performed in the Ultra-Clean Laminar Airflow Modular Operation Theaters at Bhargava Medical & Trauma Centre (BMTC), Kidwai Nagar, ensuring minimal infection risk and 24/7 post-op monitoring.",
+  },
+  {
+    q: "How soon do patients start walking after joint surgery?",
+    a: "Under modern tissue-sparing techniques and targeted sensory nerve blocks, knee and hip replacement patients take their first supported steps with a walker within 24 hours of surgery (Day 1).",
+  },
+];
+
 export default function TreatmentsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
@@ -39,8 +58,63 @@ export default function TreatmentsPage() {
       ? TREATMENT_CATEGORIES
       : TREATMENT_CATEGORIES.filter((c) => c.id === selectedCategory);
 
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://jointclinic.in",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Treatments",
+            item: "https://jointclinic.in/treatments",
+          },
+        ],
+      },
+      {
+        "@type": "MedicalWebPage",
+        "@id": "https://jointclinic.in/treatments#webpage",
+        name: "Common Orthopedic Treatments & Surgeries | Joint Clinic Kanpur",
+        description:
+          "Complete directory of 24+ orthopedic treatments in Kanpur across Knee, Hip, Sports/ACL, Shoulder, Spine, PRP, and Trauma Care by Dr. Gaurav Bhargava.",
+        mainEntity: {
+          "@type": "ItemList",
+          itemListElement: TREATMENT_CATEGORIES.map((cat, idx) => ({
+            "@type": "ListItem",
+            position: idx + 1,
+            name: cat.name,
+            description: cat.description,
+          })),
+        },
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://jointclinic.in/treatments#faq",
+        mainEntity: TREATMENTS_FAQS.map((faq) => ({
+          "@type": "Question",
+          name: faq.q,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.a,
+          },
+        })),
+      },
+    ],
+  };
+
   return (
     <div className="bg-white pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
       {/* Hero Header */}
       <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
@@ -48,6 +122,13 @@ export default function TreatmentsPage() {
 
         <div className="container relative z-10">
           <div className="max-w-3xl">
+            {/* Semantic Breadcrumbs for UX & SEO */}
+            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-white/80 font-sans mb-3">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+              <span>/</span>
+              <span className="text-[#F5CD09] font-medium">Treatments</span>
+            </nav>
+
             <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
               Patient-First Orthopedic Care
             </span>
@@ -230,6 +311,42 @@ export default function TreatmentsPage() {
             </section>
           );
         })}
+      </div>
+
+      {/* Treatments FAQ Section for Search Snippets & Patient Clarity */}
+      <div className="container mt-20 space-y-8">
+        <div className="text-center max-w-2xl mx-auto">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block mb-2">
+            Clear Answers
+          </span>
+          <h3 className="text-3xl sm:text-4xl font-serif font-bold text-slate-900">
+            Frequently Asked Questions About Treatments
+          </h3>
+          <p className="text-sm text-slate-600 mt-2">
+            Answers from Dr. Gaurav Bhargava to help you make confident decisions about your joint and bone health.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-5xl mx-auto">
+          {TREATMENTS_FAQS.map((faq, idx) => (
+            <div
+              key={idx}
+              className="p-6 sm:p-7 rounded-3xl bg-slate-50/80 border border-slate-200/80 space-y-3 hover:bg-brand-50/40 hover:border-brand-200 transition-all shadow-2xs"
+            >
+              <div className="flex items-start gap-3">
+                <div className="w-7 h-7 rounded-lg bg-brand-100 flex items-center justify-center text-[#059B8F] shrink-0 mt-0.5">
+                  <HelpCircle className="w-4 h-4" />
+                </div>
+                <h4 className="text-base font-serif font-bold text-slate-900">
+                  {faq.q}
+                </h4>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed pl-10">
+                {faq.a}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Helpful Patient Assurance Banner */}

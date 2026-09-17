@@ -19,9 +19,19 @@ import { DOCTOR_DATA } from "@/data/doctor";
 import { CLINIC_LOCATIONS, PRIMARY_CONTACT } from "@/data/clinics";
 
 export const metadata: Metadata = {
-  title: "About Dr. Gaurav Bhargava | Joint Clinic Kanpur",
+  title: "About Dr. Gaurav Bhargava | Best Orthopedic Surgeon Kanpur | Joint Clinic",
   description:
-    "Learn about Dr. Gaurav Bhargava (MBBS, MS Orthopaedics), former Senior Resident at Maulana Azad Medical College (MAMC), New Delhi, with 20+ years of joint replacement excellence in Kanpur.",
+    "Learn about Dr. Gaurav Bhargava (MBBS, MS Orthopaedics), former Senior Resident at Maulana Azad Medical College (MAMC), New Delhi, with 20+ years of joint replacement and arthroscopy excellence in Kanpur.",
+  keywords: [
+    "Dr Gaurav Bhargava",
+    "Dr Gaurav Bhargava Kanpur",
+    "Best Orthopedic Surgeon in Kanpur",
+    "Knee Replacement Doctor Kanpur",
+    "Maulana Azad Medical College Orthopedic Doctor",
+    "Joint Clinic Swaroop Nagar",
+    "BMTC Kidwai Nagar",
+    "Orthopedic Doctor Kanpur",
+  ],
   alternates: {
     canonical: "https://jointclinic.in/about",
   },
@@ -30,6 +40,7 @@ export const metadata: Metadata = {
     description:
       "MBBS, MS (Orthopaedics), Ex-Senior Resident MAMC New Delhi. Over 20 years of joint replacement and arthroscopy expertise in Kanpur.",
     url: "https://jointclinic.in/about",
+    siteName: "Joint Clinic Kanpur",
     images: [
       {
         url: "/images/doctor/gaurav-bhargava.png",
@@ -48,8 +59,41 @@ export const metadata: Metadata = {
 };
 
 export default function AboutPage() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://jointclinic.in",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "About Dr. Gaurav Bhargava",
+            item: "https://jointclinic.in/about",
+          },
+        ],
+      },
+      {
+        "@type": "ProfilePage",
+        "@id": "https://jointclinic.in/about#webpage",
+        name: "About Dr. Gaurav Bhargava | Senior Orthopaedic Surgeon Kanpur",
+        mainEntity: { "@id": "https://jointclinic.in/#physician" },
+      },
+    ],
+  };
+
   return (
     <div className="bg-white pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
       {/* Hero Header */}
       <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
@@ -57,6 +101,13 @@ export default function AboutPage() {
 
         <div className="container relative z-10">
           <div className="max-w-3xl">
+            {/* Semantic Breadcrumbs for UX & SEO */}
+            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-white/80 font-sans mb-3">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+              <span>/</span>
+              <span className="text-[#F5CD09] font-medium">About Dr. Gaurav Bhargava</span>
+            </nav>
+
             <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
               Meet Your Orthopedic Surgeon
             </span>

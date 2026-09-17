@@ -40,8 +40,42 @@ export default function RecoveryGuidePage() {
       ? RECOVERY_GUIDES
       : RECOVERY_GUIDES.filter((g) => g.id === selectedCategory);
 
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://jointclinic.in",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Recovery Guide",
+            item: "https://jointclinic.in/recovery-guide",
+          },
+        ],
+      },
+      {
+        "@type": "MedicalWebPage",
+        "@id": "https://jointclinic.in/recovery-guide#webpage",
+        name: "Patient Recovery Guides & Rehabilitation Milestones | Joint Clinic Kanpur",
+        description:
+          "Step-by-step patient recovery timelines for Knee, Hip, Sports/ACL, Shoulder, Spine, PRP, and Trauma Care by Dr. Gaurav Bhargava in Kanpur.",
+      },
+    ],
+  };
+
   return (
     <div className="bg-white pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
       {/* Hero Header */}
       <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
@@ -49,6 +83,13 @@ export default function RecoveryGuidePage() {
 
         <div className="container relative z-10">
           <div className="max-w-3xl">
+            {/* Semantic Breadcrumbs for UX & SEO */}
+            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-white/80 font-sans mb-3">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+              <span>/</span>
+              <span className="text-[#F5CD09] font-medium">Recovery Guide</span>
+            </nav>
+
             <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
               Step-by-Step Patient Recovery Portals
             </span>
