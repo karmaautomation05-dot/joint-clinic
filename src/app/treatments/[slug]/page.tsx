@@ -15,6 +15,7 @@ import {
   HelpCircle,
   Phone,
   FileCheck,
+  Stethoscope,
 } from "lucide-react";
 import { TREATMENTS } from "@/data/treatments";
 import { PRIMARY_CONTACT } from "@/data/clinics";
@@ -25,7 +26,8 @@ const ICON_MAP: Record<string, typeof Bone> = {
   ShieldCheck: ShieldCheck,
   Award: Award,
   HeartPulse: HeartPulse,
-  Stethoscope: Sparkles,
+  Stethoscope: Stethoscope,
+  Sparkles: Sparkles,
 };
 
 function getTreatmentBySlug(slug: string) {

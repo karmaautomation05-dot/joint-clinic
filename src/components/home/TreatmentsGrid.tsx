@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Clock,
   CheckCircle2,
+  Stethoscope,
 } from "lucide-react";
 import { TREATMENTS } from "@/data/treatments";
 
@@ -18,7 +19,8 @@ const ICON_MAP: Record<string, typeof Bone> = {
   ShieldCheck: ShieldCheck,
   Award: Award,
   HeartPulse: HeartPulse,
-  Stethoscope: Sparkles,
+  Stethoscope: Stethoscope,
+  Sparkles: Sparkles,
 };
 
 export default function TreatmentsGrid() {
@@ -44,14 +46,23 @@ export default function TreatmentsGrid() {
             href="/treatments"
             className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-brand-blue hover:underline shrink-0"
           >
-            <span>View All 6 Specialties</span>
+            <span>View All 7 Categories &amp; 24+ Treatments</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
         {/* High-Tech Clinical Procedure Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {TREATMENTS.map((t) => {
+          {TREATMENTS.filter((t) =>
+            [
+              "total-knee-replacement",
+              "hip-replacement",
+              "acl-reconstruction",
+              "shoulder-arthroscopy",
+              "joint-preservation-prp",
+              "complex-trauma-fractures",
+            ].includes(t.slug)
+          ).map((t) => {
             const IconComponent = ICON_MAP[t.iconName] || Bone;
             return (
               <div
