@@ -35,12 +35,12 @@ export const TREATMENTS: Treatment[] = [
     id: "knee-replacement",
     slug: "total-knee-replacement",
     aliases: ["knee-replacement", "total-knee-replacement"],
-    title: "Knee Replacement (Arthroplasty)",
+    title: "Knee Replacement Surgery",
     shortDesc:
-      "Advanced primary, partial, and computer-navigated total knee arthroplasty using high-flexion, long-life implants lasting 25+ years.",
+      "Advanced primary, partial, and total knee replacement using high-flexion, long-life implants with walking resumed within 24 hours.",
     category: "Arthroplasty",
     iconName: "Bone",
-    tag: "High-Volume Specialty",
+    tag: "Most Popular",
     stats: {
       duration: "60 - 90 mins",
       hospitalStay: "3 - 4 days",
@@ -115,12 +115,12 @@ export const TREATMENTS: Treatment[] = [
     id: "hip-replacement",
     slug: "hip-replacement",
     aliases: ["hip-replacement", "total-hip-replacement"],
-    title: "Hip Replacement (THR)",
+    title: "Hip Replacement Surgery",
     shortDesc:
-      "Minimally invasive Total Hip Replacement using ceramic-on-polyethylene or ceramic-on-ceramic bearings for pain-free pelvic mobility.",
+      "Minimally invasive Total Hip Replacement using ceramic bearings for Avascular Necrosis (AVN) and arthritis, restoring pain-free walking.",
     category: "Arthroplasty",
     iconName: "Activity",
-    tag: "Life-Changing Mobility",
+    tag: "Pain-Free Mobility",
     stats: {
       duration: "60 - 80 mins",
       hospitalStay: "3 - 4 days",
@@ -175,15 +175,22 @@ export const TREATMENTS: Treatment[] = [
     ],
   },
   {
-    id: "arthroscopy-sports-injury",
-    slug: "arthroscopy-sports-injuries",
-    aliases: ["arthroscopy-sports-injury", "arthroscopy-sports-injuries"],
-    title: "Arthroscopy & Sports Medicine",
+    id: "sports-injury-acl",
+    slug: "sports-injury-acl-treatment",
+    aliases: [
+      "arthroscopy-sports-injuries",
+      "arthroscopy-sports-injury",
+      "sports-injury-acl-treatment",
+      "acl-treatment",
+      "sports-injury",
+      "acl-reconstruction",
+    ],
+    title: "Sports Injury & ACL Treatment",
     shortDesc:
-      "Keyhole endoscopic surgery for ACL, PCL, and Meniscus injuries, restoring joint stability with tiny 4mm incisions and rapid athletic recovery.",
+      "Keyhole surgery for ACL ligament tears, meniscus injuries, and sports knee pain with fast return to active sports and running.",
     category: "Arthroscopy",
     iconName: "ShieldCheck",
-    tag: "Minimally Invasive",
+    tag: "Keyhole Sports Surgery",
     stats: {
       duration: "45 - 60 mins",
       hospitalStay: "Daycare / 1 day",
@@ -239,13 +246,13 @@ export const TREATMENTS: Treatment[] = [
   {
     id: "shoulder-arthroscopy",
     slug: "shoulder-arthroscopy",
-    aliases: ["shoulder-arthroscopy", "rotator-cuff-repair"],
-    title: "Shoulder Arthroscopy & Rotator Cuff",
+    aliases: ["shoulder-arthroscopy", "rotator-cuff-repair", "shoulder-treatment"],
+    title: "Shoulder & Rotator Cuff Treatment",
     shortDesc:
-      "Keyhole shoulder surgery for rotator cuff tears, recurrent shoulder dislocations (Bankart repair), and severe frozen shoulder.",
+      "Keyhole surgery for torn rotator cuff tendons, frozen shoulder, and recurrent shoulder dislocation for pain-free arm movement.",
     category: "Arthroscopy",
     iconName: "Award",
-    tag: "Precision Keyhole",
+    tag: "Keyhole Shoulder Care",
     stats: {
       duration: "45 - 75 mins",
       hospitalStay: "1 day",
@@ -292,13 +299,13 @@ export const TREATMENTS: Treatment[] = [
   {
     id: "joint-preservation",
     slug: "joint-preservation-prp",
-    aliases: ["joint-preservation", "joint-preservation-prp"],
-    title: "Non-Surgical Joint Preservation & PRP",
+    aliases: ["joint-preservation", "joint-preservation-prp", "prp-therapy", "arthritis-joint-preservation"],
+    title: "PRP Therapy & Joint Pain Care",
     shortDesc:
-      "Targeted intra-articular Hyaluronic Acid injections, Platelet-Rich Plasma (PRP) therapy, and cartilage protection for mild-to-moderate arthritis.",
+      "Non-surgical platelet-rich plasma (PRP) and cartilage lubrication injections to relieve joint pain and protect knee cartilage without surgery.",
     category: "Joint Preservation",
     iconName: "HeartPulse",
-    tag: "Regenerative & Preventive",
+    tag: "Non-Surgical Joint Care",
     stats: {
       duration: "15 - 30 mins",
       hospitalStay: "OPD Procedure",
@@ -350,13 +357,13 @@ export const TREATMENTS: Treatment[] = [
   {
     id: "trauma-fracture-care",
     slug: "complex-trauma-fractures",
-    aliases: ["trauma-fracture-care", "complex-trauma-fractures"],
-    title: "Complex Trauma & Fracture Care",
+    aliases: ["trauma-fracture-care", "complex-trauma-fractures", "fracture-care"],
+    title: "Bone Fracture & Trauma Care",
     shortDesc:
-      "24/7 emergency fracture management, peri-articular reconstruction, pelvic trauma, and treatment of neglected non-unions at BMTC.",
+      "24/7 emergency surgical care for bone fractures, road accident injuries, and complex joint trauma at BMTC Kidwai Nagar.",
     category: "Trauma Care",
     iconName: "Stethoscope",
-    tag: "24/7 Emergency Unit",
+    tag: "24/7 Emergency Care",
     stats: {
       duration: "Case Dependent",
       hospitalStay: "2 - 5 days",
@@ -404,13 +411,13 @@ export const TREATMENTS: Treatment[] = [
   {
     id: "spine-sciatica-care",
     slug: "spine-sciatica-care",
-    aliases: ["spine-care", "spine-sciatica-care"],
-    title: "Spine Care, Slip Disc & Sciatica Management",
+    aliases: ["spine-care", "spine-sciatica-care", "slip-disc-treatment"],
+    title: "Slip Disc & Sciatica Care",
     shortDesc:
-      "Evidence-based non-surgical decompression, targeted epidural blocks, postural physiotherapy, and disc herniation care in Kanpur.",
+      "Evidence-based non-surgical care, targeted nerve blocks, and postural physical therapy for back pain, slip disc, and sciatica.",
     category: "Joint Preservation",
     iconName: "Activity",
-    tag: "Non-Surgical & Decompressive",
+    tag: "Non-Surgical Spine Care",
     stats: {
       duration: "OPD / Daycare",
       hospitalStay: "Conservative / 1 day",

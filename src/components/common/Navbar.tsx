@@ -82,22 +82,25 @@ export default function Navbar() {
               {isTreatmentsOpen && (
                 <div className="absolute top-full left-0 w-72 bg-white rounded-2xl shadow-xl border border-brand-100 p-3 space-y-1 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
                   <Link href="/treatments/total-knee-replacement" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
-                    Total Knee Replacement (TKR)
+                    Knee Replacement Surgery
                   </Link>
                   <Link href="/treatments/hip-replacement" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
-                    Total Hip Replacement (THR)
+                    Hip Replacement Surgery
                   </Link>
-                  <Link href="/treatments/arthroscopy-sports-injuries" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
-                    Knee &amp; Shoulder Arthroscopy (ACL)
+                  <Link href="/treatments/sports-injury-acl-treatment" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
+                    Sports Injury &amp; ACL Treatment
+                  </Link>
+                  <Link href="/treatments/shoulder-arthroscopy" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
+                    Shoulder &amp; Rotator Cuff Treatment
                   </Link>
                   <Link href="/treatments/joint-preservation-prp" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
-                    PRP &amp; Joint Preservation
+                    PRP Therapy &amp; Joint Pain Care
                   </Link>
                   <Link href="/treatments/complex-trauma-fractures" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
-                    Complex Trauma &amp; Pelvic Surgery
+                    Bone Fracture &amp; Trauma Care
                   </Link>
                   <Link href="/treatments/spine-sciatica-care" className="block p-2.5 rounded-xl hover:bg-brand-50 text-xs font-semibold text-slate-800 hover:text-brand-700 transition-colors">
-                    Spine, Slip Disc &amp; Sciatica Care
+                    Slip Disc &amp; Sciatica Care
                   </Link>
                 </div>
               )}

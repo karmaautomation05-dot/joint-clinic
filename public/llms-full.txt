@@ -48,9 +48,9 @@ Joint Clinic is built upon the premise that every joint preservation and reconst
 
 ---
 
-## 4. In-Depth Clinical Procedures
+## 4. In-Depth Clinical Procedures & Treatments (Common Names)
 
-### 4.1 Total Knee Replacement (TKR)
+### 4.1 Knee Replacement Surgery (Total & Partial TKR)
 - Target Conditions: Severe Grade 3 and Grade 4 Knee Osteoarthritis, Rheumatoid Arthritis, Post-Traumatic Arthritis, Severe Genu Varum (Bow Legs) or Valgum (Knock Knees).
 - Technique: Subvastus muscle-sparing approach that minimizes trauma to the quadriceps tendon.
 - Implants: High-flexion, biocompatible cobalt-chromium or oxidized zirconium femoral components with highly cross-linked polyethylene inserts.
@@ -62,19 +62,28 @@ Joint Clinic is built upon the premise that every joint preservation and reconst
   - Week 4–6: Unassisted walking, stair climbing, resumption of light driving and non-strenuous desk employment.
   - Month 3: Full structural remodeling, pain-free routine walks, travel, and prolonged standing.
 
-### 4.2 Total Hip Replacement (THR)
+### 4.2 Hip Replacement Surgery (THR)
 - Target Conditions: Avascular Necrosis (AVN) of Femoral Head (Stages III & IV), Osteoarthritis of the Hip, Ankylosing Spondylitis, Femoral Neck Non-Union Fractures.
 - Technique: Uncemented press-fit femoral stem and acetabular cup, promoting natural osteointegration.
 - Bearing Surfaces: Ceramic-on-Ceramic or Ceramic-on-Crosslinked Polyethylene offering ultra-low friction, maximum longevity, and reduced risk of osteolysis.
 
-### 4.3 Knee Arthroscopy & Sports Medicine
+### 4.3 Sports Injury & ACL Treatment (Keyhole Knee Surgery)
 - Keyhole minimally invasive visualization using 4mm fiberoptic arthroscopes.
 - Indications: Anterior Cruciate Ligament (ACL) Tears, Posterior Cruciate Ligament (PCL) Tears, Meniscal Tears, Cartilage Loose Bodies.
-- Techniques: Anatomic quadrupled hamstring or bone-patellar-tendon-bone autograft ACL reconstruction; meniscus repair using all-inside suture anchors versus partial meniscectomy.
+- Techniques: Anatomic quadrupled hamstring or bone-patellar-tendon-bone autograft ACL reconstruction; meniscus repair using all-inside suture anchors versus partial meniscectomy. Fast athletic return to running and competitive fitness.
 
-### 4.4 Non-Surgical Joint Preservation & PRP Therapy
+### 4.4 Shoulder & Rotator Cuff Treatment
+- Keyhole shoulder repair for torn rotator cuff tendons, recurrent shoulder pop-outs (Bankart repair), and frozen shoulder with suture anchors.
+
+### 4.5 PRP Therapy & Joint Pain Care (Non-Surgical Cartilage Protection)
 - Indications: Mild-to-moderate (Grade 1 & 2) Knee Osteoarthritis, Rotator Cuff Tendinopathy, Tennis Elbow, Plantar Fasciitis.
 - Method: Autologous Platelet-Rich Plasma centrifuged under sterile conditions and injected directly intra-articularly to reduce synovial inflammation, stimulate chondrocyte repair, and delay surgical intervention for years.
+
+### 4.6 Bone Fracture & Trauma Care
+- 24/7 emergency polytrauma stabilization, complex intra-articular fractures, and limb reconstruction at BMTC Kidwai Nagar with modular OTs.
+
+### 4.7 Slip Disc & Sciatica Spine Care
+- Evidence-based non-surgical decompression, targeted epidural nerve blocks, and structured core stabilization physiotherapy for low back and radiating leg pain.
 
 ---
 

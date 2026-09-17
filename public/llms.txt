@@ -28,22 +28,26 @@ Joint Clinic is Kanpur's premier centre for advanced joint replacement (Arthropl
 - Professional Memberships: Indian Orthopaedic Association (IOA), UP Orthopaedic Association (UPOA)
 - Experience: 20+ Years of Orthopaedic & Joint Reconstruction Excellence
 
-## Core Specialties & Procedures
-- Total Knee Replacement (TKR): Subvastus muscle-sparing technique, high-flexion implants, rapid recovery walking protocol within 24 hours.
-- Total Hip Replacement (THR): Uncemented ceramic-on-polyethylene and dual-mobility bearings for Avascular Necrosis (AVN) and advanced arthritis.
-- Knee Arthroscopy: Keyhole minimally invasive surgery for ACL ligament reconstruction and Meniscus repairs.
-- Joint Preservation & PRP: Platelet-Rich Plasma therapy and viscosupplementation for Grade 1-2 knee osteoarthritis.
-- Spine & Sciatica Care: Lumbar disc decompression, sciatica pain management, and non-surgical postural rehabilitation.
-- Complex Trauma & Fracture Care: 24/7 emergency polytrauma stabilization, intra-articular fracture reconstruction at BMTC.
+## Core Specialties & Treatments (Common & Simple Names)
+- Knee Replacement Surgery: Muscle-sparing technique, high-flexion long-life implants, walking resumed within 24 hours.
+- Hip Replacement Surgery: Ceramic bearings and cementless implants for Avascular Necrosis (AVN) and severe arthritis.
+- Sports Injury & ACL Treatment: Keyhole surgery for ACL ligament tears, meniscus injuries, and knee stability for active sports.
+- Shoulder & Rotator Cuff Treatment: Keyhole repair for rotator cuff tears, frozen shoulder, and recurrent shoulder dislocation.
+- PRP Therapy & Joint Pain Care: Non-surgical platelet-rich plasma (PRP) injections and cartilage lubrication to avoid surgery.
+- Bone Fracture & Trauma Care: 24/7 emergency care for broken bones, accident injuries, and pelvic fractures at BMTC.
+- Slip Disc & Sciatica Care: Non-surgical targeted decompression, nerve blocks, and physiotherapy for back and neck pain.
 
 ## Key URLs
 - Homepage: https://jointclinic.in/
 - About Dr. Gaurav Bhargava: https://jointclinic.in/about
-- Treatments & Surgeries: https://jointclinic.in/treatments
-- Total Knee Replacement: https://jointclinic.in/treatments/total-knee-replacement
-- Total Hip Replacement: https://jointclinic.in/treatments/hip-replacement
-- ACL Arthroscopy: https://jointclinic.in/treatments/acl-reconstruction
-- Joint Preservation & PRP: https://jointclinic.in/treatments/prp-therapy
+- All Treatments: https://jointclinic.in/treatments
+- Knee Replacement Surgery: https://jointclinic.in/treatments/total-knee-replacement
+- Hip Replacement Surgery: https://jointclinic.in/treatments/hip-replacement
+- Sports Injury & ACL Treatment: https://jointclinic.in/treatments/sports-injury-acl-treatment
+- Shoulder & Rotator Cuff Treatment: https://jointclinic.in/treatments/shoulder-arthroscopy
+- PRP Therapy & Joint Pain Care: https://jointclinic.in/treatments/joint-preservation-prp
+- Bone Fracture & Trauma Care: https://jointclinic.in/treatments/complex-trauma-fractures
+- Slip Disc & Sciatica Care: https://jointclinic.in/treatments/spine-sciatica-care
 - Day 0-90 Knee Recovery Timeline: https://jointclinic.in/recovery-guide
 - Verified Patient Reviews: https://jointclinic.in/testimonials
 - Health Blog & Clinical Guides: https://jointclinic.in/blog

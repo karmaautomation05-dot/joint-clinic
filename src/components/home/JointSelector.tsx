@@ -38,20 +38,20 @@ const JOINTS_DATA: JointCondition[] = [
     ],
     recommendedTreatments: [
       {
-        title: "Total Knee Replacement (TKR)",
-        href: "/treatments/knee-replacement",
+        title: "Knee Replacement Surgery",
+        href: "/treatments/total-knee-replacement",
         type: "Surgical",
         badge: "High-Flexion 25+ Yrs",
       },
       {
-        title: "Arthroscopic ACL & Meniscus Reconstruction",
-        href: "/treatments/arthroscopy-sports-injury",
+        title: "Sports Injury & ACL Treatment",
+        href: "/treatments/sports-injury-acl-treatment",
         type: "Surgical",
         badge: "4mm Keyhole",
       },
       {
-        title: "Platelet-Rich Plasma (PRP) & Joint Lubrication",
-        href: "/treatments/arthritis-joint-preservation",
+        title: "PRP Therapy & Joint Pain Care",
+        href: "/treatments/joint-preservation-prp",
         type: "Non-Surgical",
         badge: "Cartilage Protection",
       },
@@ -75,14 +75,14 @@ const JOINTS_DATA: JointCondition[] = [
     ],
     recommendedTreatments: [
       {
-        title: "Total Hip Replacement (THR)",
+        title: "Hip Replacement Surgery",
         href: "/treatments/hip-replacement",
         type: "Surgical",
         badge: "Uncemented Ceramic",
       },
       {
-        title: "Core Decompression & Joint Preservation",
-        href: "/treatments/arthritis-joint-preservation",
+        title: "PRP & Joint Preservation",
+        href: "/treatments/joint-preservation-prp",
         type: "Non-Surgical",
         badge: "Early AVN Stage",
       },
@@ -106,20 +106,20 @@ const JOINTS_DATA: JointCondition[] = [
     ],
     recommendedTreatments: [
       {
-        title: "Keyhole Rotator Cuff Anchor Repair",
+        title: "Shoulder & Rotator Cuff Treatment",
         href: "/treatments/shoulder-arthroscopy",
         type: "Surgical",
-        badge: "Arthroscopic",
+        badge: "Keyhole Surgery",
       },
       {
-        title: "Arthroscopic Bankart Shoulder Stabilization",
+        title: "Shoulder Dislocation & Bankart Repair",
         href: "/treatments/shoulder-arthroscopy",
         type: "Surgical",
         badge: "Labral Fixation",
       },
       {
-        title: "Subacromial Injections & Target Rehabilitation",
-        href: "/treatments/arthritis-joint-preservation",
+        title: "PRP & Non-Surgical Joint Care",
+        href: "/treatments/joint-preservation-prp",
         type: "Non-Surgical",
         badge: "Conservative",
       },
@@ -141,16 +141,16 @@ const JOINTS_DATA: JointCondition[] = [
     ],
     recommendedTreatments: [
       {
-        title: "24/7 Trauma Fracture Surgery (BMTC Casualty)",
-        href: "/treatments/trauma-fracture-care",
+        title: "Bone Fracture & Emergency Surgery",
+        href: "/treatments/complex-trauma-fractures",
         type: "Surgical",
         badge: "Emergency Modular OT",
       },
       {
-        title: "Conservative Spine Decompression Protocol",
-        href: "/blog/slip-disc-vs-muscle-spasm",
+        title: "Slip Disc & Sciatica Spine Care",
+        href: "/treatments/spine-sciatica-care",
         type: "Non-Surgical",
-        badge: "Physical Therapy",
+        badge: "Decompression",
       },
     ],
   },

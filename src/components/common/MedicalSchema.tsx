@@ -108,19 +108,27 @@ export default function MedicalSchema() {
         availableService: [
           {
             "@type": "MedicalProcedure",
-            name: "Total Knee Replacement (TKR)",
+            name: "Knee Replacement Surgery",
           },
           {
             "@type": "MedicalProcedure",
-            name: "Total Hip Replacement (THR)",
+            name: "Hip Replacement Surgery",
           },
           {
             "@type": "MedicalProcedure",
-            name: "Arthroscopic ACL & Meniscus Surgery",
+            name: "Sports Injury & ACL Treatment",
           },
           {
             "@type": "MedicalProcedure",
-            name: "Joint Preservation & PRP Therapy",
+            name: "Shoulder & Rotator Cuff Treatment",
+          },
+          {
+            "@type": "MedicalProcedure",
+            name: "PRP Therapy & Joint Pain Care",
+          },
+          {
+            "@type": "MedicalProcedure",
+            name: "Slip Disc & Sciatica Care",
           },
         ],
       },

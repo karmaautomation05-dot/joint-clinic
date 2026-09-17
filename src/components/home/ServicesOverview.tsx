@@ -17,8 +17,8 @@ const serviceCategories = [
   {
     id: 'knee-replacement',
     icon: Activity,
-    title: 'Total & Partial Knee Replacement (TKR/PKR)',
-    description: 'Sub-millimeter implant precision, muscle-sparing tissue dissection, and 24-hour unassisted walking protocol.',
+    title: 'Knee Replacement Surgery',
+    description: 'Complete relief from knee pain and arthritis with high-flexion, long-life implants and walking within 24 hours.',
     slug: '/treatments/total-knee-replacement',
     subServices: [
       'Minimally Invasive Subvastus TKR',
@@ -34,8 +34,8 @@ const serviceCategories = [
   {
     id: 'hip-replacement',
     icon: Bone,
-    title: 'Total Hip Replacement (THR) & Hip Preservation',
-    description: 'Modern ceramic-on-ceramic and dual-mobility bearings designed for lifetime wear and active lifestyle.',
+    title: 'Hip Replacement Surgery',
+    description: 'Modern ceramic bearings and cementless implants for Avascular Necrosis (AVN) and arthritis, restoring normal walking.',
     slug: '/treatments/hip-replacement',
     subServices: [
       'Cementless Ceramic-on-Poly / Ceramic-on-Ceramic THR',
@@ -50,9 +50,9 @@ const serviceCategories = [
   {
     id: 'arthroscopy',
     icon: ShieldCheck,
-    title: 'Shoulder & Knee Arthroscopy (Keyhole Sports Surgery)',
-    description: 'Ultra-minimally invasive camera-guided repair of sports tears, ligament ruptures, and shoulder instability.',
-    slug: '/treatments/arthroscopy-sports-injuries',
+    title: 'Sports Injury & ACL Treatment',
+    description: 'Keyhole surgery for ACL ligament tears, meniscus damage, and sports knee injuries with fast return to fitness.',
+    slug: '/treatments/sports-injury-acl-treatment',
     subServices: [
       'ACL & PCL Ligament Keyhole Reconstruction',
       'Meniscus Repair & Root Reattachment',
@@ -66,8 +66,8 @@ const serviceCategories = [
   {
     id: 'prp-preservation',
     icon: HeartPulse,
-    title: 'Joint Preservation & PRP Biological Therapy',
-    description: 'Non-surgical cartilage protection, platelet-rich plasma injections, and biomechanical knee realignment.',
+    title: 'PRP Therapy & Joint Pain Care',
+    description: 'Non-surgical cartilage protection, platelet-rich plasma (PRP) injections, and preventive joint lubrication.',
     slug: '/treatments/joint-preservation-prp',
     subServices: [
       'Autologous High-Concentration PRP Therapy',
@@ -81,8 +81,8 @@ const serviceCategories = [
   {
     id: 'trauma-fractures',
     icon: Sparkles,
-    title: 'Complex Trauma, Fractures & Pelvic Surgery',
-    description: '24/7 emergency fracture stabilization at BMTC Kidwai Nagar with Class-100 Modular Operating Suites.',
+    title: 'Bone Fracture & Trauma Care',
+    description: '24/7 emergency surgical care for broken bones, road accident trauma, and complex fractures at BMTC Kidwai Nagar.',
     slug: '/treatments/complex-trauma-fractures',
     subServices: [
       '24/7 Polytrauma & Accident Response',
@@ -96,8 +96,8 @@ const serviceCategories = [
   {
     id: 'spine-sciatica',
     icon: Activity,
-    title: 'Spine Care, Slip Disc & Sciatica Management',
-    description: 'Targeted nerve root decompression, postural therapy, and non-surgical spinal care for back & neck pain.',
+    title: 'Slip Disc & Sciatica Care',
+    description: 'Targeted nerve root decompression, postural physical therapy, and non-surgical care for back and neck pain.',
     slug: '/treatments/spine-sciatica-care',
     subServices: [
       'Lumbar Disc Herniation Conservative Protocols',

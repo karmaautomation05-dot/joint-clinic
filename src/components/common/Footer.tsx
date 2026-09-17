@@ -124,32 +124,37 @@ export default function Footer() {
             <ul className="space-y-3.5 text-black text-sm">
               <li>
                 <Link href="/treatments/total-knee-replacement" className="hover:text-[#059B8F] transition-colors">
-                  Total Knee Replacement (TKR)
+                  Knee Replacement Surgery
                 </Link>
               </li>
               <li>
                 <Link href="/treatments/hip-replacement" className="hover:text-[#059B8F] transition-colors">
-                  Total Hip Replacement (THR)
+                  Hip Replacement Surgery
                 </Link>
               </li>
               <li>
-                <Link href="/treatments/arthroscopy-sports-injuries" className="hover:text-[#059B8F] transition-colors">
-                  ACL &amp; Meniscus Arthroscopy
+                <Link href="/treatments/sports-injury-acl-treatment" className="hover:text-[#059B8F] transition-colors">
+                  Sports Injury &amp; ACL Treatment
+                </Link>
+              </li>
+              <li>
+                <Link href="/treatments/shoulder-arthroscopy" className="hover:text-[#059B8F] transition-colors">
+                  Shoulder &amp; Rotator Cuff Treatment
                 </Link>
               </li>
               <li>
                 <Link href="/treatments/joint-preservation-prp" className="hover:text-[#059B8F] transition-colors">
-                  PRP Joint Preservation Therapy
+                  PRP Therapy &amp; Joint Pain Care
                 </Link>
               </li>
               <li>
                 <Link href="/treatments/complex-trauma-fractures" className="hover:text-[#059B8F] transition-colors">
-                  Complex Pelvic &amp; Trauma Surgery
+                  Bone Fracture &amp; Trauma Care
                 </Link>
               </li>
               <li>
                 <Link href="/treatments/spine-sciatica-care" className="hover:text-[#059B8F] transition-colors">
-                  Spine, Slip Disc &amp; Sciatica Care
+                  Slip Disc &amp; Sciatica Care
                 </Link>
               </li>
             </ul>
