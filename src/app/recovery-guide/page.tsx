@@ -15,6 +15,29 @@ export const metadata: Metadata = {
   title: "Knee Replacement Recovery Guide & Timeline | Joint Clinic Kanpur",
   description:
     "A step-by-step clinical day-by-day and week-by-week recovery guide after Total Knee Replacement surgery by Dr. Gaurav Bhargava in Kanpur.",
+  alternates: {
+    canonical: "https://jointclinic.in/recovery-guide",
+  },
+  openGraph: {
+    title: "Knee Replacement Day 0–90 Recovery Guide | Joint Clinic Kanpur",
+    description:
+      "Milestone-by-milestone recovery roadmap: First steps on Day 1, home exercises, walking independence, and long-term implant care by Dr. Gaurav Bhargava.",
+    url: "https://jointclinic.in/recovery-guide",
+    images: [
+      {
+        url: "/images/blogs/blog_knee_rehab.png",
+        width: 800,
+        height: 600,
+        alt: "Knee Replacement Recovery Protocol",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Knee Replacement Recovery Guide | Joint Clinic",
+    description: "Clinical day-by-day rehabilitation guide after knee replacement.",
+    images: ["/images/blogs/blog_knee_rehab.png"],
+  },
 };
 
 const TIMELINE_STEPS = [

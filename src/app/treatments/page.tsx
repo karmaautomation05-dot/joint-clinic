@@ -17,6 +17,29 @@ export const metadata: Metadata = {
   title: "Orthopaedic Treatments & Specialties | Joint Clinic Kanpur",
   description:
     "Explore our complete range of specialized joint procedures in Kanpur: Total Knee Replacement (TKR), Total Hip Replacement (THR), Arthroscopic ACL reconstruction, and non-surgical PRP joint preservation.",
+  alternates: {
+    canonical: "https://jointclinic.in/treatments",
+  },
+  openGraph: {
+    title: "Treatments & Surgical Specialties | Joint Clinic Kanpur",
+    description:
+      "TKR, Hip Replacement, ACL Arthroscopy, and PRP Joint Preservation performed by Dr. Gaurav Bhargava in Swaroop Nagar & BMTC Kidwai Nagar, Kanpur.",
+    url: "https://jointclinic.in/treatments",
+    images: [
+      {
+        url: "/images/doctor/gaurav-bhargava.png",
+        width: 800,
+        height: 800,
+        alt: "Dr. Gaurav Bhargava — Orthopedic Surgeries",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Orthopaedic Treatments | Joint Clinic Kanpur",
+    description: "Expert joint reconstruction and keyhole surgeries in Kanpur.",
+    images: ["/images/doctor/gaurav-bhargava.png"],
+  },
 };
 
 const ICON_MAP: Record<string, typeof Bone> = {

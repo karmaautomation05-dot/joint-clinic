@@ -52,6 +52,28 @@ export async function generateMetadata({
   return {
     title: `${treatment.title} in Kanpur | Dr. Gaurav Bhargava`,
     description: `${treatment.shortDesc} Performed by Dr. Gaurav Bhargava at Joint Clinic Swaroop Nagar & BMTC Kidwai Nagar Kanpur.`,
+    alternates: {
+      canonical: `https://jointclinic.in/treatments/${params.slug}`,
+    },
+    openGraph: {
+      title: `${treatment.title} in Kanpur | Dr. Gaurav Bhargava`,
+      description: treatment.shortDesc,
+      url: `https://jointclinic.in/treatments/${params.slug}`,
+      images: [
+        {
+          url: "/images/doctor/gaurav-bhargava.png",
+          width: 800,
+          height: 800,
+          alt: treatment.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${treatment.title} | Dr. Gaurav Bhargava Kanpur`,
+      description: treatment.shortDesc,
+      images: ["/images/doctor/gaurav-bhargava.png"],
+    },
   };
 }
 
@@ -68,8 +90,55 @@ export default function TreatmentDetailPage({
 
   const IconComponent = ICON_MAP[treatment.iconName] || Bone;
 
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "MedicalProcedure",
+        "@id": `https://jointclinic.in/treatments/${treatment.slug}#procedure`,
+        name: treatment.title,
+        description: treatment.shortDesc,
+        procedureType: "SurgicalProcedure",
+        performer: {
+          "@id": "https://jointclinic.in/#physician",
+        },
+        location: [
+          { "@id": "https://jointclinic.in/#swaroop-nagar" },
+          { "@id": "https://jointclinic.in/#kidwai-nagar" },
+        ],
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://jointclinic.in",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Treatments",
+            item: "https://jointclinic.in/treatments",
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: treatment.title,
+            item: `https://jointclinic.in/treatments/${treatment.slug}`,
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <div className="bg-white pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
       {/* Hero Header */}
       <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>

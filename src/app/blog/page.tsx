@@ -8,6 +8,29 @@ export const metadata: Metadata = {
   title: "Orthopaedic & Spine Health Blogs | Dr. Gaurav Bhargava",
   description:
     "Evidence-based clinical guides and patient recovery articles on knee replacements, arthritis, slipped disc vs spasm, and joint longevity by Dr. Gaurav Bhargava.",
+  alternates: {
+    canonical: "https://jointclinic.in/blog",
+  },
+  openGraph: {
+    title: "Orthopaedic Health Library & Recovery Guides | Joint Clinic",
+    description:
+      "Expert articles on knee replacements, hip AVN, arthritis prevention, and spinal ergonomics by Dr. Gaurav Bhargava in Kanpur.",
+    url: "https://jointclinic.in/blog",
+    images: [
+      {
+        url: "/images/blogs/blog_arthritis.png",
+        width: 800,
+        height: 600,
+        alt: "Joint Clinic Orthopedic Blog",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Orthopaedic Health Blogs | Dr. Gaurav Bhargava",
+    description: "Evidence-based joint and spine recovery articles.",
+    images: ["/images/blogs/blog_arthritis.png"],
+  },
 };
 
 export default function BlogListingPage() {

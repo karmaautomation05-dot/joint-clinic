@@ -15,6 +15,29 @@ export const metadata: Metadata = {
   title: "Contact & Clinic Locations | Joint Clinic Kanpur",
   description:
     "Visiting hours, phone numbers, and interactive Google Maps for Joint Clinic in Swaroop Nagar and Bhargava Medical & Trauma Centre (BMTC) in Kidwai Nagar, Kanpur.",
+  alternates: {
+    canonical: "https://jointclinic.in/contact",
+  },
+  openGraph: {
+    title: "Clinic Locations & Directions | Joint Clinic Kanpur",
+    description:
+      "Find Dr. Gaurav Bhargava at Joint Clinic (Swaroop Nagar, 4–7 PM) and BMTC (Kidwai Nagar, 10 AM–2 PM & 24/7 Trauma Emergency). Call +91 73090 38872.",
+    url: "https://jointclinic.in/contact",
+    images: [
+      {
+        url: "/images/doctor/gaurav-bhargava.png",
+        width: 800,
+        height: 800,
+        alt: "Joint Clinic Locations Kanpur",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Joint Clinic Locations & Contact | Kanpur",
+    description: "Swaroop Nagar & BMTC Kidwai Nagar contact details and OPD timings.",
+    images: ["/images/doctor/gaurav-bhargava.png"],
+  },
 };
 
 export default function ContactPage() {

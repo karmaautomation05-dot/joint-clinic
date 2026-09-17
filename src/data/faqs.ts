@@ -8,7 +8,7 @@ export const GENERAL_FAQS: FAQItem[] = [
   {
     category: "General",
     q: "Where is Dr. Gaurav Bhargava available for consultation?",
-    a: "Dr. Gaurav Bhargava consults at two primary locations in Kanpur: in the evenings (5:00 PM – 7:00 PM, Mon–Sat) at Joint Clinic, Swaroop Nagar (7/198-A Anand Bazar, Khalasi Line); and in the mornings (10:00 AM – 2:00 PM, Mon–Sat) at Bhargava Medical & Trauma Centre (BMTC), Kidwai Nagar (30-E, O Block). Emergency trauma services at BMTC operate 24x7.",
+    a: "Dr. Gaurav Bhargava consults at two primary locations in Kanpur: in the evenings (4:00 PM – 7:00 PM, Mon–Sat) at Joint Clinic, Swaroop Nagar (7/198-A Anand Bazar, Khalasi Line); and in the mornings (10:00 AM – 2:00 PM, Mon–Sat) at Bhargava Medical & Trauma Centre (BMTC), Kidwai Nagar (30-E, O Block). Emergency trauma services at BMTC operate 24x7.",
   },
   {
     category: "General",

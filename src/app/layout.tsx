@@ -40,6 +40,20 @@ export const metadata: Metadata = {
     "PRP Knee Therapy Kanpur",
   ],
   authors: [{ name: "Dr. Gaurav Bhargava" }],
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
     type: "website",
     locale: "en_IN",
@@ -56,6 +70,12 @@ export const metadata: Metadata = {
         alt: "Dr. Gaurav Bhargava — Joint Clinic Kanpur",
       },
     ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Joint Clinic Kanpur | Dr. Gaurav Bhargava",
+    description: "Centre of Arthroplasty & Arthroscopy led by Dr. Gaurav Bhargava in Kanpur.",
+    images: ["/images/doctor/gaurav-bhargava.png"],
   },
   other: {
     "theme-color": "#059B8F",

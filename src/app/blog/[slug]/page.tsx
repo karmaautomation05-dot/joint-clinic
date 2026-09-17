@@ -34,10 +34,23 @@ export async function generateMetadata({
   return {
     title: `${post.title} | Dr. Gaurav Bhargava`,
     description: post.excerpt,
+    alternates: {
+      canonical: `https://jointclinic.in/blog/${params.slug}`,
+    },
     openGraph: {
       title: post.title,
       description: post.excerpt,
-      images: [{ url: post.image }],
+      url: `https://jointclinic.in/blog/${params.slug}`,
+      type: "article",
+      publishedTime: post.date,
+      authors: [post.author],
+      images: [{ url: post.image, alt: post.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: [post.image],
     },
   };
 }
@@ -55,8 +68,69 @@ export default function BlogPostPage({
 
   const otherBlogs = BLOG_POSTS.filter((p) => p.id !== post.id).slice(0, 3);
 
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        "@id": `https://jointclinic.in/blog/${post.slug}#article`,
+        headline: post.title,
+        description: post.excerpt,
+        image: post.image.startsWith("http")
+          ? post.image
+          : `https://jointclinic.in${post.image}`,
+        datePublished: post.date,
+        author: {
+          "@type": "Person",
+          name: post.author,
+          url: "https://jointclinic.in/about",
+          "@id": "https://jointclinic.in/#physician",
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "Joint Clinic Kanpur",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://jointclinic.in/images/logo.png",
+          },
+        },
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": `https://jointclinic.in/blog/${post.slug}`,
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: "https://jointclinic.in",
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Blog",
+            item: "https://jointclinic.in/blog",
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: post.title,
+            item: `https://jointclinic.in/blog/${post.slug}`,
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <article className="bg-white pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
       {/* Blog Article Header */}
       <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>

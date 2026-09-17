@@ -22,6 +22,29 @@ export const metadata: Metadata = {
   title: "About Dr. Gaurav Bhargava | Joint Clinic Kanpur",
   description:
     "Learn about Dr. Gaurav Bhargava (MBBS, MS Orthopaedics), former Senior Resident at Maulana Azad Medical College (MAMC), New Delhi, with 20+ years of joint replacement excellence in Kanpur.",
+  alternates: {
+    canonical: "https://jointclinic.in/about",
+  },
+  openGraph: {
+    title: "About Dr. Gaurav Bhargava | Joint Clinic Kanpur",
+    description:
+      "MBBS, MS (Orthopaedics), Ex-Senior Resident MAMC New Delhi. Over 20 years of joint replacement and arthroscopy expertise in Kanpur.",
+    url: "https://jointclinic.in/about",
+    images: [
+      {
+        url: "/images/doctor/gaurav-bhargava.png",
+        width: 800,
+        height: 800,
+        alt: "Dr. Gaurav Bhargava — Joint Clinic Kanpur",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Dr. Gaurav Bhargava | Joint Clinic Kanpur",
+    description: "20+ years experience in joint replacements, arthroscopy, and joint preservation.",
+    images: ["/images/doctor/gaurav-bhargava.png"],
+  },
 };
 
 export default function AboutPage() {
