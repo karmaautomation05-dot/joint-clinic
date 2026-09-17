@@ -468,3 +468,367 @@ export const TREATMENTS: Treatment[] = [
     ],
   },
 ];
+
+
+export interface TreatmentItem {
+  id: string;
+  name: string;
+  shortDesc: string;
+  whenNeeded: string;
+  howHelps: string;
+  recovery: string;
+  slug: string;
+  badge?: string;
+}
+
+export interface TreatmentCategory {
+  id: string;
+  name: string;
+  tagline: string;
+  description: string;
+  iconName: string;
+  items: TreatmentItem[];
+}
+
+export const TREATMENT_CATEGORIES: TreatmentCategory[] = [
+  {
+    id: "knee-care",
+    name: "Knee Care & Surgery",
+    tagline: "Restore smooth, pain-free walking and active mobility",
+    description:
+      "From preventive cartilage protection and keyhole repairs to modern high-flexion knee replacements that let you walk on the very next day.",
+    iconName: "Bone",
+    items: [
+      {
+        id: "total-knee-replacement",
+        name: "Total Knee Replacement (TKR)",
+        shortDesc: "The gold-standard surgery to completely end severe knee pain and straighten bowed legs.",
+        whenNeeded: "When severe knee arthritis makes walking, climbing stairs, or sleeping painful despite medicines.",
+        howHelps: "Replaces worn joint surfaces with polished, long-lasting implants designed to last 25 to 30+ years.",
+        recovery: "Walking starts within 24 hours with a walker; independent walking in 4 to 6 weeks.",
+        slug: "total-knee-replacement",
+        badge: "Most Popular",
+      },
+      {
+        id: "robotic-knee-replacement",
+        name: "Robotic Knee Replacement",
+        shortDesc: "Computer and robotic-guided knee surgery for pinpoint millimeter accuracy and faster healing.",
+        whenNeeded: "For patients desiring customized implant fit, minimal tissue trauma, and a completely natural knee feel.",
+        howHelps: "Uses 3D digital planning to preserve maximum natural bone and healthy ligaments.",
+        recovery: "Less post-operative swelling and quicker return to unassisted walking.",
+        slug: "total-knee-replacement",
+        badge: "High Precision",
+      },
+      {
+        id: "partial-knee-replacement",
+        name: "Partial Knee Replacement",
+        shortDesc: "Replacing only the damaged inner half of your knee while keeping your natural ligaments intact.",
+        whenNeeded: "When arthritis affects only one side of the knee and the rest of the joint is completely healthy.",
+        howHelps: "Requires a smaller incision, preserves the ACL, and delivers a completely natural knee bend.",
+        recovery: "Shorter hospital stay (1–2 days) and faster recovery than full replacement.",
+        slug: "total-knee-replacement",
+        badge: "Minimally Invasive",
+      },
+      {
+        id: "knee-arthroscopy-meniscus",
+        name: "Knee Keyhole Surgery (Arthroscopy & Meniscus)",
+        shortDesc: "Tiny 4mm keyhole procedure to repair torn knee cushion (meniscus) and clean loose cartilage.",
+        whenNeeded: "When the knee locks, catches, clicks, or swells after a sudden twist or sports strain.",
+        howHelps: "Repairs the natural shock absorbers of the knee without opening the entire joint.",
+        recovery: "Home on the same day or next day; back to normal walking within days.",
+        slug: "sports-injury-acl-treatment",
+        badge: "Keyhole",
+      },
+    ],
+  },
+  {
+    id: "hip-care",
+    name: "Hip Care & Surgery",
+    tagline: "End groin pain and regain easy, comfortable walking",
+    description:
+      "Specialized solutions for Avascular Necrosis (AVN), hip stiffness, and arthritis using modern ceramic implants and joint-preserving techniques.",
+    iconName: "Activity",
+    items: [
+      {
+        id: "total-hip-replacement",
+        name: "Total Hip Replacement (THR)",
+        shortDesc: "Replaces a damaged hip joint with ultra-smooth ceramic bearings for lifelong, pain-free walking.",
+        whenNeeded: "For severe hip arthritis, advanced AVN, or hip fractures causing a limp and difficulty putting on shoes.",
+        howHelps: "Eliminates deep groin pain and restores full hip motion so you can walk, sit, and drive normally.",
+        recovery: "Standing on Day 1; unassisted confident walking within 4 to 6 weeks.",
+        slug: "hip-replacement",
+        badge: "High Longevity",
+      },
+      {
+        id: "avn-hip-treatment",
+        name: "AVN Hip Treatment (Avascular Necrosis)",
+        shortDesc: "Specialized care for reduced blood flow to the hip bone, common in young adults and post-steroid use.",
+        whenNeeded: "When you feel deep groin or thigh pain while walking or standing, especially if diagnosed early on MRI.",
+        howHelps: "Combines early core decompression to restore blood flow or modern ceramic replacement in advanced stages.",
+        recovery: "Targeted rehabilitation protocol customized to your exact AVN stage.",
+        slug: "hip-replacement",
+        badge: "Specialized Focus",
+      },
+      {
+        id: "hip-preservation",
+        name: "Hip Preservation & Core Decompression",
+        shortDesc: "Early-stage procedure to relieve bone pressure and stimulate fresh blood flow into the hip head.",
+        whenNeeded: "In Stage 1 and Stage 2 AVN before the bone shape collapses, aiming to save your natural hip.",
+        howHelps: "Drills tiny decompression channels and delivers healing growth factors to prevent hip replacement.",
+        recovery: "Protected crutch walking for a few weeks while natural bone regeneration occurs.",
+        slug: "hip-replacement",
+        badge: "Natural Joint Saver",
+      },
+    ],
+  },
+  {
+    id: "sports-injury",
+    name: "Sports Injury & Arthroscopy",
+    tagline: "Get back on the field, court, and gym with confidence",
+    description:
+      "Expert keyhole surgery and sports rehabilitation for torn ligaments, unstable knees, and athletic injuries.",
+    iconName: "ShieldCheck",
+    items: [
+      {
+        id: "acl-reconstruction",
+        name: "ACL Ligament Reconstruction",
+        shortDesc: "Keyhole reconstruction of the torn anterior cruciate ligament using your body's own natural tendon.",
+        whenNeeded: "When your knee pops or 'gives way' during sports, running, or sudden turning.",
+        howHelps: "Restores 100% knee stability, protecting your meniscus and preventing premature arthritis.",
+        recovery: "Walking with a brace on Day 1; running in 3 to 4 months; full sports return in 6 to 9 months.",
+        slug: "sports-injury-acl-treatment",
+        badge: "Athletic Recovery",
+      },
+      {
+        id: "pcl-multi-ligament",
+        name: "PCL & Multi-Ligament Tear Repair",
+        shortDesc: "Advanced keyhole reconstruction for complex knee injuries involving multiple damaged ligaments.",
+        whenNeeded: "Following bike accidents or heavy sports impacts causing severe knee looseness or backward sagging.",
+        howHelps: "Rebuilds knee alignment and multi-directional stability with anatomical graft placement.",
+        recovery: "Supervised structured physical therapy to steadily regain full motion and quad strength.",
+        slug: "sports-injury-acl-treatment",
+        badge: "Complex Reconstructive",
+      },
+      {
+        id: "meniscus-repair",
+        name: "Meniscus Repair (Keyhole)",
+        shortDesc: "Micro-suturing torn cartilage cushions instead of removing them, preserving natural knee cushioning.",
+        whenNeeded: "When twisting causes sharp joint line pain, swelling, or catching.",
+        howHelps: "Saves your natural cartilage cushion to maintain shock absorption for life.",
+        recovery: "Daycare or 1-day stay; gradual return to sports over 8 to 12 weeks.",
+        slug: "sports-injury-acl-treatment",
+        badge: "Cartilage Saver",
+      },
+      {
+        id: "ankle-sports-rehab",
+        name: "Ankle Sprain & Sports Rehabilitation",
+        shortDesc: "Targeted treatment for recurrent ankle sprains, Achilles tendon pain, and sports muscle tears.",
+        whenNeeded: "After twisting an ankle that stays painful, weak, or swells repeatedly during walking.",
+        howHelps: "Ligament strengthening, balance training, and non-surgical stabilization.",
+        recovery: "Fast functional recovery with personalized athletic return-to-play protocols.",
+        slug: "sports-injury-acl-treatment",
+        badge: "Active Fitness",
+      },
+    ],
+  },
+  {
+    id: "shoulder-care",
+    name: "Shoulder & Arm Care",
+    tagline: "Relieve shoulder pain, lift your arm freely, and sleep peacefully",
+    description:
+      "Comprehensive keyhole treatments for torn shoulder tendons, stiff frozen shoulders, and repeated dislocations.",
+    iconName: "Award",
+    items: [
+      {
+        id: "rotator-cuff-repair",
+        name: "Rotator Cuff Tear Repair",
+        shortDesc: "Keyhole repair of torn shoulder lifting tendons using dissolvable micro-anchors.",
+        whenNeeded: "When you have sharp night pain and cannot lift your arm to comb hair or reach overhead.",
+        howHelps: "Reattaches the torn tendon firmly back to bone, restoring arm strength and ending sleepless nights.",
+        recovery: "Arm supported in a sling for a few weeks, followed by guided movement exercises.",
+        slug: "shoulder-arthroscopy",
+        badge: "Keyhole Precision",
+      },
+      {
+        id: "frozen-shoulder-care",
+        name: "Frozen Shoulder Treatment",
+        shortDesc: "Targeted therapy and gentle keyhole release to free up stiff, locked shoulder joints.",
+        whenNeeded: "When your shoulder has become extremely tight, painful, and frozen in all directions.",
+        howHelps: "Calms inflammation with targeted injections and safely expands the tight joint capsule.",
+        recovery: "Immediate improvement in comfortable range of motion with home stretches.",
+        slug: "shoulder-arthroscopy",
+        badge: "Mobility Restorer",
+      },
+      {
+        id: "shoulder-dislocation-bankart",
+        name: "Shoulder Dislocation Care (Bankart Repair)",
+        shortDesc: "Keyhole stabilization for shoulders that repeatedly pop out of their socket.",
+        whenNeeded: "After an initial shoulder dislocation that leaves the joint loose, insecure, or slipping out.",
+        howHelps: "Re-anchors the torn joint rim (labrum) firmly to keep the shoulder permanently in place.",
+        recovery: "Full confidence in lifting and overhead arm movement restored.",
+        slug: "shoulder-arthroscopy",
+        badge: "Stability Care",
+      },
+      {
+        id: "tennis-elbow-care",
+        name: "Tennis Elbow & Arm Pain Care",
+        shortDesc: "Proven non-surgical relief and healing injections for stubborn outer elbow and forearm pain.",
+        whenNeeded: "Pain when gripping, lifting a bag, shaking hands, or using a computer mouse.",
+        howHelps: "PRP biological therapy and forearm tendon offloading to heal micro-tears naturally.",
+        recovery: "Gradual reduction in pain within 2 to 4 weeks without surgery.",
+        slug: "joint-preservation-prp",
+        badge: "Non-Surgical",
+      },
+    ],
+  },
+  {
+    id: "spine-care",
+    name: "Spine & Sciatica Care",
+    tagline: "Evidence-based non-surgical relief for back, neck, and nerve pain",
+    description:
+      "Over 90% of spine and sciatica issues can be cured without surgery using targeted nerve therapy, posture correction, and medical decompression.",
+    iconName: "Activity",
+    items: [
+      {
+        id: "slip-disc-treatment",
+        name: "Slip Disc Treatment (Herniated Disc)",
+        shortDesc: "Non-surgical decompression and targeted nerve therapy for bulging and slipped spinal discs.",
+        whenNeeded: "When sudden back pain catches you while bending, sitting, or lifting weights.",
+        howHelps: "Relieves pressure on pinched spinal nerves, calms muscle spasms, and restores spinal flexibility.",
+        recovery: "Acute pain eases within days; core physical therapy protects against future flare-ups.",
+        slug: "spine-sciatica-care",
+        badge: "Non-Surgical Focus",
+      },
+      {
+        id: "sciatica-nerve-relief",
+        name: "Sciatica Nerve Pain Relief",
+        shortDesc: "Targeted treatment for sharp, burning pain traveling from the lower back down the leg.",
+        whenNeeded: "When electric shock-like sensations, tingling, or numbness shoot into your buttock, thigh, or foot.",
+        howHelps: "Soothes the irritated sciatic nerve root using precision medication and targeted injections.",
+        recovery: "Rapid relief in walking distance and comfortable sitting.",
+        slug: "spine-sciatica-care",
+        badge: "Fast Pain Relief",
+      },
+      {
+        id: "cervical-spondylosis",
+        name: "Cervical Spondylosis (Neck Pain)",
+        shortDesc: "Relief for neck stiffness, shoulder blade aching, and arm tingling from desk work or age wear.",
+        whenNeeded: "When prolonged phone or laptop use triggers neck tightness, headaches, or finger numbness.",
+        howHelps: "Ergonomic alignment, cervical decompression stretches, and deep nerve calming therapy.",
+        recovery: "Relief with simple daily neck posture habits and guided exercises.",
+        slug: "spine-sciatica-care",
+        badge: "Posture Care",
+      },
+      {
+        id: "spine-injections",
+        name: "Targeted Spine Nerve Blocks",
+        shortDesc: "Safe, outpatient anti-inflammatory injections delivered directly near irritated spinal nerves.",
+        whenNeeded: "When severe disc pain or sciatica does not settle with oral painkillers and rest.",
+        howHelps: "Instantly calms nerve swelling, breaks the severe spasm cycle, and avoids spinal surgery.",
+        recovery: "Walk out within 30 minutes; noticeable pain reduction within 24 to 48 hours.",
+        slug: "spine-sciatica-care",
+        badge: "Quick Outpatient",
+      },
+    ],
+  },
+  {
+    id: "non-surgical",
+    name: "Non-Surgical Joint Care & PRP",
+    tagline: "Protect your natural cartilage and delay or avoid surgery",
+    description:
+      "Regenerative biological injections, joint fluid lubrication, and lifestyle plans for early to moderate joint pain.",
+    iconName: "HeartPulse",
+    items: [
+      {
+        id: "prp-therapy",
+        name: "PRP Therapy (Platelet-Rich Plasma)",
+        shortDesc: "Using concentrated healing factors from your own blood to calm joint inflammation and nourish cartilage.",
+        whenNeeded: "For mild-to-moderate knee pain, morning stiffness, or tendonitis where you want to avoid surgery.",
+        howHelps: "Natural, drug-free biological injection that soothes joint lining and supports tissue health.",
+        recovery: "Walk home immediately after the 20-minute procedure; benefits build over 3 to 6 weeks.",
+        slug: "joint-preservation-prp",
+        badge: "100% Natural",
+      },
+      {
+        id: "hyaluronic-injections",
+        name: "Joint Lubrication Injections (Gel)",
+        shortDesc: "Supplying natural cushioning fluid directly inside the knee joint to reduce grating and stiffness.",
+        whenNeeded: "When your knees feel dry, creaky, or rub uncomfortably when climbing stairs.",
+        howHelps: "Acts like clean shock-absorbing fluid, smoothing knee movement and easing daily walks.",
+        recovery: "Zero downtime; immediate return to everyday routine.",
+        slug: "joint-preservation-prp",
+        badge: "Cartilage Cushion",
+      },
+      {
+        id: "arthritis-prevention",
+        name: "Arthritis & Cartilage Protection",
+        shortDesc: "Comprehensive joint preservation plan combining weight offloading, knee exercises, and nutrition.",
+        whenNeeded: "At the first sign of knee pain in your 40s or 50s to keep your joints healthy for decades.",
+        howHelps: "Every 1 kg of body weight lost takes 4 kg of pressure off your knees with every single step.",
+        recovery: "Ongoing joint comfort and active lifestyle preservation.",
+        slug: "joint-preservation-prp",
+        badge: "Preventive Care",
+      },
+      {
+        id: "heel-pain-plantar",
+        name: "Heel Pain Care (Plantar Fasciitis)",
+        shortDesc: "Fast, effective relief for stabbing morning heel pain when you take your very first steps.",
+        whenNeeded: "Sharp heel pain upon waking up or standing up after sitting for a while.",
+        howHelps: "Stretching regimens, custom foot orthotics, and localized healing injections.",
+        recovery: "Quick morning comfort with proper footwear and simple calf stretches.",
+        slug: "joint-preservation-prp",
+        badge: "Everyday Relief",
+      },
+    ],
+  },
+  {
+    id: "fractures-trauma",
+    name: "Bone Fractures & 24/7 Trauma Care",
+    tagline: "Round-the-clock emergency bone and accident care at BMTC Kidwai Nagar",
+    description:
+      "Full surgical and non-surgical fracture care with modular OTs, emergency casualty, digital X-rays, and in-house recovery.",
+    iconName: "Stethoscope",
+    items: [
+      {
+        id: "bone-fracture-care",
+        name: "Bone Fracture Plaster & Alignment",
+        shortDesc: "Accurate diagnosis and non-surgical casting or surgical alignment for broken bones of all ages.",
+        whenNeeded: "Following falls, slips, or sports impacts causing sudden bone swelling, pain, or deformity.",
+        howHelps: "Ensures broken bones heal in their exact anatomical position so limbs function perfectly.",
+        recovery: "Regular X-ray monitoring until solid bone union is achieved.",
+        slug: "complex-trauma-fractures",
+        badge: "Essential Care",
+      },
+      {
+        id: "rod-plate-fixation",
+        name: "Plate & Rod Bone Fixation (Nailing/Plating)",
+        shortDesc: "Modern titanium plates, screws, and interlocking rods to hold complex broken bones securely.",
+        whenNeeded: "For displaced fractures of thigh, leg, arm, or collarbone that cannot heal safely in plaster.",
+        howHelps: "Provides immediate internal rigidity, allowing earlier limb movement and preventing joint stiffness.",
+        recovery: "Supported early mobilization tailored to the specific fracture type.",
+        slug: "complex-trauma-fractures",
+        badge: "Surgical Precision",
+      },
+      {
+        id: "old-fracture-nonunion",
+        name: "Old Fracture & Non-Union Surgery",
+        shortDesc: "Corrective treatment for broken bones that failed to heal properly after earlier treatment elsewhere.",
+        whenNeeded: "When a past fracture remains painful, mobile, or has healed crookedly (malunion).",
+        howHelps: "Cleans scar tissue, uses bone grafting, and applies stable modern fixation to restart healing.",
+        recovery: "Restores normal limb shape and strength under expert follow-up.",
+        slug: "complex-trauma-fractures",
+        badge: "Corrective Specialist",
+      },
+      {
+        id: "emergency-accident-trauma",
+        name: "24/7 Emergency Accident Trauma (BMTC)",
+        shortDesc: "Immediate emergency response for road traffic accidents, complex injuries, and pelvic trauma.",
+        whenNeeded: "Any acute trauma emergency occurring day or night in Kanpur and surrounding areas.",
+        howHelps: "Full hospital backup with modular clean OTs, high-dependency ICU, and experienced trauma teams.",
+        recovery: "Comprehensive inpatient rehabilitation from day one until complete recovery.",
+        slug: "complex-trauma-fractures",
+        badge: "24/7 Available",
+      },
+    ],
+  },
+];
