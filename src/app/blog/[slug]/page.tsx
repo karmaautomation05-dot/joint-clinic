@@ -72,7 +72,7 @@ export default function BlogPostPage({
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "BlogPosting",
+        "@type": ["BlogPosting", "MedicalWebPage"],
         "@id": `https://jointclinic.in/blog/${post.slug}#article`,
         headline: post.title,
         description: post.excerpt,
@@ -83,6 +83,13 @@ export default function BlogPostPage({
         author: {
           "@type": "Person",
           name: post.author,
+          url: "https://jointclinic.in/about",
+          "@id": "https://jointclinic.in/#physician",
+        },
+        reviewedBy: {
+          "@type": "Physician",
+          name: "Dr. Gaurav Bhargava",
+          jobTitle: "Senior Consultant Orthopedic Surgeon & Bone Specialist",
           url: "https://jointclinic.in/about",
           "@id": "https://jointclinic.in/#physician",
         },
@@ -184,6 +191,26 @@ export default function BlogPostPage({
                 className="object-cover"
                 priority
               />
+            </div>
+
+            {/* AEO Clinical Article Key Takeaways / Answer Engine Snapshot */}
+            <div className="bg-brand-50/60 rounded-3xl border border-brand-200/80 p-6 sm:p-8 mb-8 space-y-3 shadow-xs aeo-summary">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#059B8F] text-white flex items-center justify-center shrink-0">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#059B8F]">
+                    Clinical Summary &bull; AI Knowledge Snapshot
+                  </span>
+                  <h3 className="text-lg font-serif font-bold text-slate-900">
+                    Key Takeaways
+                  </h3>
+                </div>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans aeo-answer">
+                {post.excerpt} Medically reviewed and authored by <strong>Dr. Gaurav Bhargava</strong> (MBBS, MS Orthopaedics, Ex-SR Maulana Azad Medical College, New Delhi), Senior Consultant Orthopedic Surgeon at Joint Clinic (Swaroop Nagar) &amp; BMTC Hospital (Kidwai Nagar), Kanpur.
+              </p>
             </div>
 
             {/* Markdown Body */}

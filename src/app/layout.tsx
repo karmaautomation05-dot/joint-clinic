@@ -109,6 +109,9 @@ export default function RootLayout({
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <head>
         <MedicalSchema />
+        <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Knowledge Context" />
+        <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM Plaintext Context" />
+        <link rel="help" href="/llms.txt" title="AI Search & LLM Knowledge Base" />
       </head>
       <body className="font-sans min-h-screen flex flex-col bg-white text-slate-900 antialiased selection:bg-brand-600 selection:text-white">
         <Navbar />

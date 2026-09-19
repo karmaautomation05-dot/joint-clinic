@@ -3,6 +3,7 @@ Allow: /
 
 User-Agent: GPTBot
 User-Agent: ChatGPT-User
+User-Agent: OAI-SearchBot
 User-Agent: PerplexityBot
 User-Agent: ClaudeBot
 User-Agent: anthropic-ai
@@ -10,7 +11,14 @@ User-Agent: Google-Extended
 User-Agent: Applebot-Extended
 User-Agent: Bytespider
 User-Agent: CCBot
+User-Agent: Meta-ExternalAgent
+User-Agent: Amazonbot
+User-Agent: DuckAssistBot
+User-Agent: cohere-ai
 Allow: /
 
 Host: https://jointclinic.in
 Sitemap: https://jointclinic.in/sitemap.xml
+# AI Knowledge Graph & LLM Endpoints:
+# https://jointclinic.in/llms.txt
+# https://jointclinic.in/llms-full.txt

@@ -314,29 +314,43 @@ export default function TreatmentDetailPage({
               </div>
             </div>
 
-            {/* Procedure FAQs */}
+            {/* Procedure FAQs with Schema Microdata */}
             {treatment.faqs.length > 0 && (
-              <div className="bg-white rounded-[2.5rem] border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-6">
-                <h2 className="text-3xl font-serif font-bold text-slate-900">
-                  Frequently Asked Questions
-                </h2>
+              <section 
+                itemScope 
+                itemType="https://schema.org/FAQPage"
+                className="bg-white rounded-[2.5rem] border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-6"
+              >
+                <div className="space-y-1">
+                  <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block">
+                    Direct Answers &bull; Procedure FAQ
+                  </span>
+                  <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
+                    Frequently Asked Questions About {treatment.title}
+                  </h2>
+                </div>
                 <div className="space-y-4">
                   {treatment.faqs.map((faq, idx) => (
-                    <div
+                    <article
                       key={idx}
+                      itemScope
+                      itemProp="mainEntity"
+                      itemType="https://schema.org/Question"
                       className="p-6 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-2"
                     >
-                      <h3 className="text-base font-serif font-bold text-slate-900 flex items-center gap-2">
+                      <h3 itemProp="name" className="text-base font-serif font-bold text-slate-900 flex items-center gap-2">
                         <HelpCircle className="w-4 h-4 text-brand-600 shrink-0" />
                         <span>{faq.q}</span>
                       </h3>
-                      <p className="text-sm text-slate-600 leading-relaxed pl-6">
-                        {faq.a}
-                      </p>
-                    </div>
+                      <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                        <p itemProp="text" className="text-sm text-slate-600 leading-relaxed pl-6 font-sans">
+                          {faq.a}
+                        </p>
+                      </div>
+                    </article>
                   ))}
                 </div>
-              </div>
+              </section>
             )}
           </div>
 

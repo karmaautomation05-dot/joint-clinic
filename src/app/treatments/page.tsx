@@ -48,6 +48,14 @@ const TREATMENTS_FAQS = [
     q: "How soon do patients start walking after joint surgery?",
     a: "Under modern tissue-sparing techniques and targeted sensory nerve blocks, knee and hip replacement patients take their first supported steps with a walker within 24 hours of surgery (Day 1).",
   },
+  {
+    q: "Are cashless health insurance and Ayushman Bharat accepted for surgeries?",
+    a: "Yes. Inpatient surgical treatments at BMTC Hospital Kidwai Nagar support cashless health insurance TPA processing as well as government healthcare panel schemes, with a dedicated TPA helpdesk assisting with pre-authorization.",
+  },
+  {
+    q: "What non-surgical treatments are available for knee and shoulder pain?",
+    a: "Non-surgical treatments include autologous Platelet-Rich Plasma (PRP) therapy, hyaluronic acid joint lubrication injections, ultrasound-guided frozen shoulder hydrodilatation, spinal nerve root blocks, and customized kinetic physiotherapy.",
+  },
 ];
 
 const CATEGORY_TO_RECOVERY_MAP: Record<string, string> = {
@@ -242,10 +250,14 @@ export default function TreatmentsPage() {
       </div>
 
       {/* Treatments FAQ Section for Search Snippets & Patient Clarity */}
-      <div className="container mt-20 space-y-8">
+      <section 
+        className="container mt-20 space-y-8"
+        itemScope
+        itemType="https://schema.org/FAQPage"
+      >
         <div className="text-center max-w-2xl mx-auto">
           <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block mb-2">
-            Clear Answers
+            Direct Answers &bull; Treatment FAQs
           </span>
           <h3 className="text-3xl sm:text-4xl font-serif font-bold text-slate-900">
             Frequently Asked Questions About Treatments
@@ -257,25 +269,30 @@ export default function TreatmentsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-5xl mx-auto">
           {TREATMENTS_FAQS.map((faq, idx) => (
-            <div
+            <article
               key={idx}
+              itemScope
+              itemProp="mainEntity"
+              itemType="https://schema.org/Question"
               className="p-6 sm:p-7 rounded-3xl bg-slate-50/80 border border-slate-200/80 space-y-3 hover:bg-brand-50/40 hover:border-brand-200 transition-all shadow-2xs"
             >
               <div className="flex items-start gap-3">
                 <div className="w-7 h-7 rounded-lg bg-brand-100 flex items-center justify-center text-[#059B8F] shrink-0 mt-0.5">
                   <HelpCircle className="w-4 h-4" />
                 </div>
-                <h4 className="text-base font-serif font-bold text-slate-900">
+                <h4 itemProp="name" className="text-base font-serif font-bold text-slate-900">
                   {faq.q}
                 </h4>
               </div>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed pl-10">
-                {faq.a}
-              </p>
-            </div>
+              <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                <p itemProp="text" className="text-xs sm:text-sm text-slate-600 leading-relaxed pl-10 font-sans">
+                  {faq.a}
+                </p>
+              </div>
+            </article>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* Helpful Patient Assurance Banner */}
       <div className="container mt-20">

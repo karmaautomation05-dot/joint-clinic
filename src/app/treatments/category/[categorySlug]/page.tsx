@@ -426,6 +426,75 @@ export default function TreatmentCategoryPage({
           </div>
         </div>
 
+        {/* Visible Category FAQ Section with Microdata for Search Engines & AEO */}
+        <section 
+          itemScope 
+          itemType="https://schema.org/FAQPage"
+          className="mt-14 bg-slate-50/80 rounded-3xl p-6 sm:p-10 border border-slate-200/80 space-y-6"
+        >
+          <div>
+            <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block mb-1">
+              Direct Answers &bull; Clinical FAQ
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
+              Frequently Asked Questions About {category.name}
+            </h3>
+          </div>
+
+          <div className="space-y-4">
+            <article 
+              itemScope 
+              itemProp="mainEntity" 
+              itemType="https://schema.org/Question" 
+              className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/70 shadow-2xs space-y-2"
+            >
+              <h4 itemProp="name" className="text-base font-serif font-bold text-slate-900 flex items-center gap-2">
+                <HelpCircle className="w-4 h-4 text-[#059B8F] shrink-0" />
+                <span>What conditions are treated under {category.name} in Kanpur?</span>
+              </h4>
+              <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                <p itemProp="text" className="text-xs sm:text-sm text-slate-600 leading-relaxed pl-6 font-sans">
+                  {category.description} At Joint Clinic, Dr. Gaurav Bhargava provides comprehensive diagnosis and surgical/non-surgical care for {category.items.map((i) => i.name).join(", ")}.
+                </p>
+              </div>
+            </article>
+
+            <article 
+              itemScope 
+              itemProp="mainEntity" 
+              itemType="https://schema.org/Question" 
+              className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/70 shadow-2xs space-y-2"
+            >
+              <h4 itemProp="name" className="text-base font-serif font-bold text-slate-900 flex items-center gap-2">
+                <HelpCircle className="w-4 h-4 text-[#059B8F] shrink-0" />
+                <span>Who is the specialist for {category.name} in Kanpur?</span>
+              </h4>
+              <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                <p itemProp="text" className="text-xs sm:text-sm text-slate-600 leading-relaxed pl-6 font-sans">
+                  Dr. Gaurav Bhargava (MBBS, MS Orthopaedics, Ex-Senior Resident Maulana Azad Medical College, New Delhi) with 20+ years of surgical experience is the chief specialist for {category.name} at Joint Clinic (Swaroop Nagar) and BMTC Hospital (Kidwai Nagar), Kanpur.
+                </p>
+              </div>
+            </article>
+
+            <article 
+              itemScope 
+              itemProp="mainEntity" 
+              itemType="https://schema.org/Question" 
+              className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/70 shadow-2xs space-y-2"
+            >
+              <h4 itemProp="name" className="text-base font-serif font-bold text-slate-900 flex items-center gap-2">
+                <HelpCircle className="w-4 h-4 text-[#059B8F] shrink-0" />
+                <span>Where are {category.name} consultations and surgeries conducted?</span>
+              </h4>
+              <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+                <p itemProp="text" className="text-xs sm:text-sm text-slate-600 leading-relaxed pl-6 font-sans">
+                  Evening OPD consultations (4:00 PM – 7:00 PM) are held at Joint Clinic, Swaroop Nagar. Surgeries, digital X-rays, and 24/7 trauma emergency care are provided at Bhargava Medical &amp; Trauma Centre (BMTC), Kidwai Nagar, Kanpur.
+                </p>
+              </div>
+            </article>
+          </div>
+        </section>
+
         {/* Explore Other Specialties Switcher */}
         <div className="mt-16 pt-10 border-t border-slate-200">
           <div className="text-center max-w-xl mx-auto mb-8">

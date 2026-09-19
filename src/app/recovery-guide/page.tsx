@@ -102,6 +102,44 @@ export default function RecoveryGuideIndexPage() {
           })),
         },
       },
+      {
+        "@type": "FAQPage",
+        "@id": "https://jointclinic.in/recovery-guide#faq",
+        mainEntity: [
+          {
+            "@type": "Question",
+            name: "How soon do patients walk after joint surgery at Joint Clinic?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Under Dr. Gaurav Bhargava's tissue-sparing subvastus approach and multimodal pain relief, over 95% of knee and hip replacement patients stand and take supported steps with a walker within 24 hours of surgery (Day 1).",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "What physiotherapy is required during home recovery?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Patients receive a customized bedside exercise plan focusing on ankle pumps, quad sets, straight leg raises, and gentle knee bending. Our in-house physiotherapy team monitors progress to prevent stiffness and ensure safe mobility.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "When can patients resume driving and work after joint replacement?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Sedentary desk work can typically be resumed in 2 to 3 weeks. Driving is usually permitted around 4 to 6 weeks once full emergency braking reflex and quadriceps control are confirmed by Dr. Bhargava.",
+            },
+          },
+          {
+            "@type": "Question",
+            name: "Where are follow-up recovery reviews conducted in Kanpur?",
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: "Follow-up reviews, suture removals, and recovery progress checks are conducted at Joint Clinic in Swaroop Nagar (Evening OPD 4:00 PM – 7:00 PM) or BMTC Hospital in Kidwai Nagar (Morning OPD 10:00 AM – 2:00 PM). Hotline: +91 73090 38872.",
+            },
+          },
+        ],
+      },
     ],
   };
 
@@ -142,6 +180,26 @@ export default function RecoveryGuideIndexPage() {
 
       {/* Recovery Category Cards Grid */}
       <div className="container mt-12 sm:mt-16">
+        {/* AEO Rehabilitation Knowledge Snapshot for Search Engines & AI Assistants */}
+        <div className="bg-brand-50/60 rounded-3xl border border-brand-200/80 p-6 sm:p-8 mb-12 space-y-3 shadow-xs aeo-summary">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#059B8F] text-white flex items-center justify-center shrink-0">
+              <HeartPulse className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#059B8F]">
+                Rehabilitation Protocols &bull; AI Knowledge Snapshot
+              </span>
+              <h3 className="text-lg font-serif font-bold text-slate-900">
+                Orthopedic Recovery at Joint Clinic Kanpur at a Glance
+              </h3>
+            </div>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans aeo-answer">
+            Patient recovery protocols at Joint Clinic are curated by <strong>Dr. Gaurav Bhargava</strong> (Ex-Senior Resident MAMC New Delhi). Utilizing modern tissue-sparing surgical techniques and targeted sensory nerve blocks, over <strong>95% of joint replacement patients walk within 24 hours of surgery (Day 1)</strong>. Step-by-step rehabilitation roadmaps cover 7 specialized categories: Knee, Hip, Sports/ACL, Shoulder, Spine, PRP Joint Preservation, and Bone Fracture Trauma. Post-operative reviews are conducted at Joint Clinic Swaroop Nagar and BMTC Hospital Kidwai Nagar.
+          </p>
+        </div>
+
         <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
           <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block mb-2">
             Rehabilitation Portals
@@ -242,6 +300,91 @@ export default function RecoveryGuideIndexPage() {
           })}
         </div>
       </div>
+
+      {/* Recovery FAQ Section with Schema Microdata */}
+      <section 
+        itemScope 
+        itemType="https://schema.org/FAQPage"
+        className="container mt-20 space-y-8"
+      >
+        <div className="text-center max-w-2xl mx-auto">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block mb-2">
+            Direct Answers &bull; Rehabilitation FAQ
+          </span>
+          <h3 className="text-3xl sm:text-4xl font-serif font-bold text-slate-900">
+            Frequently Asked Questions About Recovery
+          </h3>
+          <p className="text-sm text-slate-600 mt-2">
+            Key answers on walking milestones, home care, and follow-up reviews by Dr. Gaurav Bhargava.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-5xl mx-auto">
+          <article 
+            itemScope 
+            itemProp="mainEntity" 
+            itemType="https://schema.org/Question"
+            className="p-6 sm:p-7 rounded-3xl bg-slate-50/80 border border-slate-200/80 space-y-3 hover:bg-brand-50/40 hover:border-brand-200 transition-all shadow-2xs"
+          >
+            <h4 itemProp="name" className="text-base font-serif font-bold text-slate-900">
+              How soon do patients walk after joint surgery at Joint Clinic?
+            </h4>
+            <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+              <p itemProp="text" className="text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
+                Under Dr. Gaurav Bhargava&apos;s tissue-sparing subvastus approach and multimodal pain relief, over 95% of knee and hip replacement patients stand and take supported steps with a walker within 24 hours of surgery (Day 1).
+              </p>
+            </div>
+          </article>
+
+          <article 
+            itemScope 
+            itemProp="mainEntity" 
+            itemType="https://schema.org/Question"
+            className="p-6 sm:p-7 rounded-3xl bg-slate-50/80 border border-slate-200/80 space-y-3 hover:bg-brand-50/40 hover:border-brand-200 transition-all shadow-2xs"
+          >
+            <h4 itemProp="name" className="text-base font-serif font-bold text-slate-900">
+              What physiotherapy is required during home recovery?
+            </h4>
+            <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+              <p itemProp="text" className="text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
+                Patients receive a customized bedside exercise plan focusing on ankle pumps, quad sets, straight leg raises, and gentle knee bending. Our in-house physiotherapy team monitors progress to prevent stiffness and ensure safe mobility.
+              </p>
+            </div>
+          </article>
+
+          <article 
+            itemScope 
+            itemProp="mainEntity" 
+            itemType="https://schema.org/Question"
+            className="p-6 sm:p-7 rounded-3xl bg-slate-50/80 border border-slate-200/80 space-y-3 hover:bg-brand-50/40 hover:border-brand-200 transition-all shadow-2xs"
+          >
+            <h4 itemProp="name" className="text-base font-serif font-bold text-slate-900">
+              When can patients resume driving and work after joint replacement?
+            </h4>
+            <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+              <p itemProp="text" className="text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
+                Sedentary desk work can typically be resumed in 2 to 3 weeks. Driving is usually permitted around 4 to 6 weeks once full emergency braking reflex and quadriceps control are confirmed by Dr. Bhargava.
+              </p>
+            </div>
+          </article>
+
+          <article 
+            itemScope 
+            itemProp="mainEntity" 
+            itemType="https://schema.org/Question"
+            className="p-6 sm:p-7 rounded-3xl bg-slate-50/80 border border-slate-200/80 space-y-3 hover:bg-brand-50/40 hover:border-brand-200 transition-all shadow-2xs"
+          >
+            <h4 itemProp="name" className="text-base font-serif font-bold text-slate-900">
+              Where are follow-up recovery reviews conducted in Kanpur?
+            </h4>
+            <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+              <p itemProp="text" className="text-xs sm:text-sm text-slate-600 leading-relaxed font-sans">
+                Follow-up reviews, suture removals, and recovery progress checks are conducted at Joint Clinic in Swaroop Nagar (Evening OPD 4:00 PM – 7:00 PM) or BMTC Hospital in Kidwai Nagar (Morning OPD 10:00 AM – 2:00 PM). Hotline: +91 73090 38872.
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
 
       {/* Patient Reassurance & Helpline Banner */}
       <div className="container mt-20">
