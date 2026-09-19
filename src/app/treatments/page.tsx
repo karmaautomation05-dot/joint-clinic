@@ -84,9 +84,9 @@ export default function TreatmentsPage() {
       {
         "@type": "MedicalWebPage",
         "@id": "https://jointclinic.in/treatments#webpage",
-        name: "Orthopedic Specialties & Treatments by Category | Joint Clinic Kanpur",
+        name: "Bone, Joint & Fracture Treatment in Kanpur — Dr. Gaurav Bhargava",
         description:
-          "Explore 7 clinical orthopedic categories covering 24+ specialized treatments by Dr. Gaurav Bhargava across Knee, Hip, Sports/ACL, Shoulder, Spine, PRP, and Trauma Care in Kanpur.",
+          "Explore 7 clinical orthopedic categories covering 24+ specialized treatments by Dr. Gaurav Bhargava (Best Orthopedic Doctor in Kanpur) across Knee Care, Hip Replacement, ACL Arthroscopy, Shoulder, Spine, PRP, and Fracture Trauma in Kanpur.",
         mainEntity: {
           "@type": "ItemList",
           itemListElement: TREATMENT_CATEGORIES.map((cat, idx) => ({
@@ -134,14 +134,13 @@ export default function TreatmentsPage() {
             </nav>
 
             <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
-              7 Clinical Specialties
+              Bone, Joint &amp; Fracture Treatment in Kanpur
             </span>
             <h1 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
               Orthopedic Treatments &amp; Surgeries
             </h1>
             <p className="text-lg sm:text-xl text-white/90 mt-4 leading-relaxed font-sans">
-              Find clear, simple explanations for your joint, bone, and ligament concerns.
-              Select a specialty category below to explore all available surgical and non-surgical procedures tailored to your condition.
+              Expert orthopedic care led by Dr. Gaurav Bhargava (Best Orthopedic Surgeon &amp; Bone Specialist in Kanpur). From advanced knee &amp; hip replacements and sports injury arthroscopy to non-surgical arthritis treatment and 24/7 bone fracture care.
             </p>
           </div>
         </div>

@@ -13,16 +13,38 @@ import { WhatsAppIcon } from "@/components/common/WhatsAppIcon";
 import { CLINIC_LOCATIONS, PRIMARY_CONTACT } from "@/data/clinics";
 
 export const metadata: Metadata = {
-  title: "Contact & Clinic Locations | Joint Clinic Kanpur",
+  title: "Orthopedic Clinic & Hospital in Kanpur | Dr. Gaurav Bhargava | Locations",
   description:
-    "Visiting hours, phone numbers, and interactive Google Maps for Joint Clinic in Swaroop Nagar and Bhargava Medical & Trauma Centre (BMTC) in Kidwai Nagar, Kanpur.",
+    "Find Dr. Gaurav Bhargava (Best Orthopedic Doctor & Bone Specialist in Kanpur) at Joint Clinic (Swaroop Nagar) and BMTC (Orthopedic Hospital in Kidwai Nagar) for bone, joint & fracture treatment.",
+  keywords: [
+    "Best Orthopedic Doctor in Kanpur",
+    "Best Orthopedic Surgeon in Kanpur",
+    "Orthopedic Doctor in Kanpur",
+    "Bone Specialist in Kanpur",
+    "Best Bone Doctor in Kanpur",
+    "Fracture Specialist in Kanpur",
+    "Bone, Joint & Fracture Treatment in Kanpur",
+    "Joint Replacement Surgeon in Kanpur",
+    "Knee Replacement Surgeon in Kanpur",
+    "Knee Pain Specialist in Kanpur",
+    "Hip Replacement Surgeon in Kanpur",
+    "Sports Injury Specialist in Kanpur",
+    "Arthroscopy Surgeon in Kanpur",
+    "Arthritis Treatment in Kanpur",
+    "Bone and Joint Specialist in Kanpur",
+    "Orthopedic Hospital in Kanpur",
+    "Bone Fracture Treatment in Kanpur",
+    "Orthopedic Clinic in Kanpur",
+    "Dr Gaurav Bhargava Orthopedic Doctor",
+    "Orthopedic Doctor Near Me",
+  ],
   alternates: {
     canonical: "https://jointclinic.in/contact",
   },
   openGraph: {
-    title: "Clinic Locations & Directions | Joint Clinic Kanpur",
+    title: "Best Orthopedic Clinic & Hospital in Kanpur | Dr. Gaurav Bhargava",
     description:
-      "Find Dr. Gaurav Bhargava at Joint Clinic (Swaroop Nagar, 4–7 PM) and BMTC (Kidwai Nagar, 10 AM–2 PM & 24/7 Trauma Emergency). Call +91 73090 38872.",
+      "Looking for an orthopedic doctor near me in Kanpur? Visit Dr. Gaurav Bhargava at Joint Clinic Swaroop Nagar & BMTC Orthopedic Hospital Kidwai Nagar. Call +91 73090 38872.",
     url: "https://jointclinic.in/contact",
     images: [
       {
@@ -35,8 +57,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Joint Clinic Locations & Contact | Kanpur",
-    description: "Swaroop Nagar & BMTC Kidwai Nagar contact details and OPD timings.",
+    title: "Orthopedic Clinic & Hospital in Kanpur | Dr. Gaurav Bhargava",
+    description: "Swaroop Nagar orthopedic clinic & BMTC Kidwai Nagar orthopedic hospital contact details and OPD timings.",
     images: ["/images/doctor/gaurav-bhargava.png"],
   },
 };
@@ -65,9 +87,9 @@ export default function ContactPage() {
       {
         "@type": "ContactPage",
         "@id": "https://jointclinic.in/contact#webpage",
-        name: "Contact Joint Clinic Kanpur — Swaroop Nagar & BMTC Kidwai Nagar",
+        name: "Best Orthopedic Clinic & Hospital in Kanpur — Dr. Gaurav Bhargava",
         description:
-          "Clinic timings, addresses, phone numbers, and directions for Joint Clinic Swaroop Nagar and BMTC Kidwai Nagar in Kanpur.",
+          "Looking for an orthopedic doctor near me or bone specialist in Kanpur? Clinic timings, addresses, phone numbers, and directions for Joint Clinic Swaroop Nagar and BMTC Orthopedic Hospital Kidwai Nagar.",
       },
     ],
   };
@@ -93,14 +115,13 @@ export default function ContactPage() {
             </nav>
 
             <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
-              Locations &amp; Contact Details
+              Orthopedic Doctor Near Me • Swaroop Nagar &amp; Kidwai Nagar
             </span>
             <h1 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
-              Get in Touch with Joint Clinic
+              Orthopedic Clinic &amp; Hospital in Kanpur
             </h1>
             <p className="text-lg sm:text-xl text-white/90 mt-4 leading-relaxed font-sans">
-              We operate across two dedicated facilities in Kanpur for outpatient specialist
-              consultations, advanced joint surgeries, and 24/7 trauma emergency care.
+              Looking for the best orthopedic doctor, bone specialist, or joint replacement surgeon near you in Kanpur? Dr. Gaurav Bhargava consults at Joint Clinic (Swaroop Nagar) and Bhargava Medical &amp; Trauma Centre (BMTC, Kidwai Nagar) for comprehensive bone, joint &amp; fracture treatment.
             </p>
           </div>
         </div>
@@ -228,6 +249,62 @@ export default function ContactPage() {
             <Phone className="w-4 h-4 text-white" />
             <span>Emergency: {PRIMARY_CONTACT.emergencyPhoneDisplay}</span>
           </a>
+        </div>
+
+        {/* Neighborhood Proximity Guide for "Orthopedic Doctor Near Me" SEO */}
+        <div className="bg-slate-50 border border-slate-200/80 rounded-[2.5rem] p-8 sm:p-12 space-y-8">
+          <div className="max-w-3xl">
+            <span className="text-xs font-bold uppercase tracking-wider text-brand-700 px-3 py-1 rounded-full bg-brand-50 border border-brand-100 inline-block mb-3">
+              Kanpur Localities &amp; Connectivity
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
+              Serving Patients Across All Kanpur Neighborhoods
+            </h3>
+            <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+              If you are searching for the <strong>best orthopedic doctor near me in Kanpur</strong>, a <strong>bone specialist in Kanpur</strong>, or a specialized <strong>orthopedic clinic in Kanpur</strong>, Dr. Gaurav Bhargava provides consultations and emergency care conveniently accessible from every major locality:
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs space-y-3">
+              <div className="flex items-center gap-2 text-brand-700 font-bold text-sm">
+                <MapPin className="w-4 h-4 text-brand-600" />
+                <h4>North &amp; Central Kanpur</h4>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                <strong>Localities:</strong> Swaroop Nagar, Civil Lines, Arya Nagar, Khalasi Lines, Tilak Nagar, Kakadeo, Rawatpur.
+              </p>
+              <p className="text-xs text-brand-800 font-medium">
+                Convenient 5–15 min drive to <strong>Joint Clinic (Swaroop Nagar)</strong> for evening specialist OPD (4:00 PM – 7:00 PM).
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs space-y-3">
+              <div className="flex items-center gap-2 text-brand-700 font-bold text-sm">
+                <Building2 className="w-4 h-4 text-brand-600" />
+                <h4>South &amp; East Kanpur</h4>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                <strong>Localities:</strong> Kidwai Nagar, Govind Nagar, Yashoda Nagar, Barra, Naubasta, Juhi, Shyam Nagar, Chakeri.
+              </p>
+              <p className="text-xs text-brand-800 font-medium">
+                Direct access to <strong>BMTC Orthopedic Hospital (Kidwai Nagar)</strong> for morning OPD (10 AM – 2 PM) &amp; 24/7 trauma emergency.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs space-y-3">
+              <div className="flex items-center gap-2 text-brand-700 font-bold text-sm">
+                <Stethoscope className="w-4 h-4 text-brand-600" />
+                <h4>West Kanpur &amp; GT Road Corridor</h4>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                <strong>Localities:</strong> Kalyanpur, IIT Kanpur, Panki, Sharda Nagar, Gumti No. 5, Fazalganj.
+              </p>
+              <p className="text-xs text-brand-800 font-medium">
+                Quick arterial and Kanpur Metro connectivity to both centers for elective joint replacement and sports injury arthroscopy.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

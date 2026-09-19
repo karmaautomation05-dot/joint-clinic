@@ -23,17 +23,20 @@ export default function Hero() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-600"></span>
               </span>
-              A Centre of Arthroplasty &amp; Arthroscopy • Kanpur
+              Best Orthopedic Doctor &amp; Surgeon • Kanpur
             </div>
             
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-6.5xl font-serif font-bold text-slate-900 leading-[1.12] mb-7 tracking-tight">
-              Expert Care for <span className="text-brand-600 italic">Active Living</span> &amp; Pain-Free Joint Mobility
+              Best Orthopedic Doctor &amp; Joint Replacement Surgeon in <span className="text-brand-600 italic">Kanpur</span>
             </h1>
             
             {/* Lead Paragraph */}
-            <p className="text-lg md:text-xl text-slate-600 leading-relaxed mb-10 max-w-xl">
-              Led by <strong className="text-slate-900 font-semibold">Dr. Gaurav Bhargava</strong> (Ex-Senior Resident, Maulana Azad Medical College &amp; Lok Nayak Hospital, New Delhi). Dedicated to sub-millimeter precision joint replacement, keyhole arthroscopy, and 24-hour unassisted mobilization.
+            <p className="text-lg md:text-xl text-slate-600 leading-relaxed mb-4 max-w-xl">
+              Led by <strong className="text-slate-900 font-semibold">Dr. Gaurav Bhargava</strong> — premier bone specialist, fracture specialist, and knee/hip replacement surgeon (Ex-Senior Resident, Maulana Azad Medical College &amp; Lok Nayak Hospital, New Delhi).
+            </p>
+            <p className="text-sm md:text-base text-slate-500 leading-relaxed mb-10 max-w-xl">
+              Comprehensive bone, joint &amp; fracture treatment, sports injury care, knee pain treatment, and arthritis relief at <strong className="text-slate-800 font-semibold">Joint Clinic</strong> (Swaroop Nagar) &amp; <strong className="text-slate-800 font-semibold">BMTC Orthopedic Hospital</strong> (Kidwai Nagar).
             </p>
             
             {/* Dual CTAs */}
@@ -47,7 +50,7 @@ export default function Hero() {
                 <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
               </Link>
               <a 
-                href="https://wa.me/917309038872?text=Hello%20Dr.%20Gaurav%20Bhargava,%20I%20would%20like%20to%20consult%20regarding%20joint%20pain%20and%20orthopedic%20care." 
+                href="https://wa.me/917309038872?text=Hello%20Dr.%20Gaurav%20Bhargava,%20I%20would%20like%20to%20consult%20the%20best%20orthopedic%20doctor%20in%20Kanpur%20for%20bone%20and%20joint%20treatment." 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="btn-secondary flex items-center justify-center gap-2.5 whitespace-nowrap text-base py-3.5 px-7 hover:border-[#25D366] hover:text-[#25D366] transition-colors"
@@ -77,11 +80,11 @@ export default function Hero() {
                 <div className="flex items-center gap-2 text-base font-bold text-slate-900 leading-none mb-1">
                   <span>5,000+ Joint Surgeries</span>
                   <span className="text-[#F18712] font-serif flex items-center text-sm font-bold">
-                    ★ 5.0 (41+ Justdial Reviews)
+                    ★ 5.0 (41+ Verified Reviews)
                   </span>
                 </div>
                 <div className="text-xs text-slate-500 font-medium">
-                  Dual OPDs in Swaroop Nagar &amp; BMTC Kidwai Nagar
+                  Orthopedic Clinic in Swaroop Nagar &amp; 24/7 Trauma Hospital at BMTC Kidwai Nagar
                 </div>
               </div>
             </div>

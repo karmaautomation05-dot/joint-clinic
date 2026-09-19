@@ -19,26 +19,40 @@ import { DOCTOR_DATA } from "@/data/doctor";
 import { CLINIC_LOCATIONS, PRIMARY_CONTACT } from "@/data/clinics";
 
 export const metadata: Metadata = {
-  title: "About Dr. Gaurav Bhargava | Best Orthopedic Surgeon Kanpur | Joint Clinic",
+  title: "Best Orthopedic Doctor in Kanpur | Dr. Gaurav Bhargava | Bone & Joint Specialist",
   description:
-    "Learn about Dr. Gaurav Bhargava (MBBS, MS Orthopaedics), former Senior Resident at Maulana Azad Medical College (MAMC), New Delhi, with 20+ years of joint replacement and arthroscopy excellence in Kanpur.",
+    "Consult Dr. Gaurav Bhargava, the best orthopedic surgeon and bone doctor in Kanpur (Ex-SR MAMC New Delhi, 20+ yrs experience). Specialist in knee replacement, hip surgery, bone fracture treatment, and sports arthroscopy at Joint Clinic Swaroop Nagar & BMTC Kidwai Nagar.",
   keywords: [
-    "Dr Gaurav Bhargava",
-    "Dr Gaurav Bhargava Kanpur",
+    "Best Orthopedic Doctor in Kanpur",
     "Best Orthopedic Surgeon in Kanpur",
-    "Knee Replacement Doctor Kanpur",
+    "Orthopedic Doctor in Kanpur",
+    "Bone Specialist in Kanpur",
+    "Best Bone Doctor in Kanpur",
+    "Fracture Specialist in Kanpur",
+    "Bone, Joint & Fracture Treatment in Kanpur",
+    "Joint Replacement Surgeon in Kanpur",
+    "Knee Replacement Surgeon in Kanpur",
+    "Knee Pain Specialist in Kanpur",
+    "Hip Replacement Surgeon in Kanpur",
+    "Sports Injury Specialist in Kanpur",
+    "Arthroscopy Surgeon in Kanpur",
+    "Arthritis Treatment in Kanpur",
+    "Bone and Joint Specialist in Kanpur",
+    "Orthopedic Hospital in Kanpur",
+    "Bone Fracture Treatment in Kanpur",
+    "Orthopedic Clinic in Kanpur",
+    "Dr Gaurav Bhargava Orthopedic Doctor",
+    "Orthopedic Doctor Near Me",
+    "Dr Gaurav Bhargava",
     "Maulana Azad Medical College Orthopedic Doctor",
-    "Joint Clinic Swaroop Nagar",
-    "BMTC Kidwai Nagar",
-    "Orthopedic Doctor Kanpur",
   ],
   alternates: {
     canonical: "https://jointclinic.in/about",
   },
   openGraph: {
-    title: "About Dr. Gaurav Bhargava | Joint Clinic Kanpur",
+    title: "About Dr. Gaurav Bhargava | Best Orthopedic Doctor in Kanpur",
     description:
-      "MBBS, MS (Orthopaedics), Ex-Senior Resident MAMC New Delhi. Over 20 years of joint replacement and arthroscopy expertise in Kanpur.",
+      "MBBS, MS (Orthopaedics), Ex-Senior Resident MAMC New Delhi. Over 20 years of excellence as Kanpur's leading bone specialist and joint replacement surgeon.",
     url: "https://jointclinic.in/about",
     siteName: "Joint Clinic Kanpur",
     images: [
@@ -46,14 +60,14 @@ export const metadata: Metadata = {
         url: "/images/doctor/gaurav-bhargava.png",
         width: 800,
         height: 800,
-        alt: "Dr. Gaurav Bhargava — Joint Clinic Kanpur",
+        alt: "Dr. Gaurav Bhargava — Best Orthopedic Surgeon in Kanpur",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "About Dr. Gaurav Bhargava | Joint Clinic Kanpur",
-    description: "20+ years experience in joint replacements, arthroscopy, and joint preservation.",
+    title: "About Dr. Gaurav Bhargava | Best Orthopedic Surgeon Kanpur",
+    description: "20+ years experience in bone, joint & fracture treatment, joint replacement, and sports arthroscopy.",
     images: ["/images/doctor/gaurav-bhargava.png"],
   },
 };
@@ -109,16 +123,16 @@ export default function AboutPage() {
             </nav>
 
             <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
-              Meet Your Orthopedic Surgeon
+              Best Orthopedic Surgeon &amp; Bone Specialist in Kanpur
             </span>
             <h1 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
               Dr. Gaurav Bhargava
             </h1>
             <p className="text-lg sm:text-xl text-white/90 mt-4 leading-relaxed font-sans">
-              Senior Consultant Joint Replacement &amp; Arthroscopy Surgeon
+              Best Orthopedic Doctor, Bone Specialist &amp; Joint Replacement Surgeon in Kanpur
               <br />
               <span className="text-[#F5CD09] font-semibold text-base">
-                Director &amp; Chief Surgeon — Joint Clinic &amp; BMTC Orthopaedics, Kanpur
+                Director &amp; Chief Surgeon — Joint Clinic (Swaroop Nagar) &amp; BMTC Orthopedic Hospital (Kidwai Nagar)
               </span>
             </p>
           </div>

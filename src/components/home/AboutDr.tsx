@@ -68,24 +68,24 @@ export default function AboutDr() {
           {/* Right Column: Bio & Philosophy */}
           <div>
             <span className="text-brand-600 font-bold uppercase tracking-widest text-sm mb-4 block">
-              Meet Your Orthopedic Surgeon
+              Bone and Joint Specialist in Kanpur
             </span>
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-6 leading-tight">
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-4 leading-tight">
               Dr. Gaurav Bhargava
             </h2>
             <p className="text-lg text-brand-700 font-semibold mb-6">
-              Senior Joint Replacement, Arthroscopy &amp; Trauma Specialist
+              Best Orthopedic Surgeon, Joint Replacement Specialist &amp; Fracture Specialist in Kanpur
             </p>
             
             <div className="space-y-5 text-slate-600 leading-relaxed mb-10 text-base">
               <p>
-                <strong className="text-slate-900 font-semibold">Dr. Gaurav Bhargava</strong> is one of Kanpur&apos;s foremost orthopedic surgeons specializing in total joint arthroplasty, keyhole sports arthroscopy, and complex fracture reconstruction. With over two decades of surgical practice, he brings premier national healthcare standards to Central Uttar Pradesh.
+                <strong className="text-slate-900 font-semibold">Dr. Gaurav Bhargava</strong> is widely recognized as the <strong className="text-slate-900">best orthopedic doctor in Kanpur</strong>, serving as a trusted bone specialist, joint replacement surgeon, and fracture specialist. With over 20 years of surgical experience, he brings premier Delhi-standard orthopedic healthcare to patients across Kanpur and Central Uttar Pradesh.
               </p>
               <p>
-                Having completed his post-graduation from <span className="font-semibold text-slate-800">S.N. Medical College, Agra</span> and rigorous Senior Residency at the prestigious <span className="font-semibold text-slate-800">Maulana Azad Medical College (MAMC) &amp; Lok Nayak Hospital, New Delhi</span>, Dr. Bhargava combines Delhi-standard clinical rigor with an empathetic, patient-centric philosophy.
+                Having completed his post-graduation from <span className="font-semibold text-slate-800">S.N. Medical College, Agra</span> and rigorous Senior Residency at the prestigious <span className="font-semibold text-slate-800">Maulana Azad Medical College (MAMC) &amp; Lok Nayak Hospital, New Delhi</span>, Dr. Bhargava combines sub-millimeter surgical accuracy with compassionate, patient-first recovery.
               </p>
               <p>
-                As a Life Member of the <span className="font-semibold text-slate-800">Indian Orthopaedic Association (IOA)</span>, he is committed to tissue-preserving surgical techniques, sub-millimeter component positioning, and rapid 24-hour mobilization protocols that allow patients to regain pain-free independence within days.
+                As a Life Member of the <span className="font-semibold text-slate-800">Indian Orthopaedic Association (IOA)</span> and UPOA, he delivers comprehensive bone, joint &amp; fracture treatment — from non-surgical arthritis treatment and PRP therapy to knee replacement, hip replacement, and 24/7 trauma care at BMTC Orthopedic Hospital.
               </p>
             </div>
 

@@ -1,28 +1,38 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Orthopedic Treatments & Surgeries in Kanpur | Dr. Gaurav Bhargava",
+  title: "Bone, Joint & Fracture Treatment in Kanpur | Orthopedic Specialties | Joint Clinic",
   description:
-    "Explore 24+ orthopedic treatments in Kanpur across Knee Care, Hip Replacement, ACL Arthroscopy, Shoulder, Spine, PRP Therapy, and 24/7 Trauma Care by Dr. Gaurav Bhargava (MAMC New Delhi).",
+    "Comprehensive bone, joint & fracture treatment in Kanpur by Dr. Gaurav Bhargava (Best Orthopedic Surgeon & Joint Replacement Specialist). Knee, hip, sports injury, arthroscopy, and arthritis care.",
   keywords: [
-    "Orthopedic treatments Kanpur",
-    "Knee replacement surgery Kanpur",
-    "Hip replacement Kanpur",
-    "ACL ligament reconstruction Kanpur",
-    "Shoulder arthroscopy Kanpur",
-    "Slip disc treatment Kanpur",
-    "PRP therapy Kanpur",
-    "Dr Gaurav Bhargava treatments",
-    "Joint Clinic Kanpur",
-    "Best orthopedic doctor in Kanpur",
+    "Best Orthopedic Doctor in Kanpur",
+    "Best Orthopedic Surgeon in Kanpur",
+    "Orthopedic Doctor in Kanpur",
+    "Bone Specialist in Kanpur",
+    "Best Bone Doctor in Kanpur",
+    "Fracture Specialist in Kanpur",
+    "Bone, Joint & Fracture Treatment in Kanpur",
+    "Joint Replacement Surgeon in Kanpur",
+    "Knee Replacement Surgeon in Kanpur",
+    "Knee Pain Specialist in Kanpur",
+    "Hip Replacement Surgeon in Kanpur",
+    "Sports Injury Specialist in Kanpur",
+    "Arthroscopy Surgeon in Kanpur",
+    "Arthritis Treatment in Kanpur",
+    "Bone and Joint Specialist in Kanpur",
+    "Orthopedic Hospital in Kanpur",
+    "Bone Fracture Treatment in Kanpur",
+    "Orthopedic Clinic in Kanpur",
+    "Dr Gaurav Bhargava Orthopedic Doctor",
+    "Orthopedic Doctor Near Me",
   ],
   alternates: {
     canonical: "https://jointclinic.in/treatments",
   },
   openGraph: {
-    title: "Orthopedic Treatments & Surgeries | Joint Clinic Kanpur",
+    title: "Bone, Joint & Fracture Treatment in Kanpur | Joint Clinic",
     description:
-      "Clear, patient-friendly guide to knee replacements, hip surgery, ACL keyhole repairs, PRP injections, and spine care in Kanpur by Dr. Gaurav Bhargava.",
+      "Expert orthopedic care by Dr. Gaurav Bhargava: knee & hip replacement, sports injury arthroscopy, arthritis care, and 24/7 fracture trauma in Kanpur.",
     url: "https://jointclinic.in/treatments",
     siteName: "Joint Clinic Kanpur",
     images: [
@@ -36,8 +46,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Orthopedic Treatments in Kanpur | Joint Clinic",
-    description: "Common orthopedic procedures explained in simple patient language.",
+    title: "Bone, Joint & Fracture Treatment in Kanpur | Joint Clinic",
+    description: "24+ orthopedic treatments across knee, hip, sports injury, spine, PRP, and bone fracture care.",
     images: ["/images/doctor/gaurav-bhargava.png"],
   },
 };

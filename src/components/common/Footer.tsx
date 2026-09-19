@@ -36,7 +36,7 @@ export default function Footer() {
             </Link>
             
             <p className="text-black leading-relaxed text-sm">
-              A Centre of Arthroplasty &amp; Arthroscopy led by <strong className="text-black font-bold">Dr. Gaurav Bhargava</strong> (MBBS, MS Ortho, Ex-Senior Resident MAMC New Delhi). Delivering sub-millimeter precision joint replacement and rapid 24-hour walking recovery in Kanpur.
+              Led by <strong className="text-black font-bold">Dr. Gaurav Bhargava</strong> (Best Orthopedic Doctor &amp; Bone Specialist in Kanpur, Ex-Senior Resident MAMC New Delhi). Providing advanced bone, joint &amp; fracture treatment with rapid 24-hour walking recovery in Kanpur.
             </p>
             
             <div className="flex gap-3">
@@ -118,7 +118,7 @@ export default function Footer() {
           {/* Column 3: Orthopedic Procedures */}
           <div>
             <h4 className="text-lg font-serif font-bold mb-8 relative inline-block text-black">
-              Surgical Specialties
+              Bone &amp; Joint Treatments
               <span className="absolute -bottom-2 left-0 w-8 h-1 bg-[#02BAB9] rounded-full"></span>
             </h4>
             <ul className="space-y-3.5 text-black text-sm">

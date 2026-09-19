@@ -17,8 +17,8 @@ const serviceCategories = [
   {
     id: 'knee-replacement',
     icon: Activity,
-    title: 'Knee Replacement Surgery',
-    description: 'Complete relief from knee pain and arthritis with high-flexion, long-life implants and walking within 24 hours.',
+    title: 'Knee Replacement & Knee Pain Treatment',
+    description: 'Complete relief from severe knee pain and arthritis with high-flexion implants and walking within 24 hours by Kanpur’s leading knee replacement surgeon.',
     slug: '/treatments/total-knee-replacement',
     subServices: [
       'Minimally Invasive Subvastus TKR',
@@ -34,8 +34,8 @@ const serviceCategories = [
   {
     id: 'hip-replacement',
     icon: Bone,
-    title: 'Hip Replacement Surgery',
-    description: 'Modern ceramic bearings and cementless implants for Avascular Necrosis (AVN) and arthritis, restoring normal walking.',
+    title: 'Hip Replacement Surgery & AVN Care',
+    description: 'Modern ceramic bearings and cementless implants for Avascular Necrosis (AVN) and hip arthritis, restoring natural, stable walking.',
     slug: '/treatments/hip-replacement',
     subServices: [
       'Cementless Ceramic-on-Poly / Ceramic-on-Ceramic THR',
@@ -50,8 +50,8 @@ const serviceCategories = [
   {
     id: 'arthroscopy',
     icon: ShieldCheck,
-    title: 'Sports Injury & ACL Treatment',
-    description: 'Keyhole surgery for ACL ligament tears, meniscus damage, and sports knee injuries with fast return to fitness.',
+    title: 'Sports Injury Specialist & Arthroscopy',
+    description: 'Keyhole arthroscopy surgery for ACL ligament tears, meniscus damage, and sports knee injuries with fast return to active fitness.',
     slug: '/treatments/sports-injury-acl-treatment',
     subServices: [
       'ACL & PCL Ligament Keyhole Reconstruction',
@@ -66,8 +66,8 @@ const serviceCategories = [
   {
     id: 'prp-preservation',
     icon: HeartPulse,
-    title: 'PRP Therapy & Joint Pain Care',
-    description: 'Non-surgical cartilage protection, platelet-rich plasma (PRP) injections, and preventive joint lubrication.',
+    title: 'Arthritis Treatment & PRP Joint Care',
+    description: 'Non-surgical cartilage protection, platelet-rich plasma (PRP) injections, and joint lubrication to delay or avoid surgery.',
     slug: '/treatments/joint-preservation-prp',
     subServices: [
       'Autologous High-Concentration PRP Therapy',
@@ -81,8 +81,8 @@ const serviceCategories = [
   {
     id: 'trauma-fractures',
     icon: Sparkles,
-    title: 'Bone Fracture & Trauma Care',
-    description: '24/7 emergency surgical care for broken bones, road accident trauma, and complex fractures at BMTC Kidwai Nagar.',
+    title: 'Bone Fracture Treatment & 24/7 Trauma',
+    description: '24/7 emergency fracture specialist care for broken bones, accident trauma, and complex fractures at BMTC Orthopedic Hospital Kidwai Nagar.',
     slug: '/treatments/complex-trauma-fractures',
     subServices: [
       '24/7 Polytrauma & Accident Response',
@@ -96,8 +96,8 @@ const serviceCategories = [
   {
     id: 'spine-sciatica',
     icon: Activity,
-    title: 'Slip Disc & Sciatica Care',
-    description: 'Targeted nerve root decompression, postural physical therapy, and non-surgical care for back and neck pain.',
+    title: 'Slip Disc, Sciatica & Spine Care',
+    description: 'Targeted nerve root decompression, postural physical therapy, and non-surgical care for back, neck, and nerve pain.',
     slug: '/treatments/spine-sciatica-care',
     subServices: [
       'Lumbar Disc Herniation Conservative Protocols',
@@ -135,13 +135,13 @@ export default function ServicesOverview() {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
           <div className="max-w-2xl">
             <span className="text-brand-600 font-bold uppercase tracking-widest text-sm mb-4 block">
-              Surgical &amp; Non-Surgical Specialties
+              Bone, Joint &amp; Fracture Treatment in Kanpur
             </span>
             <h2 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-6">
-              Our Orthopedic Services
+              Our Orthopedic Services &amp; Specialties
             </h2>
             <p className="text-lg text-slate-600">
-              Delhi-standard surgical mastery across primary joint replacements, sports keyhole arthroscopy, and biological joint preservation in Kanpur.
+              Delhi-standard surgical mastery across knee replacement, hip replacement, sports arthroscopy, fracture care, and arthritis treatment in Kanpur.
             </p>
           </div>
           <button 
