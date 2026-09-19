@@ -1,31 +1,29 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Book Consultation & Second Opinion | Joint Clinic Kanpur",
+  title: "Book Orthopedic Consultation in Kanpur | Dr. Gaurav Bhargava | Joint Clinic",
   description:
-    "Schedule an outpatient consultation with Dr. Gaurav Bhargava at Joint Clinic (Swaroop Nagar) or BMTC (Kidwai Nagar), Kanpur. Fast-track appointment booking and second opinion on MRI/X-ray reports.",
+    "Schedule your consultation with Dr. Gaurav Bhargava, Best Orthopedic Doctor & Joint Replacement Surgeon in Kanpur. Clinics at Swaroop Nagar & BMTC Kidwai Nagar.",
+  keywords: [
+    "Orthopedic Doctor in Kanpur",
+    "Best Orthopedic Doctor in Kanpur",
+    "Best Orthopedic Surgeon in Kanpur",
+    "Dr Gaurav Bhargava Orthopedic Doctor",
+    "Orthopedic Doctor Near Me",
+    "Bone Specialist in Kanpur",
+    "Knee Pain Specialist in Kanpur",
+    "Joint Replacement Surgeon in Kanpur",
+    "Orthopedic Clinic in Kanpur",
+  ],
   alternates: {
     canonical: "https://jointclinic.in/appointment",
   },
   openGraph: {
-    title: "Book Consultation | Dr. Gaurav Bhargava — Joint Clinic Kanpur",
+    title: "Book Orthopedic Consultation in Kanpur | Dr. Gaurav Bhargava",
     description:
-      "Schedule your orthopedic consultation or MRI second opinion with Dr. Gaurav Bhargava in Kanpur. Available at Swaroop Nagar and BMTC Kidwai Nagar.",
+      "Direct OPD consultation booking at Swaroop Nagar & BMTC Kidwai Nagar with Kanpur's leading orthopedic surgeon.",
     url: "https://jointclinic.in/appointment",
-    images: [
-      {
-        url: "/images/doctor/gaurav-bhargava.png",
-        width: 800,
-        height: 800,
-        alt: "Dr. Gaurav Bhargava — Joint Clinic Kanpur",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Book Consultation | Dr. Gaurav Bhargava — Joint Clinic Kanpur",
-    description: "Book an orthopedic appointment at Swaroop Nagar or BMTC Kidwai Nagar, Kanpur.",
-    images: ["/images/doctor/gaurav-bhargava.png"],
+    siteName: "Joint Clinic Kanpur",
   },
 };
 

@@ -1,31 +1,26 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Patient Stories & Recovery Reviews | Joint Clinic Kanpur",
+  title: "Patient Reviews & Recovery Stories | Dr. Gaurav Bhargava | Joint Clinic Kanpur",
   description:
-    "Real video testimonials and verified recovery reviews from patients who underwent Total Knee Replacement, Hip Surgery, and ACL Arthroscopy with Dr. Gaurav Bhargava in Kanpur.",
+    "Read real patient reviews and recovery stories for knee replacement, hip surgery, arthroscopy, and fracture treatments by Dr. Gaurav Bhargava in Kanpur.",
+  keywords: [
+    "Best Orthopedic Doctor in Kanpur",
+    "Knee Replacement Surgeon in Kanpur",
+    "Dr Gaurav Bhargava Orthopedic Doctor",
+    "Joint Replacement Surgeon in Kanpur",
+    "Orthopedic Hospital in Kanpur",
+    "Bone Specialist in Kanpur",
+  ],
   alternates: {
     canonical: "https://jointclinic.in/testimonials",
   },
   openGraph: {
-    title: "Patient Testimonials & Reviews | Joint Clinic Kanpur",
+    title: "Patient Reviews & Recovery Stories | Joint Clinic Kanpur",
     description:
-      "Watch inspiring recovery journeys of patients walking pain-free after joint replacement surgery by Dr. Gaurav Bhargava.",
+      "Real patient experiences and verified surgical outcomes from Dr. Gaurav Bhargava's orthopedic patients in Kanpur.",
     url: "https://jointclinic.in/testimonials",
-    images: [
-      {
-        url: "/images/doctor/gaurav-bhargava.png",
-        width: 800,
-        height: 800,
-        alt: "Dr. Gaurav Bhargava — Joint Clinic Kanpur",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Patient Testimonials | Joint Clinic Kanpur",
-    description: "Verified reviews and video recovery stories from Dr. Gaurav Bhargava's patients.",
-    images: ["/images/doctor/gaurav-bhargava.png"],
+    siteName: "Joint Clinic Kanpur",
   },
 };
 
