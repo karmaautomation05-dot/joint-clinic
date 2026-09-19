@@ -155,6 +155,18 @@ export default function DedicatedRecoveryCategoryPage({
         name: `${guide.title} | Joint Clinic Kanpur`,
         description: guide.overview,
       },
+      {
+        "@type": "HowTo",
+        "@id": `https://jointclinic.in/recovery-guide/${guide.id}#howto`,
+        name: `${guide.title}: Step-by-Step Patient Recovery Roadmap`,
+        description: guide.overview,
+        step: guide.phases.map((phase, idx) => ({
+          "@type": "HowToStep",
+          position: idx + 1,
+          name: `${phase.phase}: ${phase.title}`,
+          text: `${phase.focus}. Recommended actions: ${phase.actions.join("; ")}. Clinical tip: ${phase.tip}`,
+        })),
+      },
     ],
   };
 
@@ -225,6 +237,26 @@ export default function DedicatedRecoveryCategoryPage({
 
       {/* Main Container */}
       <div className="container mt-12 sm:mt-16 space-y-16">
+        {/* AEO Rehabilitation Milestone Summary Box for Search & AI Assistants */}
+        <div className="bg-brand-50/60 rounded-3xl border border-brand-200/80 p-6 sm:p-8 space-y-3 shadow-xs aeo-summary">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#059B8F] text-white flex items-center justify-center shrink-0">
+              <GuideIcon className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#059B8F]">
+                Rehabilitation Milestones &bull; AI Knowledge Snapshot
+              </span>
+              <h3 className="text-lg font-serif font-bold text-slate-900">
+                {guide.title} at a Glance
+              </h3>
+            </div>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans aeo-answer">
+            The <strong>{guide.title}</strong> at Joint Clinic, Kanpur is directed by <strong>Dr. Gaurav Bhargava</strong> (Ex-Senior Resident MAMC New Delhi). Following advanced tissue-sparing techniques, patients experience a structured {guide.phases.length}-phase recovery starting with {guide.phases[0]?.focus.toLowerCase()} and progressing to {guide.phases[guide.phases.length - 1]?.focus.toLowerCase()}. Regular follow-up reviews are conducted at Joint Clinic Swaroop Nagar and BMTC Hospital Kidwai Nagar.
+          </p>
+        </div>
+
         {/* Home Preparation Checklist (Cards) */}
         {guide.homePrep && guide.homePrep.length > 0 && (
           <section className="bg-slate-50 rounded-3xl p-6 sm:p-10 border border-slate-200/90 shadow-2xs">

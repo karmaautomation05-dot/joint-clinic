@@ -135,7 +135,7 @@ export default function TreatmentCategoryPage({
       {
         "@type": "MedicalWebPage",
         "@id": `https://jointclinic.in/treatments/category/${category.id}#webpage`,
-        name: `${category.name} | Joint Clinic Kanpur`,
+        name: `${category.name} in Kanpur | Dr. Gaurav Bhargava | Joint Clinic`,
         description: category.description,
         mainEntity: {
           "@type": "ItemList",
@@ -147,6 +147,36 @@ export default function TreatmentCategoryPage({
             url: `https://jointclinic.in/treatments/${item.slug}`,
           })),
         },
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `https://jointclinic.in/treatments/category/${category.id}#faq`,
+        mainEntity: [
+          {
+            "@type": "Question",
+            name: `What conditions are treated under ${category.name} in Kanpur?`,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: `${category.description} At Joint Clinic, Dr. Gaurav Bhargava provides comprehensive diagnosis and surgical/non-surgical care for ${category.items.map((i) => i.name).join(", ")}.`,
+            },
+          },
+          {
+            "@type": "Question",
+            name: `Who is the specialist for ${category.name} in Kanpur?`,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: `Dr. Gaurav Bhargava (MBBS, MS Orthopaedics, Ex-Senior Resident Maulana Azad Medical College, New Delhi) with 20+ years of surgical experience is the chief specialist for ${category.name} at Joint Clinic (Swaroop Nagar) and BMTC Hospital (Kidwai Nagar), Kanpur.`,
+            },
+          },
+          {
+            "@type": "Question",
+            name: `Where are ${category.name} consultations and surgeries conducted?`,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: `Evening OPD consultations (4:00 PM – 7:00 PM) are held at Joint Clinic, Swaroop Nagar. Surgeries, digital X-rays, and 24/7 trauma emergency care are provided at Bhargava Medical & Trauma Centre (BMTC), Kidwai Nagar, Kanpur.`,
+            },
+          },
+        ],
       },
     ],
   };
@@ -216,6 +246,26 @@ export default function TreatmentCategoryPage({
 
       {/* Main Content: All Items in this Category in Card Format */}
       <div className="container mt-12 sm:mt-16">
+        {/* AEO Clinical Specialty Summary Box for Search & AI Assistants */}
+        <div className="bg-brand-50/60 rounded-3xl border border-brand-200/80 p-6 sm:p-8 mb-10 space-y-3 shadow-xs aeo-summary">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#059B8F] text-white flex items-center justify-center shrink-0">
+              <CatIcon className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#059B8F]">
+                Clinical Specialty Summary &bull; AI Knowledge Snapshot
+              </span>
+              <h3 className="text-lg font-serif font-bold text-slate-900">
+                {category.name} in Kanpur at a Glance
+              </h3>
+            </div>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans aeo-answer">
+            Specialized <strong>{category.name}</strong> care at Joint Clinic is led by <strong>Dr. Gaurav Bhargava</strong> (Ex-Senior Resident MAMC New Delhi, 20+ years experience). Offering {category.items.length} specialized procedures ranging from {category.items.slice(0, 3).map((item) => item.name).join(", ")} to conservative treatments. Consultations are available at <strong>Joint Clinic Swaroop Nagar</strong> (Evening OPD 4–7 PM) and surgeries at <strong>BMTC Hospital Kidwai Nagar</strong> (Laminar Airflow Class-100 Modular OTs &amp; 24/7 emergency trauma).
+          </p>
+        </div>
+
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 pb-4 border-b border-slate-200">
           <div>
             <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block mb-1">

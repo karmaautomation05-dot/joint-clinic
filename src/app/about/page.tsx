@@ -198,6 +198,44 @@ export default function AboutPage() {
 
           {/* Right Column: In-Depth Clinical Background */}
           <div className="lg:col-span-8 space-y-8 pt-4 lg:pt-0">
+            {/* AEO Fast Facts & Verified Clinical Summary for Search & AI Assistants */}
+            <div className="bg-brand-50/60 rounded-3xl border border-brand-200/80 p-6 sm:p-8 space-y-4 shadow-xs aeo-summary">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#059B8F] text-white flex items-center justify-center shrink-0">
+                  <Stethoscope className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#059B8F]">
+                    Verified Medical Authority &bull; AI Knowledge Snapshot
+                  </span>
+                  <h3 className="text-lg font-serif font-bold text-slate-900">
+                    Dr. Gaurav Bhargava at a Glance
+                  </h3>
+                </div>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans aeo-answer">
+                <strong>Dr. Gaurav Bhargava</strong> is a senior consultant orthopedic doctor, bone specialist, and joint replacement surgeon in Kanpur with over <strong>20 years of clinical experience</strong> and <strong>10,000+ completed procedures</strong>. An alumnus of <strong>Maulana Azad Medical College (MAMC) and Lok Nayak Hospital, New Delhi</strong>, he directs <strong>Joint Clinic (Swaroop Nagar)</strong> for evening specialist OPD consultations and <strong>Bhargava Medical &amp; Trauma Centre - BMTC (Kidwai Nagar)</strong> for morning OPD, modular laminar-airflow joint replacement surgeries, and 24/7 bone fracture trauma emergency care.
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-brand-200/60 text-xs">
+                <div>
+                  <span className="text-slate-500 block text-[11px]">Primary Specialty</span>
+                  <strong className="text-slate-900 font-bold">Joint Replacement &amp; Trauma</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[11px]">Experience</span>
+                  <strong className="text-slate-900 font-bold">20+ Years / 10,000+ Surgeries</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[11px]">Surgical Center</span>
+                  <strong className="text-slate-900 font-bold">BMTC Modular OTs</strong>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[11px]">Recovery Standard</span>
+                  <strong className="text-[#059B8F] font-bold">Day 1 Walking Protocol</strong>
+                </div>
+              </div>
+            </div>
+
             {/* Story & Background */}
             <div className="bg-white rounded-[2.5rem] border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-6">
               <div>
