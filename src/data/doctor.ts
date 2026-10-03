@@ -125,12 +125,6 @@ export const DOCTOR_DATA: DoctorProfile = {
       role: "Director & Chief Surgeon",
     },
     {
-      src: "/images/doctor/dr-gaurav-formal.png",
-      alt: "Dr. Gaurav Bhargava - Bone, Joint & Fracture Specialist",
-      label: "Clinical & Trauma Rigor",
-      role: "20+ Years Surgical Excellence",
-    },
-    {
       src: "/images/doctor/gaurav-bhargava.png",
       alt: "Dr. Gaurav Bhargava - Orthopedic Specialist Kanpur",
       label: "Specialist OPD Consultations",
