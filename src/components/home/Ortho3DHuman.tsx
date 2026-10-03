@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import type * as THREE from 'three'
+import { buildFullBodySkeleton } from '@/utils/skeleton3D'
 
 export interface Joint3DInfo {
   id: string
@@ -67,18 +68,40 @@ interface Ortho3DHumanProps {
   activeJointId: string | null
   onSelectJoint: (id: string | null) => void
   activeColor: string
+  viewMode?: 'normal' | 'skeleton'
+  onToggleViewMode?: (mode: 'normal' | 'skeleton') => void
 }
 
 export default function Ortho3DHuman({
   activeJointId,
   onSelectJoint,
   activeColor,
+  viewMode: propViewMode,
+  onToggleViewMode,
 }: Ortho3DHumanProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const [isLoading, setIsLoading] = useState(true)
   const [loadProgress, setLoadProgress] = useState(0)
+
+  // View Mode: 'normal' (middle-aged gentleman) vs 'skeleton' (full-body skeletal X-Ray)
+  const [internalViewMode, setInternalViewMode] = useState<'normal' | 'skeleton'>('normal')
+  const viewMode = propViewMode ?? internalViewMode
+  const setViewMode = useCallback(
+    (mode: 'normal' | 'skeleton') => {
+      setInternalViewMode(mode)
+      onToggleViewMode?.(mode)
+    },
+    [onToggleViewMode]
+  )
+
+  // In joint X-Ray view: toggle native joint anatomy vs surgical replacement implant
+  const [showImplant, setShowImplant] = useState(false)
+
+  useEffect(() => {
+    setShowImplant(false)
+  }, [activeJointId])
 
   // Full body camera initial view: z = 3.10 perfectly fits 1.85m human male head-to-toe
   const FULL_BODY_CAM: [number, number, number] = [0, 0.0, 3.10]
@@ -95,6 +118,7 @@ export default function Ortho3DHuman({
   const stateRef = useRef<{
     selectJoint?: (id: string | null) => void
     resetView?: () => void
+    applyVisualMode?: (mode: 'normal' | 'skeleton', activeJoint: string | null, implant: boolean) => void
   }>({})
 
   useEffect(() => {
@@ -445,6 +469,80 @@ export default function Ortho3DHuman({
             }
           })
 
+          // Build smooth, realistic anatomical skeleton and surgical implants directly on armature bones
+          const skeletonResult = buildFullBodySkeleton(THREE as any, boneMap)
+          characterGroup.add(skeletonResult.skeletonGroup)
+
+          // Store mesh material information for switching between Normal and Skeleton/X-Ray
+          const avatarMeshes: Array<{
+            mesh: any
+            originalColor: THREE.Color
+            originalRoughness: number
+            originalMetalness: number
+          }> = []
+
+          model.traverse((child: any) => {
+            if (child.isMesh && child.material) {
+              avatarMeshes.push({
+                mesh: child,
+                originalColor: child.material.color.clone(),
+                originalRoughness: child.material.roughness,
+                originalMetalness: child.material.metalness,
+              })
+            }
+          })
+
+          function applyVisualMode(
+            mode: 'normal' | 'skeleton',
+            jointId: string | null,
+            implant: boolean
+          ) {
+            const isXray = mode === 'skeleton' || jointId !== null
+
+            if (isXray) {
+              skeletonResult.skeletonGroup.visible = true
+              avatarMeshes.forEach((item) => {
+                const mat = item.mesh.material
+                if (mat) {
+                  mat.transparent = true
+                  mat.opacity = mode === 'skeleton' ? 0.16 : 0.22
+                  mat.depthWrite = false
+                  mat.color.setHex(0x38bdf8) // Medical cyan radiograph tone
+                  mat.needsUpdate = true
+                }
+              })
+            } else {
+              skeletonResult.skeletonGroup.visible = false
+              avatarMeshes.forEach((item) => {
+                const mat = item.mesh.material
+                if (mat) {
+                  mat.transparent = false
+                  mat.opacity = 1.0
+                  mat.depthWrite = true
+                  mat.color.copy(item.originalColor)
+                  mat.roughness = item.originalRoughness
+                  mat.metalness = item.originalMetalness
+                  mat.needsUpdate = true
+                }
+              })
+            }
+
+            // Update surgical implants
+            Object.keys(skeletonResult.jointImplants).forEach((key) => {
+              const imp = skeletonResult.jointImplants[key]
+              if (imp) {
+                if (jointId && implant) {
+                  imp.visible = key === jointId || key === `${jointId}_femur`
+                } else {
+                  imp.visible = false
+                }
+              }
+            })
+          }
+
+          stateRef.current.applyVisualMode = applyVisualMode
+          applyVisualMode(viewMode, activeJointId, showImplant)
+
           characterGroup.add(model)
           model.updateMatrixWorld(true)
 
@@ -751,12 +849,21 @@ export default function Ortho3DHuman({
     }
   }, [activeJointId])
 
+  // React to viewMode, activeJointId, or showImplant changes
+  useEffect(() => {
+    if (stateRef.current.applyVisualMode) {
+      stateRef.current.applyVisualMode(viewMode, activeJointId, showImplant)
+    }
+  }, [viewMode, activeJointId, showImplant])
+
   const handleResetCamera = useCallback(() => {
     onSelectJoint(null)
     if (stateRef.current.resetView) {
       stateRef.current.resetView()
     }
   }, [onSelectJoint])
+
+  const activeJointInfo = activeJointId ? JOINTS_3D_DATA.find((j) => j.id === activeJointId) : null
 
   return (
     <div
@@ -785,6 +892,46 @@ export default function Ortho3DHuman({
         className="w-full h-full cursor-grab active:cursor-grabbing block"
       />
 
+      {/* View Mode Toggle: Normal View vs Full Body Skeleton X-Ray (Top Left) */}
+      <div className="absolute top-4 left-4 z-20 flex items-center bg-white/95 backdrop-blur-md p-1 rounded-full border border-slate-200 shadow-md">
+        <button
+          type="button"
+          onClick={() => setViewMode('normal')}
+          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+            viewMode === 'normal'
+              ? 'bg-slate-900 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
+          title="Switch to Normal Clothed Male View"
+        >
+          <span>👤 Normal</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setViewMode('skeleton')}
+          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+            viewMode === 'skeleton'
+              ? 'bg-brand-600 text-white shadow-xs shadow-brand-500/20'
+              : 'text-slate-600 hover:text-brand-700 hover:bg-slate-100'
+          }`}
+          title="Switch to Full Body Anatomical Skeleton X-Ray"
+        >
+          <span>🦴 Skeleton X-Ray</span>
+        </button>
+      </div>
+
+      {/* Active Joint Digital X-Ray HUD (Top Center) */}
+      {activeJointId && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 bg-slate-900/90 text-white backdrop-blur-md px-3.5 py-1.5 rounded-full border border-sky-400/40 shadow-lg text-[11px] font-mono">
+          <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+          <span className="font-bold tracking-wider text-sky-300">HIGH-DEF X-RAY</span>
+          <span className="text-slate-400">•</span>
+          <span className="text-slate-100 uppercase font-sans font-bold">
+            {activeJointInfo?.label || activeJointId}
+          </span>
+        </div>
+      )}
+
       {/* Clean Full Body / Reset Button (Top Right) */}
       <div className="absolute top-4 right-4 z-20">
         <button
@@ -799,12 +946,42 @@ export default function Ortho3DHuman({
         </button>
       </div>
 
-      {/* Subtle Drag Hint (Bottom Center) */}
-      <div className="absolute bottom-3 inset-x-0 pointer-events-none text-center hidden sm:block z-10">
-        <span className="text-[11px] font-medium text-slate-500 bg-white/90 px-3.5 py-1 rounded-full border border-slate-200/80 shadow-xs">
-          Drag to rotate 360° • Click any joint to inspect
-        </span>
-      </div>
+      {/* Joint Anatomy vs Surgical Implant Toggle (Bottom Center when Joint is Active) */}
+      {activeJointId && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center bg-white/95 backdrop-blur-md p-1 rounded-2xl border border-slate-200/90 shadow-xl">
+          <button
+            type="button"
+            onClick={() => setShowImplant(false)}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              !showImplant
+                ? 'bg-slate-900 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <span>🦴 Natural Bone Anatomy</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowImplant(true)}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              showImplant
+                ? 'bg-brand-600 text-white shadow-xs shadow-brand-500/20'
+                : 'text-slate-600 hover:text-brand-700 hover:bg-slate-100'
+            }`}
+          >
+            <span>🦾 Surgical Reconstruction</span>
+          </button>
+        </div>
+      )}
+
+      {/* Subtle Drag Hint (Bottom Center when in Full Body Overview) */}
+      {!activeJointId && (
+        <div className="absolute bottom-3 inset-x-0 pointer-events-none text-center hidden sm:block z-10">
+          <span className="text-[11px] font-medium text-slate-500 bg-white/90 px-3.5 py-1 rounded-full border border-slate-200/80 shadow-xs">
+            Drag to rotate 360° • Click any joint to inspect X-Ray &amp; Implants
+          </span>
+        </div>
+      )}
     </div>
   )
 }

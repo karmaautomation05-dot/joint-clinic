@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { ArrowRight, CheckCircle2, Phone, Calendar } from 'lucide-react'
+import { getAnatomyType } from '@/utils/anatomy'
 
 // Dynamically import the WebGL 3D clothed human male with SSR disabled
 const Ortho3DHuman = dynamic(() => import('./Ortho3DHuman'), {
@@ -22,6 +23,17 @@ const Ortho3DHuman = dynamic(() => import('./Ortho3DHuman'), {
           Initializing Interactive Musculoskeletal View
         </div>
       </div>
+    </div>
+  ),
+})
+
+// Dynamically import high-definition 3D Joint Anatomy viewer
+const JointAnatomy3D = dynamic(() => import('@/components/common/JointAnatomy3D'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[320px] rounded-2xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center gap-2">
+      <div className="w-8 h-8 rounded-full border-2 border-brand-500/20 border-t-brand-600 animate-spin" />
+      <span className="text-xs text-slate-500 font-medium">Loading 3D Joint Anatomy...</span>
     </div>
   ),
 })
@@ -153,6 +165,8 @@ const JOINTS: JointZone[] = [
 
 export default function BodyMapSelector() {
   const [activeJointId, setActiveJointId] = useState<string | null>(null)
+  const [viewMode, setViewMode] = useState<'normal' | 'skeleton'>('normal')
+  const [rightPanelTab, setRightPanelTab] = useState<'protocol' | 'anatomy'>('protocol')
 
   const activeJoint = activeJointId ? JOINTS.find((j) => j.id === activeJointId) : null
   const currentColor = activeJoint?.color || '#059B8F'
@@ -174,12 +188,38 @@ export default function BodyMapSelector() {
             Explore Your Joint &amp; Treatment
           </h2>
           <p className="text-sm sm:text-base md:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-            View the full 3D human body below. Click any joint pin or select a body part to focus the camera and inspect Dr. Gaurav Bhargava&apos;s specialized surgical procedures.
+            View the full 3D human body below. Click any joint pin or select a body part to focus the camera and inspect Dr. Gaurav Bhargava&apos;s specialized surgical procedures in high-definition X-Ray.
           </p>
         </div>
 
-        {/* Clean Body Part Selection Buttons */}
+        {/* Clean Body Part & View Mode Selection Bar */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-8 sm:mb-10">
+          {/* Normal Clothed vs Full Skeleton View Toggle */}
+          <div className="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200 shadow-xs mr-1">
+            <button
+              type="button"
+              onClick={() => setViewMode('normal')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                viewMode === 'normal'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>👤 Clothed</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('skeleton')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                viewMode === 'skeleton'
+                  ? 'bg-brand-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-brand-700'
+              }`}
+            >
+              <span>🦴 Skeleton X-Ray</span>
+            </button>
+          </div>
+
           {/* Full Body Overview Button */}
           <button
             onClick={() => setActiveJointId(null)}
@@ -202,7 +242,10 @@ export default function BodyMapSelector() {
             return (
               <button
                 key={j.id}
-                onClick={() => setActiveJointId(j.id)}
+                onClick={() => {
+                  setActiveJointId(j.id)
+                  setRightPanelTab('protocol')
+                }}
                 className={`flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
                   isSelected
                     ? 'text-white shadow-md shadow-brand-600/20'
@@ -235,8 +278,13 @@ export default function BodyMapSelector() {
           <div className="lg:col-span-7 flex flex-col justify-center">
             <Ortho3DHuman
               activeJointId={activeJointId}
-              onSelectJoint={(id) => setActiveJointId(id)}
+              onSelectJoint={(id) => {
+                setActiveJointId(id)
+                if (id) setRightPanelTab('protocol')
+              }}
               activeColor={currentColor}
+              viewMode={viewMode}
+              onToggleViewMode={setViewMode}
             />
           </div>
 
@@ -250,9 +298,9 @@ export default function BodyMapSelector() {
               }}
             >
               {activeJoint ? (
-                // SPECIFIC JOINT PROCEDURE VIEW
+                // SPECIFIC JOINT PROCEDURE & 3D X-RAY VIEW
                 <div>
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-3">
                     <span
                       className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full"
                       style={{
@@ -267,60 +315,103 @@ export default function BodyMapSelector() {
                     </span>
                   </div>
 
-                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mb-3 leading-snug">
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mb-2 leading-snug">
                     {activeJoint.treatmentName}
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
-                    {activeJoint.desc}
-                  </p>
+                  {/* Interactive Tab Switch: Protocol vs 3D Joint Anatomy */}
+                  <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 border border-slate-200 mb-4">
+                    <button
+                      type="button"
+                      onClick={() => setRightPanelTab('protocol')}
+                      className={`flex-1 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        rightPanelTab === 'protocol'
+                          ? 'bg-white text-slate-900 shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <span>📋 Surgical Protocol</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRightPanelTab('anatomy')}
+                      className={`flex-1 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                        rightPanelTab === 'anatomy'
+                          ? 'bg-white text-brand-700 shadow-xs'
+                          : 'text-slate-600 hover:text-brand-700'
+                      }`}
+                    >
+                      <span>🔬 3D X-Ray &amp; Implants</span>
+                    </button>
+                  </div>
 
-                  <div className="grid grid-cols-3 gap-2 sm:gap-2.5 mb-6">
-                    {activeJoint.stats.map((stat, i) => (
-                      <div
-                        key={i}
-                        className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-center"
-                      >
-                        <div
-                          className="text-xs sm:text-sm font-bold leading-tight"
-                          style={{ color: activeJoint.color }}
-                        >
-                          {stat}
+                  {rightPanelTab === 'anatomy' ? (
+                    <div className="mb-6">
+                      <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-inner bg-slate-50">
+                        <JointAnatomy3D
+                          type={getAnatomyType(activeJoint.slug || activeJoint.id)}
+                          title={`${activeJoint.label} 3D Anatomy & Implants`}
+                          subtitle="High-Definition Surgical Reconstruction"
+                        />
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-2 text-center">
+                        Interactive 360° X-Ray View • Click callout pins to inspect components
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-5">
+                        {activeJoint.desc}
+                      </p>
+
+                      <div className="grid grid-cols-3 gap-2 sm:gap-2.5 mb-5">
+                        {activeJoint.stats.map((stat, i) => (
+                          <div
+                            key={i}
+                            className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-center"
+                          >
+                            <div
+                              className="text-xs sm:text-sm font-bold leading-tight"
+                              style={{ color: activeJoint.color }}
+                            >
+                              {stat}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mb-5 space-y-2.5">
+                        <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                          Surgical Protocol &amp; Rigor:
+                        </div>
+                        {activeJoint.surgicalFeatures.map((feat, i) => (
+                          <div key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700">
+                            <CheckCircle2
+                              size={16}
+                              className="shrink-0 mt-0.5"
+                              style={{ color: activeJoint.color }}
+                            />
+                            <span>{feat}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs mb-6">
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-slate-500 font-medium shrink-0">Implant / Protocol:</span>
+                          <span className="text-right font-semibold text-slate-900">
+                            {activeJoint.implantType}
+                          </span>
+                        </div>
+                        <div className="flex items-start justify-between gap-2 pt-2 border-t border-slate-200">
+                          <span className="text-slate-500 font-medium shrink-0">Mobilization:</span>
+                          <span className="text-right font-bold text-emerald-700">
+                            {activeJoint.recoveryTime}
+                          </span>
                         </div>
                       </div>
-                    ))}
-                  </div>
-
-                  <div className="mb-6 space-y-2.5">
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                      Surgical Protocol &amp; Rigor:
                     </div>
-                    {activeJoint.surgicalFeatures.map((feat, i) => (
-                      <div key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700">
-                        <CheckCircle2
-                          size={16}
-                          className="shrink-0 mt-0.5"
-                          style={{ color: activeJoint.color }}
-                        />
-                        <span>{feat}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs mb-6">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="text-slate-500 font-medium shrink-0">Implant / Protocol:</span>
-                      <span className="text-right font-semibold text-slate-900">
-                        {activeJoint.implantType}
-                      </span>
-                    </div>
-                    <div className="flex items-start justify-between gap-2 pt-2 border-t border-slate-200">
-                      <span className="text-slate-500 font-medium shrink-0">Mobilization:</span>
-                      <span className="text-right font-bold text-emerald-700">
-                        {activeJoint.recoveryTime}
-                      </span>
-                    </div>
-                  </div>
+                  )}
                 </div>
               ) : (
                 // FULL BODY OVERVIEW (SHOWN ON INITIAL LOAD & FULL BODY SELECTION)
