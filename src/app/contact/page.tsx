@@ -101,7 +101,7 @@ export default function ContactPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       {/* Header */}
-      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-12 sm:py-16 lg:py-20 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#02BAB9]/20 rounded-full blur-3xl pointer-events-none translate-y-1/2 -translate-x-1/2"></div>
 
@@ -114,13 +114,13 @@ export default function ContactPage() {
               <span className="text-[#F5CD09] font-medium">Contact</span>
             </nav>
 
-            <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-3 sm:mb-4">
               Orthopedic Doctor Near Me • Swaroop Nagar &amp; Kidwai Nagar
             </span>
-            <h1 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
               Orthopedic Clinic &amp; Hospital in Kanpur
             </h1>
-            <p className="text-lg sm:text-xl text-white/90 mt-4 leading-relaxed font-sans">
+            <p className="text-base sm:text-lg md:text-xl text-white/90 mt-3 sm:mt-4 leading-relaxed font-sans">
               Looking for the best orthopedic doctor, bone specialist, or joint replacement surgeon near you in Kanpur? Dr. Gaurav Bhargava consults at Joint Clinic (Swaroop Nagar) and Bhargava Medical &amp; Trauma Centre (BMTC, Kidwai Nagar) for comprehensive bone, joint &amp; fracture treatment.
             </p>
           </div>
@@ -128,15 +128,15 @@ export default function ContactPage() {
       </section>
 
       {/* Dual Locations Cards with Maps */}
-      <div className="container -mt-10 relative z-20 space-y-12">
+      <div className="container -mt-8 sm:-mt-10 relative z-20 space-y-8 sm:space-y-12">
         {CLINIC_LOCATIONS.map((clinic, idx) => (
           <div
             key={clinic.id}
-            className="bg-white rounded-[2.5rem] border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+            className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
           >
             <div className="grid grid-cols-1 lg:grid-cols-12">
               {/* Info Column */}
-              <div className="lg:col-span-6 p-8 sm:p-12 space-y-6 flex flex-col justify-between">
+              <div className="lg:col-span-6 p-5 sm:p-8 md:p-10 space-y-5 sm:space-y-6 flex flex-col justify-between">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700 px-3 py-1 rounded-full bg-brand-50 border border-brand-100 inline-block">
                     {clinic.timings.badge}
@@ -230,13 +230,13 @@ export default function ContactPage() {
         ))}
 
         {/* 24/7 Emergency Trauma Callout */}
-        <div className="bg-gradient-to-r from-red-950 via-brand-950 to-slate-950 text-white rounded-[2.5rem] p-8 sm:p-12 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6 border border-red-900/30">
+        <div className="bg-gradient-to-r from-red-950 via-brand-950 to-slate-950 text-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6 border border-red-900/30">
           <div className="space-y-2 text-center sm:text-left">
             <div className="flex items-center gap-2 text-red-300 text-xs font-bold uppercase tracking-wider justify-center sm:justify-start">
               <ShieldCheck className="w-4 h-4" />
               <span>24/7 Emergency Polytrauma &amp; Fractures</span>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-serif font-bold">Accident or Acute Fracture Emergency?</h3>
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold">Accident or Acute Fracture Emergency?</h3>
             <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
               Bhargava Medical &amp; Trauma Centre (BMTC), Kidwai Nagar operates round-the-clock emergency casualty, digital X-rays, modular OTs, and ICU resuscitation.
             </p>
@@ -244,7 +244,7 @@ export default function ContactPage() {
 
           <a
             href={`tel:${PRIMARY_CONTACT.emergencyPhone}`}
-            className="btn-primary bg-red-600 hover:bg-red-700 py-3.5 px-7 text-xs font-bold shrink-0 flex items-center gap-2 shadow-lg shadow-red-600/30"
+            className="btn-primary bg-red-600 hover:bg-red-700 py-3.5 px-6 sm:px-7 text-xs font-bold shrink-0 flex items-center gap-2 shadow-lg shadow-red-600/30 w-full sm:w-auto justify-center"
           >
             <Phone className="w-4 h-4 text-white" />
             <span>Emergency: {PRIMARY_CONTACT.emergencyPhoneDisplay}</span>
@@ -252,7 +252,7 @@ export default function ContactPage() {
         </div>
 
         {/* Neighborhood Proximity Guide for "Orthopedic Doctor Near Me" SEO */}
-        <div className="bg-slate-50 border border-slate-200/80 rounded-[2.5rem] p-8 sm:p-12 space-y-8">
+        <div className="bg-slate-50 border border-slate-200/80 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 space-y-6 sm:space-y-8">
           <div className="max-w-3xl">
             <span className="text-xs font-bold uppercase tracking-wider text-brand-700 px-3 py-1 rounded-full bg-brand-50 border border-brand-100 inline-block mb-3">
               Kanpur Localities &amp; Connectivity

@@ -130,23 +130,23 @@ export default function ServicesOverview() {
   }
 
   return (
-    <section className="section-padding bg-white" id="treatments">
+    <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white" id="treatments">
       <div className="container">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 gap-6">
           <div className="max-w-2xl">
-            <span className="text-brand-600 font-bold uppercase tracking-widest text-sm mb-4 block">
+            <span className="text-brand-600 font-bold uppercase tracking-widest text-xs sm:text-sm mb-3 sm:mb-4 block">
               Bone, Joint &amp; Fracture Treatment in Kanpur
             </span>
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-4 sm:mb-6 leading-tight">
               Our Orthopedic Services &amp; Specialties
             </h2>
-            <p className="text-lg text-slate-600">
+            <p className="text-sm sm:text-base md:text-lg text-slate-600 leading-relaxed">
               Delhi-standard surgical mastery across knee replacement, hip replacement, sports arthroscopy, fracture care, and arthritis treatment in Kanpur.
             </p>
           </div>
           <button 
             onClick={toggleAll}
-            className="btn-secondary group flex items-center justify-center gap-2 whitespace-nowrap h-fit shadow-sm"
+            className="btn-secondary group flex items-center justify-center gap-2 whitespace-nowrap h-fit shadow-xs text-xs sm:text-sm py-2.5 sm:py-3 px-4 sm:px-5"
           >
             <span>{isAllExpanded ? 'Collapse All Specialties' : 'View All Specialties & Procedures'}</span>
             <ChevronDown 
@@ -156,19 +156,21 @@ export default function ServicesOverview() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           {serviceCategories.map((category) => {
             const isExpanded = expandedCategories.includes(category.id)
             
             return (
               <div 
                 key={category.id} 
-                className={`group rounded-[2rem] bg-white border border-slate-200/80 transition-all duration-300 overflow-hidden ${
-                  isExpanded ? 'shadow-xl border-brand-300 ring-1 ring-brand-200' : 'hover:shadow-lg hover:border-brand-200'
+                className={`group rounded-3xl bg-white border transition-all duration-300 overflow-hidden ${
+                  isExpanded 
+                    ? 'shadow-xl border-brand-300 ring-1 ring-brand-200' 
+                    : 'border-slate-200/80 hover:shadow-lg hover:border-brand-200'
                 }`}
               >
                 <div 
-                  className="p-8 cursor-pointer flex flex-col sm:flex-row gap-6 items-start"
+                  className="p-5 sm:p-7 md:p-8 cursor-pointer flex flex-col sm:flex-row gap-4 sm:gap-6 items-start"
                   onClick={() => toggleCategory(category.id)}
                   role="button"
                   aria-expanded={isExpanded}
@@ -181,25 +183,27 @@ export default function ServicesOverview() {
                     }
                   }}
                 >
-                  <div className={`shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center transition-colors duration-300 ${
-                    isExpanded ? 'bg-brand-600 text-white shadow-md' : 'bg-brand-50 text-brand-600 shadow-sm group-hover:bg-brand-100'
+                  <div className={`shrink-0 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center transition-colors duration-300 ${
+                    isExpanded 
+                      ? 'bg-brand-600 text-white shadow-md' 
+                      : 'bg-brand-50 text-brand-600 shadow-xs group-hover:bg-brand-100'
                   }`}>
-                    <category.icon size={30} />
+                    <category.icon size={26} className="sm:w-7 sm:h-7" />
                   </div>
                   
                   <div className="flex-1 w-full">
-                    <div className="flex items-start justify-between gap-4">
-                      <h3 className="text-2xl font-serif font-bold text-slate-900 mb-2 leading-tight">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <h3 className="text-lg sm:text-xl md:text-2xl font-serif font-bold text-slate-900 leading-snug group-hover:text-brand-700 transition-colors">
                         {category.title}
                       </h3>
-                      <div className={`p-2 rounded-full transition-colors shrink-0 ${isExpanded ? 'bg-brand-50 text-brand-600' : 'bg-slate-100 text-slate-400 group-hover:text-brand-600'}`}>
+                      <div className={`p-1.5 sm:p-2 rounded-full transition-colors shrink-0 ${isExpanded ? 'bg-brand-50 text-brand-600' : 'bg-slate-100 text-slate-400 group-hover:text-brand-600'}`}>
                         <ChevronDown 
-                          size={20} 
+                          size={18} 
                           className={`transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} 
                         />
                       </div>
                     </div>
-                    <p className={`text-slate-600 leading-relaxed transition-all duration-300 ${isExpanded ? 'mb-6' : 'm-0'}`}>
+                    <p className={`text-slate-600 leading-relaxed text-xs sm:text-sm transition-all duration-300 ${isExpanded ? 'mb-5' : 'm-0'}`}>
                       {category.description}
                     </p>
                     
@@ -211,25 +215,25 @@ export default function ServicesOverview() {
                       }`}
                     >
                       <div className="overflow-hidden">
-                        <div className="pt-6 border-t border-slate-100">
-                          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">
+                        <div className="pt-5 border-t border-slate-100">
+                          <h4 className="text-[11px] sm:text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">
                             Procedures &amp; Clinical Highlights:
                           </h4>
-                          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-4">
+                          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-2.5 sm:gap-y-3 gap-x-4">
                             {category.subServices.map((sub, i) => (
                               <li key={i} className="flex items-start gap-2 text-slate-700">
-                                <CheckCircle2 size={16} className="shrink-0 text-brand-600 mt-0.5" />
+                                <CheckCircle2 size={15} className="shrink-0 text-brand-600 mt-0.5" />
                                 <span className="text-xs sm:text-sm font-medium leading-snug">{sub}</span>
                               </li>
                             ))}
                           </ul>
-                          <div className="mt-7 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                          <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
                             <Link 
                               href={category.slug} 
-                              className="text-brand-600 font-bold text-sm flex items-center gap-1.5 hover:text-brand-800 transition-colors"
+                              className="text-brand-600 font-bold text-xs sm:text-sm flex items-center gap-1.5 hover:text-brand-800 transition-colors"
                             >
                               <span>Learn Procedure Details</span>
-                              <ArrowRight size={15} />
+                              <ArrowRight size={14} />
                             </Link>
                             <Link 
                               href="/appointment" 
@@ -243,9 +247,9 @@ export default function ServicesOverview() {
                     </div>
 
                     {!isExpanded && (
-                      <div className="mt-4 text-brand-600 font-bold text-sm flex items-center gap-1.5 group-hover:text-brand-700">
-                        <span>View Procedures</span>
-                        <span className="text-xs">▼</span>
+                      <div className="mt-3 text-brand-600 font-bold text-xs sm:text-sm flex items-center gap-1.5 group-hover:text-brand-700">
+                        <span>View Procedures ({category.subServices.length})</span>
+                        <span className="text-[10px]">▼</span>
                       </div>
                     )}
                   </div>

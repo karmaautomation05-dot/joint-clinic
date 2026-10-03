@@ -151,7 +151,7 @@ export default function RecoveryGuideIndexPage() {
       />
 
       {/* Hero Header */}
-      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-12 sm:py-16 lg:py-20 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#02BAB9]/20 rounded-full blur-3xl pointer-events-none translate-y-1/2 -translate-x-1/2"></div>
 
@@ -164,13 +164,13 @@ export default function RecoveryGuideIndexPage() {
               <span className="text-[#F5CD09] font-medium">Recovery Guide</span>
             </nav>
 
-            <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-3 sm:mb-4">
               7 Patient Recovery Portals
             </span>
-            <h1 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
               Patient Recovery Guides
             </h1>
-            <p className="text-lg sm:text-xl text-white/90 mt-4 leading-relaxed font-sans">
+            <p className="text-base sm:text-lg md:text-xl text-white/90 mt-3 sm:mt-4 leading-relaxed font-sans">
               Reassuring, structured recovery timelines from <strong className="text-white">Dr. Gaurav Bhargava</strong>.
               Select a specialty below to view step-by-step healing milestones, home preparation checklists, exercises, and safety precautions.
             </p>
@@ -179,9 +179,9 @@ export default function RecoveryGuideIndexPage() {
       </section>
 
       {/* Recovery Category Cards Grid */}
-      <div className="container mt-12 sm:mt-16">
+      <div className="container mt-8 sm:mt-14">
         {/* AEO Rehabilitation Knowledge Snapshot for Search Engines & AI Assistants */}
-        <div className="bg-brand-50/60 rounded-3xl border border-brand-200/80 p-6 sm:p-8 mb-12 space-y-3 shadow-xs aeo-summary">
+        <div className="bg-brand-50/60 rounded-2xl sm:rounded-3xl border border-brand-200/80 p-5 sm:p-7 mb-10 sm:mb-12 space-y-3 shadow-xs aeo-summary">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#059B8F] text-white flex items-center justify-center shrink-0">
               <HeartPulse className="w-5 h-5" />
@@ -223,7 +223,7 @@ export default function RecoveryGuideIndexPage() {
             return (
               <div
                 key={guide.id}
-                className="bg-white rounded-3xl border border-slate-200/90 hover:border-brand-300 p-6 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
+                className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 hover:border-brand-300 p-5 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
               >
                 <div>
                   {/* Top Badge & Icon */}
@@ -387,8 +387,8 @@ export default function RecoveryGuideIndexPage() {
       </section>
 
       {/* Patient Reassurance & Helpline Banner */}
-      <div className="container mt-20">
-        <div className="bg-gradient-to-r from-brand-50 to-teal-50/50 rounded-3xl p-8 sm:p-12 border border-brand-100 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="container mt-14 sm:mt-20">
+        <div className="bg-gradient-to-r from-brand-50 to-teal-50/50 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 border border-brand-100 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="max-w-2xl">
             <div className="flex items-center gap-2 mb-2">
               <HeartHandshake className="w-5 h-5 text-[#059B8F]" />

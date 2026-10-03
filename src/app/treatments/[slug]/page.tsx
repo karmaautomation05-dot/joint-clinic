@@ -172,7 +172,7 @@ export default function TreatmentDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       {/* Hero Header */}
-      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-12 sm:py-16 lg:py-20 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#02BAB9]/20 rounded-full blur-3xl pointer-events-none translate-y-1/2 -translate-x-1/2"></div>
 
@@ -187,37 +187,37 @@ export default function TreatmentDetailPage({
               <span className="text-[#F5CD09] font-medium">{treatment.title}</span>
             </nav>
 
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs text-[#F5CD09] text-xs font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-xs text-[#F5CD09] text-[11px] sm:text-xs font-bold uppercase tracking-wider">
               <span>{treatment.category}</span>
               <span>&bull;</span>
               <span>{treatment.tag}</span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
               {treatment.title}
             </h1>
 
-            <p className="text-lg sm:text-xl text-white/90 leading-relaxed font-sans">
+            <p className="text-base sm:text-lg md:text-xl text-white/90 leading-relaxed font-sans">
               {treatment.shortDesc}
             </p>
 
             {/* Quick Metrics Bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-white/20 text-xs">
-              <div>
-                <span className="text-white/70 block mb-0.5">Surgical Duration:</span>
-                <strong className="text-white font-bold text-sm">{treatment.stats.duration}</strong>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-5 sm:pt-6 border-t border-white/20 text-xs">
+              <div className="bg-white/10 p-2.5 sm:p-3 rounded-xl backdrop-blur-xs">
+                <span className="text-white/70 block mb-0.5 text-[11px]">Surgical Duration:</span>
+                <strong className="text-white font-bold text-xs sm:text-sm">{treatment.stats.duration}</strong>
               </div>
-              <div>
-                <span className="text-white/70 block mb-0.5">Hospital Stay:</span>
-                <strong className="text-white font-bold text-sm">{treatment.stats.hospitalStay}</strong>
+              <div className="bg-white/10 p-2.5 sm:p-3 rounded-xl backdrop-blur-xs">
+                <span className="text-white/70 block mb-0.5 text-[11px]">Hospital Stay:</span>
+                <strong className="text-white font-bold text-xs sm:text-sm">{treatment.stats.hospitalStay}</strong>
               </div>
-              <div>
-                <span className="text-white/70 block mb-0.5">Walking Resumed:</span>
-                <strong className="text-[#F5CD09] font-bold text-sm">{treatment.stats.walkingResumed}</strong>
+              <div className="bg-white/10 p-2.5 sm:p-3 rounded-xl backdrop-blur-xs">
+                <span className="text-white/70 block mb-0.5 text-[11px]">Walking Resumed:</span>
+                <strong className="text-[#F5CD09] font-bold text-xs sm:text-sm">{treatment.stats.walkingResumed}</strong>
               </div>
-              <div>
-                <span className="text-white/70 block mb-0.5">Target Longevity:</span>
-                <strong className="text-[#F5CD09] font-bold text-sm">{treatment.stats.longevity}</strong>
+              <div className="bg-white/10 p-2.5 sm:p-3 rounded-xl backdrop-blur-xs">
+                <span className="text-white/70 block mb-0.5 text-[11px]">Target Longevity:</span>
+                <strong className="text-[#F5CD09] font-bold text-xs sm:text-sm">{treatment.stats.longevity}</strong>
               </div>
             </div>
           </div>
@@ -225,12 +225,12 @@ export default function TreatmentDetailPage({
       </section>
 
       {/* Main Content Layout */}
-      <div className="container -mt-10 relative z-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div className="container -mt-8 sm:-mt-10 relative z-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
           {/* Main Article & Procedures */}
-          <div className="lg:col-span-8 space-y-8">
+          <div className="lg:col-span-8 space-y-6 sm:space-y-8">
             {/* AEO Quick Fact / Answer Box for Search Engines & Patients */}
-            <div className="bg-brand-50/60 rounded-3xl border border-brand-200/80 p-6 sm:p-8 space-y-3 shadow-xs aeo-summary">
+            <div className="bg-brand-50/60 rounded-2xl sm:rounded-3xl border border-brand-200/80 p-5 sm:p-7 space-y-3 shadow-xs aeo-summary">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[#059B8F] text-white flex items-center justify-center shrink-0">
                   <IconComponent className="w-5 h-5" />
@@ -239,7 +239,7 @@ export default function TreatmentDetailPage({
                   <span className="text-[10px] font-bold uppercase tracking-wider text-[#059B8F]">
                     Fast Facts &amp; Clinical Summary
                   </span>
-                  <h3 className="text-lg font-serif font-bold text-slate-900">
+                  <h3 className="text-base sm:text-lg font-serif font-bold text-slate-900">
                     {treatment.title} at a Glance
                   </h3>
                 </div>
@@ -250,25 +250,25 @@ export default function TreatmentDetailPage({
             </div>
 
             {/* Overview */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-5">
-              <h2 className="text-3xl font-serif font-bold text-slate-900">Clinical Overview</h2>
-              <p className="text-base text-slate-600 leading-relaxed">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-4 sm:space-y-5">
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">Clinical Overview</h2>
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                 {treatment.overview}
               </p>
             </div>
 
             {/* Who is a Candidate / Indications */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-6">
-              <h2 className="text-3xl font-serif font-bold text-slate-900">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-5 sm:space-y-6">
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
                 When is this Procedure Recommended?
               </h2>
               <div className="space-y-3">
                 {treatment.indications.map((ind, idx) => (
                   <div
                     key={idx}
-                    className="flex items-start gap-3 p-4 rounded-2xl bg-brand-50/30 border border-brand-100 text-sm text-slate-800 font-medium"
+                    className="flex items-start gap-3 p-3.5 sm:p-4 rounded-2xl bg-brand-50/30 border border-brand-100 text-xs sm:text-sm text-slate-800 font-medium"
                   >
-                    <CheckCircle2 className="w-5 h-5 text-brand-600 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-brand-600 shrink-0 mt-0.5" />
                     <span>{ind}</span>
                   </div>
                 ))}
@@ -276,18 +276,18 @@ export default function TreatmentDetailPage({
             </div>
 
             {/* Specific Techniques */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-6">
-              <h2 className="text-3xl font-serif font-bold text-slate-900">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-5 sm:space-y-6">
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
                 Surgical Approaches &amp; Modern Technology
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-3.5 sm:space-y-4">
                 {treatment.techniques.map((tech, idx) => (
                   <div
                     key={idx}
-                    className="p-6 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-2"
+                    className="p-4 sm:p-6 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-2"
                   >
-                    <h3 className="text-lg font-serif font-bold text-slate-900">{tech.name}</h3>
-                    <p className="text-sm text-slate-600 leading-relaxed">
+                    <h3 className="text-base sm:text-lg font-serif font-bold text-slate-900">{tech.name}</h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                       {tech.description}
                     </p>
                   </div>
@@ -296,17 +296,17 @@ export default function TreatmentDetailPage({
             </div>
 
             {/* Recovery Milestones */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-6">
-              <h2 className="text-3xl font-serif font-bold text-slate-900">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-5 sm:space-y-6">
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
                 Expected Recovery Timeline
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-3.5 sm:space-y-4">
                 {treatment.recoveryMilestones.map((rec, idx) => (
-                  <div key={idx} className="flex items-start gap-4">
-                    <div className="w-28 text-xs font-bold uppercase tracking-wider text-brand-700 shrink-0 pt-2 font-mono">
+                  <div key={idx} className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-4">
+                    <div className="sm:w-28 text-xs font-bold uppercase tracking-wider text-brand-700 shrink-0 sm:pt-2 font-mono">
                       {rec.timeline}
                     </div>
-                    <div className="p-4 rounded-2xl bg-brand-50/30 border border-brand-100 flex-1 text-sm text-slate-800">
+                    <div className="p-3.5 sm:p-4 rounded-2xl bg-brand-50/30 border border-brand-100 flex-1 text-xs sm:text-sm text-slate-800">
                       {rec.milestone}
                     </div>
                   </div>
@@ -319,7 +319,7 @@ export default function TreatmentDetailPage({
               <section 
                 itemScope 
                 itemType="https://schema.org/FAQPage"
-                className="bg-white rounded-[2.5rem] border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-6"
+                className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-5 sm:space-y-6"
               >
                 <div className="space-y-1">
                   <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block">
@@ -329,21 +329,21 @@ export default function TreatmentDetailPage({
                     Frequently Asked Questions About {treatment.title}
                   </h2>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-3.5 sm:space-y-4">
                   {treatment.faqs.map((faq, idx) => (
                     <article
                       key={idx}
                       itemScope
                       itemProp="mainEntity"
                       itemType="https://schema.org/Question"
-                      className="p-6 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-2"
+                      className="p-4 sm:p-6 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-2"
                     >
-                      <h3 itemProp="name" className="text-base font-serif font-bold text-slate-900 flex items-center gap-2">
+                      <h3 itemProp="name" className="text-sm sm:text-base font-serif font-bold text-slate-900 flex items-center gap-2">
                         <HelpCircle className="w-4 h-4 text-brand-600 shrink-0" />
                         <span>{faq.q}</span>
                       </h3>
                       <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
-                        <p itemProp="text" className="text-sm text-slate-600 leading-relaxed pl-6 font-sans">
+                        <p itemProp="text" className="text-xs sm:text-sm text-slate-600 leading-relaxed pl-6 font-sans">
                           {faq.a}
                         </p>
                       </div>
@@ -356,12 +356,12 @@ export default function TreatmentDetailPage({
 
           {/* Sidebar CTA & Doctor Quick Info */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-white rounded-[2.5rem] border border-slate-200/80 p-6 sm:p-8 shadow-xl space-y-6 sticky top-28">
-              <div className="space-y-2 text-center pb-5 border-b border-slate-100">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-7 shadow-xl space-y-5 sticky top-28">
+              <div className="space-y-2 text-center pb-4 sm:pb-5 border-b border-slate-100">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700 px-3 py-1 rounded-full bg-brand-50 border border-brand-100 inline-block">
                   Specialist Consultation
                 </span>
-                <h3 className="text-xl font-serif font-bold text-slate-900 mt-1">
+                <h3 className="text-lg sm:text-xl font-serif font-bold text-slate-900 mt-1">
                   Dr. Gaurav Bhargava
                 </h3>
                 <p className="text-xs text-slate-500">

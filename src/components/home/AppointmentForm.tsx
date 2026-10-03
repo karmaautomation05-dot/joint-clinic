@@ -30,41 +30,41 @@ export default function AppointmentForm() {
   }
 
   return (
-    <section id="appointment-section" className="py-16 md:py-24 bg-white">
+    <section id="appointment-section" className="py-14 sm:py-20 lg:py-24 bg-slate-50/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+        <div className="grid grid-cols-1 lg:grid-cols-12 bg-white rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden border border-slate-200/80">
           {/* Left Hero/Info Column */}
-          <div className="lg:col-span-5 p-8 md:p-12 lg:p-14 bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white flex flex-col justify-between relative overflow-hidden">
+          <div className="lg:col-span-5 p-6 sm:p-8 md:p-12 lg:p-14 bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white flex flex-col justify-between relative overflow-hidden">
             {/* Soft Ambient Accents */}
             <div className="absolute -top-24 -right-24 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-[#02BAB9]/20 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-white text-xs font-semibold uppercase tracking-wider mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-white text-[11px] sm:text-xs font-semibold uppercase tracking-wider mb-5 sm:mb-6">
                 <Calendar size={14} className="text-[#F5CD09]" />
                 Priority OPD Scheduling
               </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-white mb-6 leading-tight">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-white mb-4 sm:mb-6 leading-tight">
                 Schedule Your <span className="text-[#F5CD09]">Joint Consultation</span>
               </h2>
-              <p className="text-white/90 text-base sm:text-lg leading-relaxed mb-10">
+              <p className="text-white/90 text-sm sm:text-base md:text-lg leading-relaxed mb-8 sm:mb-10">
                 Take the first step towards active, pain-free mobility. Book an in-person consultation or request a second opinion on your MRI/X-Ray with Dr. Gaurav Bhargava.
               </p>
               
-              <div className="space-y-5">
+              <div className="space-y-4 sm:space-y-5">
                 <a
                   href="tel:+917309038872"
-                  className="flex items-start gap-4 p-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-xs hover:bg-white/15 transition-all group"
+                  className="flex items-start gap-3.5 sm:gap-4 p-3.5 sm:p-4 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-xs hover:bg-white/15 transition-all group"
                 >
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-[#F5CD09] shrink-0 group-hover:scale-105 transition-transform">
-                    <Phone size={22} />
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center text-[#F5CD09] shrink-0 group-hover:scale-105 transition-transform">
+                    <Phone size={20} className="sm:w-[22px] sm:h-[22px]" />
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-white/80 uppercase tracking-wider mb-0.5">
+                    <div className="text-[11px] font-bold text-white/80 uppercase tracking-wider mb-0.5">
                       Call Clinic Desk
                     </div>
-                    <div className="text-xl font-bold font-mono text-white group-hover:text-[#F5CD09] transition-colors">+91 73090 38872</div>
-                    <div className="text-xs text-white/80">BMTC Day OPD &amp; 24/7 Trauma Emergency</div>
+                    <div className="text-lg sm:text-xl font-bold font-mono text-white group-hover:text-[#F5CD09] transition-colors">+91 73090 38872</div>
+                    <div className="text-[11px] sm:text-xs text-white/80">BMTC Day OPD &amp; 24/7 Trauma Emergency</div>
                   </div>
                 </a>
                 
@@ -72,31 +72,31 @@ export default function AppointmentForm() {
                   href="https://wa.me/917309038872?text=Hello%20Dr.%20Gaurav%20Bhargava,%20I%20would%20like%20to%20consult%20regarding%20joint%20pain."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-4 p-4 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xs hover:bg-white/15 transition-all group cursor-pointer"
+                  className="flex items-start gap-3.5 sm:gap-4 p-3.5 sm:p-4 rounded-2xl bg-white/10 border border-white/20 backdrop-blur-xs hover:bg-white/15 transition-all group cursor-pointer"
                 >
-                  <div className="w-12 h-12 bg-[#25D366] text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-[#25D366]/40 group-hover:scale-105 transition-transform">
-                    <WhatsAppIcon className="w-6 h-6 fill-white" />
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 bg-[#25D366] text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-[#25D366]/40 group-hover:scale-105 transition-transform">
+                    <WhatsAppIcon className="w-5 h-5 sm:w-6 sm:h-6 fill-white" />
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-white/80 uppercase tracking-wider mb-0.5 flex items-center gap-1.5">
+                    <div className="text-[11px] font-bold text-white/80 uppercase tracking-wider mb-0.5 flex items-center gap-1.5">
                       WhatsApp Triage
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#25D366] text-white tracking-wide">Online</span>
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-[#25D366] text-white tracking-wide">Online</span>
                     </div>
-                    <div className="text-lg font-bold text-white group-hover:text-[#F5CD09] transition-colors">Fast Appointment Confirmation</div>
-                    <div className="text-xs text-white/80">Share your MRI or X-ray reports directly on WhatsApp</div>
+                    <div className="text-base sm:text-lg font-bold text-white group-hover:text-[#F5CD09] transition-colors">Fast Appointment Confirmation</div>
+                    <div className="text-[11px] sm:text-xs text-white/80">Share your MRI or X-ray reports directly on WhatsApp</div>
                   </div>
                 </a>
               </div>
             </div>
 
-            <div className="relative z-10 mt-10 pt-6 border-t border-white/20 text-xs text-white/80">
+            <div className="relative z-10 mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-white/20 text-xs text-white/80">
               <span>Evening OPD: Swaroop Nagar • Morning OPD: BMTC Kidwai Nagar</span>
             </div>
           </div>
 
           {/* Right Form Column */}
-          <div className="lg:col-span-7 p-8 md:p-12 lg:p-16">
-            <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="lg:col-span-7 p-6 sm:p-8 md:p-12 lg:p-14">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
                   <label htmlFor="full-name" className="text-xs font-bold text-slate-700 flex items-center gap-1.5">

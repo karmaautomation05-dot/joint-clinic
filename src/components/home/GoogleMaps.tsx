@@ -49,28 +49,28 @@ export default function GoogleMaps() {
   ]
 
   return (
-    <section className="bg-white section-padding" ref={sectionRef} id="locations">
+    <section className="bg-white py-14 sm:py-20 lg:py-24" ref={sectionRef} id="locations">
       <div className="container">
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <span className="text-brand-600 font-bold uppercase tracking-widest text-sm mb-4 block">
+        <div className="text-center mb-10 sm:mb-16 max-w-3xl mx-auto">
+          <span className="text-brand-600 font-bold uppercase tracking-widest text-[11px] sm:text-xs mb-3 block">
             Clinic Schedules &amp; GPS
           </span>
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-slate-900 mb-3 sm:mb-5 leading-tight">
             Dual Clinic Locations in Kanpur
           </h2>
-          <p className="text-slate-600 leading-relaxed text-base sm:text-lg">
+          <p className="text-slate-600 leading-relaxed text-sm sm:text-base md:text-lg">
             Dr. Gaurav Bhargava provides dedicated consultations across two accessible locations in Kanpur. Please verify the operating hours before your visit.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
           {locations.map((loc, index) => (
             <div 
               key={index} 
-              className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
+              className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
             >
               {/* Map at Top */}
-              <div className="w-full h-[300px] bg-slate-100 relative group overflow-hidden">
+              <div className="w-full h-[220px] sm:h-[280px] bg-slate-100 relative group overflow-hidden">
                 {isIntersecting ? (
                   <iframe 
                     width="100%" 
@@ -85,66 +85,68 @@ export default function GoogleMaps() {
                   ></iframe>
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 bg-brand-50/30">
-                    <MapPin size={48} className="mb-4 text-brand-400 animate-pulse" />
-                    <p className="font-serif italic text-lg text-brand-700/70">Loading interactive map...</p>
+                    <MapPin size={40} className="mb-3 text-brand-400 animate-pulse" />
+                    <p className="font-serif italic text-base text-brand-700/70">Loading interactive map...</p>
                   </div>
                 )}
               </div>
 
               {/* Information below Map */}
-              <div className="p-8 md:p-10 flex-grow flex flex-col">
-                <div className="mb-6">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-brand-600 mb-1 block">
-                    {loc.tagline}
-                  </span>
-                  <h3 className="text-2xl font-serif font-bold text-slate-900 leading-tight">
-                    {loc.title}
-                  </h3>
-                </div>
-                
-                <div className="space-y-6 mb-8 flex-grow">
-                  <div className="flex gap-4">
-                    <div className="w-10 h-10 bg-brand-50 rounded-full flex items-center justify-center shrink-0 text-brand-600">
-                      <MapPin size={20} />
+              <div className="p-5 sm:p-7 md:p-8 flex-grow flex flex-col justify-between">
+                <div>
+                  <div className="mb-5">
+                    <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-brand-700 mb-1.5 inline-block px-2.5 py-0.5 rounded-full bg-brand-50 border border-brand-100">
+                      {loc.tagline}
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 leading-snug">
+                      {loc.title}
+                    </h3>
+                  </div>
+                  
+                  <div className="space-y-3.5 mb-6">
+                    <div className="flex gap-3 sm:gap-3.5 p-3 sm:p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-50 rounded-xl flex items-center justify-center shrink-0 text-brand-600">
+                        <MapPin size={18} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 text-[11px] sm:text-xs uppercase tracking-wider mb-0.5">
+                          Clinic Address
+                        </h4>
+                        <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">{loc.address}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider mb-1">
-                        Clinic Address
-                      </h4>
-                      <p className="text-slate-600 text-sm leading-relaxed">{loc.address}</p>
+
+                    <div className="flex gap-3 sm:gap-3.5 p-3 sm:p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-50 rounded-xl flex items-center justify-center shrink-0 text-brand-600">
+                        <Clock size={18} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 text-[11px] sm:text-xs uppercase tracking-wider mb-0.5">
+                          Consultation Timings
+                        </h4>
+                        <p className="text-slate-600 text-xs sm:text-sm">
+                          {loc.days}: <span className="font-bold text-brand-700">{loc.hours}</span>
+                        </p>
+                      </div>
                     </div>
                   </div>
-
-                  <div className="flex gap-4">
-                    <div className="w-10 h-10 bg-brand-50 rounded-full flex items-center justify-center shrink-0 text-brand-600">
-                      <Clock size={20} />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-900 text-xs uppercase tracking-wider mb-1">
-                        Consultation Timings
-                      </h4>
-                      <p className="text-slate-600 text-sm">
-                        {loc.days}: <span className="font-bold text-brand-700">{loc.hours}</span>
-                      </p>
-                    </div>
-                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100">
                   <a 
                     href={`tel:${loc.phone.replace(/\s/g, '')}`}
-                    className="btn-primary flex items-center justify-center gap-2 py-3.5 text-sm font-semibold"
+                    className="btn-primary flex items-center justify-center gap-2 py-3 text-xs sm:text-sm font-semibold shadow-md shadow-brand-600/15"
                   >
-                    <Phone size={16} />
+                    <Phone size={15} />
                     <span>Call Clinic Desk</span>
                   </a>
                   <a 
                     href={loc.mapLink}
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="btn-secondary flex items-center justify-center gap-2 py-3.5 text-sm font-semibold"
+                    className="btn-secondary flex items-center justify-center gap-2 py-3 text-xs sm:text-sm font-semibold hover:border-brand-300"
                   >
-                    <Navigation size={16} />
+                    <Navigation size={15} />
                     <span>Get GPS Route</span>
                   </a>
                 </div>

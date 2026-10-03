@@ -139,7 +139,7 @@ export default function BlogPostPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       {/* Blog Article Header */}
-      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-12 sm:py-16 lg:py-20 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#02BAB9]/20 rounded-full blur-3xl pointer-events-none translate-y-1/2 -translate-x-1/2"></div>
 
@@ -158,7 +158,7 @@ export default function BlogPostPage({
             <span>{post.readTime}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-serif font-bold tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-bold tracking-tight leading-tight">
             {post.title}
           </h1>
 
@@ -177,12 +177,12 @@ export default function BlogPostPage({
       </section>
 
       {/* Main Blog Body & Sidebar */}
-      <div className="container -mt-10 relative z-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div className="container -mt-8 sm:-mt-10 relative z-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
           {/* Main Article Content */}
-          <div className="lg:col-span-8 bg-white rounded-[2.5rem] border border-slate-200/80 p-8 sm:p-12 shadow-sm">
+          <div className="lg:col-span-8 bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm">
             {/* Featured Image */}
-            <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden mb-10 shadow-sm">
+            <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden mb-8 sm:mb-10 shadow-sm">
               <Image
                 src={post.image}
                 alt={post.title}
@@ -221,8 +221,8 @@ export default function BlogPostPage({
             </div>
 
             {/* Author Footer Card */}
-            <div className="mt-12 pt-6 border-t border-slate-100 flex items-center gap-4 p-5 rounded-2xl bg-brand-50/40 border border-brand-100/60">
-              <div className="w-14 h-14 rounded-full overflow-hidden bg-[#a89c94] relative shrink-0 shadow-sm">
+            <div className="mt-10 sm:mt-12 pt-6 border-t border-slate-100 flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-brand-50/40 border border-brand-100/60">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-gradient-to-b from-brand-50 to-brand-100 border border-brand-200/50 relative shrink-0 shadow-sm">
                 <Image
                   src="/images/doctor/gaurav-bhargava.png"
                   alt={post.author}
@@ -231,9 +231,9 @@ export default function BlogPostPage({
                 />
               </div>
               <div>
-                <p className="text-xs text-slate-500">Article clinically authored &amp; reviewed by</p>
-                <h4 className="text-base font-serif font-bold text-slate-900">{post.author}</h4>
-                <p className="text-xs text-brand-700 font-semibold">{post.authorRole}</p>
+                <p className="text-[11px] sm:text-xs text-slate-500">Article clinically authored &amp; reviewed by</p>
+                <h4 className="text-sm sm:text-base font-serif font-bold text-slate-900">{post.author}</h4>
+                <p className="text-[11px] sm:text-xs text-brand-700 font-semibold">{post.authorRole}</p>
               </div>
             </div>
           </div>
@@ -241,7 +241,7 @@ export default function BlogPostPage({
           {/* Sidebar */}
           <div className="lg:col-span-4 space-y-6">
             {/* Quick Consultation Booking Card */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-200/80 p-6 sm:p-8 shadow-xl space-y-5 sticky top-28">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-7 shadow-xl space-y-5 sticky top-28">
               <div className="space-y-1.5 text-center pb-4 border-b border-slate-100">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700 px-3 py-1 rounded-full bg-brand-50 border border-brand-100 inline-block">
                   Expert Assessment

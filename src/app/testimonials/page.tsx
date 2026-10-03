@@ -12,19 +12,19 @@ export default function TestimonialsPage() {
   return (
     <div className="bg-white pb-24">
       {/* Header */}
-      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-12 sm:py-16 lg:py-20 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#02BAB9]/20 rounded-full blur-3xl pointer-events-none translate-y-1/2 -translate-x-1/2"></div>
 
         <div className="container relative z-10">
           <div className="max-w-3xl">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-3 sm:mb-4">
               Patient Experiences &amp; Outcomes
             </span>
-            <h1 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
               Recovery Stories &amp; Testimonials
             </h1>
-            <p className="text-lg sm:text-xl text-white/90 mt-4 leading-relaxed font-sans">
+            <p className="text-base sm:text-lg md:text-xl text-white/90 mt-3 sm:mt-4 leading-relaxed font-sans">
               Watch real patients describe their journey from chronic joint pain to active, unassisted
               walking under the care of Dr. Gaurav Bhargava in Kanpur.
             </p>
@@ -33,12 +33,12 @@ export default function TestimonialsPage() {
       </section>
 
       {/* Videos Section */}
-      <div className="container -mt-10 relative z-20 space-y-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="container -mt-8 sm:-mt-10 relative z-20 space-y-10 sm:space-y-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {VIDEO_TESTIMONIALS.map((video) => (
             <div
               key={video.id}
-              className="bg-white rounded-[2.5rem] border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-xl hover:border-brand-200 group flex flex-col justify-between transition-all duration-300"
+              className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 overflow-hidden shadow-sm hover:shadow-xl hover:border-brand-200 group flex flex-col justify-between transition-all duration-300"
             >
               <div className="relative aspect-video bg-slate-900 overflow-hidden cursor-pointer">
                 {activeVideoId === video.youtubeId ? (
@@ -61,20 +61,20 @@ export default function TestimonialsPage() {
                       loading="lazy"
                     />
                     <div className="absolute inset-0 bg-slate-950/30 group-hover:bg-slate-950/10 transition-colors flex items-center justify-center">
-                      <div className="w-14 h-14 rounded-full bg-white text-brand-600 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
-                        <Play className="w-6 h-6 fill-brand-600 ml-1" />
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white text-brand-600 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                        <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-brand-600 ml-1" />
                       </div>
                     </div>
                   </div>
                 )}
               </div>
 
-              <div className="p-7 space-y-3">
+              <div className="p-5 sm:p-7 space-y-2.5 sm:space-y-3">
                 <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-brand-50 text-brand-700 border border-brand-100 inline-block">
                   {video.procedure}
                 </span>
-                <h2 className="text-xl font-serif font-bold text-slate-900">{video.patientName}</h2>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <h2 className="text-lg sm:text-xl font-serif font-bold text-slate-900">{video.patientName}</h2>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                   {video.summary}
                 </p>
               </div>
@@ -83,7 +83,7 @@ export default function TestimonialsPage() {
         </div>
 
         {/* Written Verified Reviews */}
-        <div className="bg-white rounded-[2.5rem] border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-8">
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-6 sm:space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-3xl font-serif font-bold text-slate-900">

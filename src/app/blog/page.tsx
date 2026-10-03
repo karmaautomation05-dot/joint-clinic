@@ -37,19 +37,19 @@ export default function BlogListingPage() {
   return (
     <div className="bg-white pb-24">
       {/* Header */}
-      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-12 sm:py-16 lg:py-20 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#02BAB9]/20 rounded-full blur-3xl pointer-events-none translate-y-1/2 -translate-x-1/2"></div>
 
         <div className="container relative z-10">
           <div className="max-w-3xl">
-            <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-3 sm:mb-4">
               Patient Education &amp; Clinical Guides
             </span>
-            <h1 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
               Orthopaedic Health Library
             </h1>
-            <p className="text-lg sm:text-xl text-white/90 mt-4 leading-relaxed font-sans">
+            <p className="text-base sm:text-lg md:text-xl text-white/90 mt-3 sm:mt-4 leading-relaxed font-sans">
               In-depth medical articles and recovery blueprints authored by Dr. Gaurav Bhargava to
               help you make well-informed decisions regarding your joint and spine health.
             </p>
@@ -58,12 +58,12 @@ export default function BlogListingPage() {
       </section>
 
       {/* Blog Cards Grid */}
-      <div className="container -mt-10 relative z-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="container -mt-8 sm:-mt-10 relative z-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {BLOG_POSTS.map((post) => (
             <article
               key={post.id}
-              className="bg-white rounded-[2.5rem] border border-slate-200/80 overflow-hidden shadow-sm hover:border-brand-300 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+              className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 overflow-hidden shadow-sm hover:border-brand-300 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
             >
               <div>
                 {/* Cover Image Container */}
@@ -81,7 +81,7 @@ export default function BlogListingPage() {
                 </Link>
 
                 {/* Content */}
-                <div className="p-7 space-y-3">
+                <div className="p-5 sm:p-7 space-y-3">
                   <div className="flex items-center gap-3 text-xs text-slate-400">
                     <span className="flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5 text-brand-600" />

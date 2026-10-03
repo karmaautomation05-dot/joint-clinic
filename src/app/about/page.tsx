@@ -109,7 +109,7 @@ export default function AboutPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       {/* Hero Header */}
-      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-12 sm:py-16 lg:py-20 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#02BAB9]/20 rounded-full blur-3xl pointer-events-none translate-y-1/2 -translate-x-1/2"></div>
 
@@ -122,16 +122,16 @@ export default function AboutPage() {
               <span className="text-[#F5CD09] font-medium">About Dr. Gaurav Bhargava</span>
             </nav>
 
-            <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-3 sm:mb-4">
               Best Orthopedic Surgeon &amp; Bone Specialist in Kanpur
             </span>
-            <h1 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
               Dr. Gaurav Bhargava
             </h1>
-            <p className="text-lg sm:text-xl text-white/90 mt-4 leading-relaxed font-sans">
+            <p className="text-base sm:text-lg md:text-xl text-white/90 mt-3 sm:mt-4 leading-relaxed font-sans">
               Best Orthopedic Doctor, Bone Specialist &amp; Joint Replacement Surgeon in Kanpur
               <br />
-              <span className="text-[#F5CD09] font-semibold text-base">
+              <span className="text-[#F5CD09] font-semibold text-sm sm:text-base">
                 Director &amp; Chief Surgeon — Joint Clinic (Swaroop Nagar) &amp; BMTC Orthopedic Hospital (Kidwai Nagar)
               </span>
             </p>
@@ -140,12 +140,12 @@ export default function AboutPage() {
       </section>
 
       {/* Main Profile & Credentials Section */}
-      <div className="container -mt-10 relative z-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div className="container -mt-8 sm:-mt-10 relative z-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
           {/* Left Column: Doctor Card & Fast Facts */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-white rounded-[2.5rem] border border-slate-200/80 p-6 sm:p-8 shadow-xl space-y-6">
-              <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-[#b0a59e]">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-7 shadow-xl space-y-6">
+              <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-gradient-to-b from-brand-50 to-brand-100/50 border border-brand-200/40 shadow-inner">
                 <Image
                   src={DOCTOR_DATA.image}
                   alt={DOCTOR_DATA.name}
@@ -237,17 +237,17 @@ export default function AboutPage() {
             </div>
 
             {/* Story & Background */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-6">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-6">
               <div>
                 <span className="text-brand-600 font-bold uppercase tracking-widest text-xs mb-2 block">
                   Clinical Pedigree &amp; Surgical Philosophy
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-serif font-bold text-slate-900 leading-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-slate-900 leading-tight">
                   Bringing Delhi-Standard Surgical Care to Kanpur
                 </h2>
               </div>
 
-              <div className="space-y-4 text-base text-slate-600 leading-relaxed font-sans">
+              <div className="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed font-sans">
                 <p>
                   With more than two decades of surgical leadership,{" "}
                   <strong className="text-slate-900">Dr. Gaurav Bhargava</strong> is one of Kanpur&apos;s
@@ -266,8 +266,8 @@ export default function AboutPage() {
               </div>
 
               {/* Quote */}
-              <div className="p-6 sm:p-8 rounded-2xl bg-brand-50/50 border-l-4 border-brand-600 border border-brand-100/60">
-                <p className="text-base font-serif italic text-slate-800 leading-relaxed">
+              <div className="p-4 sm:p-6 md:p-8 rounded-2xl bg-brand-50/50 border-l-4 border-brand-600 border border-brand-100/60">
+                <p className="text-sm sm:text-base font-serif italic text-slate-800 leading-relaxed">
                   &ldquo;{DOCTOR_DATA.philosophy.quote}&rdquo;
                 </p>
                 <p className="text-xs font-bold text-brand-700 uppercase tracking-wider mt-3">
@@ -277,22 +277,22 @@ export default function AboutPage() {
             </div>
 
             {/* Academic & Training Journey */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-6">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-6">
               <h3 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
                 Education &amp; Advanced Training
               </h3>
 
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {/* MAMC Item */}
-                <div className="flex items-start gap-4 p-5 rounded-2xl bg-brand-50/30 border border-brand-100">
-                  <div className="w-12 h-12 rounded-xl bg-brand-600 text-white flex items-center justify-center shrink-0 shadow-sm">
-                    <GraduationCap className="w-6 h-6" />
+                <div className="flex items-start gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-brand-50/30 border border-brand-100">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-brand-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                    <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div>
                     <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-brand-100 text-brand-800">
                       Tertiary Surgical Residency
                     </span>
-                    <h4 className="text-lg font-serif font-bold text-slate-900 mt-1">
+                    <h4 className="text-base sm:text-lg font-serif font-bold text-slate-900 mt-1">
                       {DOCTOR_DATA.residency.institution}
                     </h4>
                     <p className="text-xs text-brand-700 font-semibold">
@@ -308,13 +308,13 @@ export default function AboutPage() {
                 {DOCTOR_DATA.education.map((edu, idx) => (
                   <div
                     key={idx}
-                    className="flex items-start gap-4 p-5 rounded-2xl bg-slate-50/70 border border-slate-100"
+                    className="flex items-start gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-slate-50/70 border border-slate-100"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-accent-100 text-accent-700 flex items-center justify-center shrink-0">
-                      <Award className="w-6 h-6" />
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-accent-100 text-accent-700 flex items-center justify-center shrink-0">
+                      <Award className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                      <h4 className="text-base font-serif font-bold text-slate-900">{edu.degree}</h4>
+                      <h4 className="text-sm sm:text-base font-serif font-bold text-slate-900">{edu.degree}</h4>
                       <p className="text-xs text-brand-700 font-semibold">{edu.institution}</p>
                       <p className="text-xs text-slate-600 mt-1 leading-relaxed">{edu.details}</p>
                     </div>
@@ -324,7 +324,7 @@ export default function AboutPage() {
             </div>
 
             {/* Affiliated Facilities Overview */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-200/80 p-8 sm:p-12 shadow-sm space-y-6">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-6">
               <h3 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
                 Clinical Centers &amp; Surgical Infrastructure
               </h3>

@@ -44,55 +44,67 @@ export default function FAQ() {
 
   return (
     <section 
-      className="section-padding bg-white" 
+      className="py-14 sm:py-20 lg:py-24 bg-white" 
       id="faq"
       itemScope 
       itemType="https://schema.org/FAQPage"
     >
       <div className="container">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14">
           {/* Left Column */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-28">
-              <div className="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center text-brand-600 mb-6 shadow-sm">
-                <HelpCircle size={32} />
+          <div className="lg:col-span-4">
+            <div className="lg:sticky lg:top-28">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-brand-50 to-brand-100 rounded-2xl flex items-center justify-center text-brand-600 mb-5 sm:mb-6 shadow-xs border border-brand-200/60">
+                <HelpCircle className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
-              <span className="text-brand-600 font-bold uppercase tracking-widest text-xs mb-3 block">
+              <span className="text-brand-600 font-bold uppercase tracking-widest text-[11px] sm:text-xs mb-2.5 block">
                 Direct Answers • Patient &amp; AI Search
               </span>
-              <h2 className="text-3xl sm:text-4xl font-serif font-bold text-slate-900 mb-5">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-slate-900 mb-4 leading-tight">
                 Frequently Asked Questions
               </h2>
               <p className="text-slate-600 leading-relaxed mb-6 text-sm sm:text-base">
                 Direct medical guidance on joint replacement recovery, non-surgical arthritis care, emergency fracture treatment, and clinic OPD timings by Dr. Gaurav Bhargava.
               </p>
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 mb-6 space-y-2">
+              
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-brand-50/50 to-slate-50 border border-brand-100 mb-6 space-y-3">
                 <span className="text-[11px] font-bold text-brand-700 uppercase tracking-wider block">
                   Quick Appointment Assistance
                 </span>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Have an MRI or X-ray report? Book a priority consultation or chat directly on WhatsApp:
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Have an MRI or X-ray report? Book a priority consultation or speak directly with our clinic desk:
                 </p>
-                <a 
-                  href="tel:+917309038872" 
-                  className="text-xs font-bold text-slate-900 hover:text-brand-600 block font-mono"
-                >
-                  Call +91 73090 38872
-                </a>
+                <div className="flex flex-col sm:flex-row lg:flex-col gap-2 pt-1">
+                  <a 
+                    href="tel:+917309038872" 
+                    className="inline-flex items-center gap-2 text-xs font-bold text-slate-900 hover:text-brand-600 font-mono bg-white px-3 py-2 rounded-xl border border-slate-200 shadow-2xs transition-colors"
+                  >
+                    <span>📞 Call +91 73090 38872</span>
+                  </a>
+                  <a 
+                    href="https://wa.me/917309038872?text=Hello%20Dr.%20Gaurav%20Bhargava,%20I%20have%20an%20inquiry%20regarding%20joint%20consultation." 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-xs font-bold text-[#25D366] hover:text-[#1eb855] bg-emerald-50/80 px-3 py-2 rounded-xl border border-emerald-200/60 transition-colors"
+                  >
+                    <span>💬 Chat on WhatsApp</span>
+                  </a>
+                </div>
               </div>
+
               <Link 
                 href="/contact" 
-                className="inline-flex items-center gap-2 text-brand-600 font-bold border-b-2 border-brand-200 hover:border-brand-600 pb-1 transition-all text-sm"
+                className="inline-flex items-center gap-2 text-brand-600 hover:text-brand-700 font-bold border-b-2 border-brand-200 hover:border-brand-600 pb-1 transition-all text-xs sm:text-sm"
               >
                 <span>View Full Clinic Locations &amp; Maps</span>
-                <ArrowRight size={16} />
+                <ArrowRight size={15} />
               </Link>
             </div>
           </div>
 
           {/* Right Column: Accordion with Semantic AEO Microdata */}
-          <div className="lg:col-span-2">
-            <div className="space-y-4">
+          <div className="lg:col-span-8">
+            <div className="space-y-3.5 sm:space-y-4">
               {faqs.map((f, idx) => {
                 const isOpen = openIdx === idx
                 return (
@@ -101,12 +113,14 @@ export default function FAQ() {
                     itemScope 
                     itemProp="mainEntity" 
                     itemType="https://schema.org/Question"
-                    className={`border rounded-[1.5rem] transition-all duration-300 overflow-hidden ${
-                      isOpen ? 'border-brand-200 bg-brand-50/25 shadow-sm' : 'border-slate-100 bg-white hover:border-brand-100'
+                    className={`border rounded-2xl sm:rounded-3xl transition-all duration-300 overflow-hidden ${
+                      isOpen 
+                        ? 'border-brand-300 bg-brand-50/30 shadow-sm ring-1 ring-brand-500/10' 
+                        : 'border-slate-200/80 bg-white hover:border-brand-200 hover:shadow-xs'
                     }`}
                   >
                     <button 
-                      className="w-full flex items-center justify-between p-6 sm:p-7 text-left gap-4"
+                      className="w-full flex items-center justify-between p-4 sm:p-6 text-left gap-3.5 sm:gap-4 cursor-pointer"
                       onClick={() => setOpenIdx(isOpen ? null : idx)}
                       aria-expanded={isOpen}
                       aria-controls={`faq-answer-${idx}`}
@@ -114,16 +128,16 @@ export default function FAQ() {
                     >
                       <h3 
                         itemProp="name"
-                        className={`text-base sm:text-lg font-serif font-bold transition-colors ${
-                          isOpen ? 'text-brand-800' : 'text-slate-900'
+                        className={`text-sm sm:text-base md:text-lg font-serif font-bold transition-colors leading-snug ${
+                          isOpen ? 'text-brand-900' : 'text-slate-900'
                         }`}
                       >
                         {f.q}
                       </h3>
-                      <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                        isOpen ? 'bg-brand-600 text-white rotate-180' : 'bg-slate-100 text-slate-500'
+                      <div className={`shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all ${
+                        isOpen ? 'bg-brand-600 text-white rotate-180 shadow-xs' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                       }`}>
-                        {isOpen ? <Minus size={18} /> : <Plus size={18} />}
+                        {isOpen ? <Minus size={16} /> : <Plus size={16} />}
                       </div>
                     </button>
                     
@@ -135,12 +149,12 @@ export default function FAQ() {
                       itemProp="acceptedAnswer" 
                       itemType="https://schema.org/Answer"
                       className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                        isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                        isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
                       }`}
                     >
                       <div 
                         itemProp="text"
-                        className="p-6 sm:p-7 pt-0 text-slate-600 leading-relaxed text-sm sm:text-base border-t border-brand-100/30 font-sans"
+                        className="px-4 pb-4 sm:px-6 sm:pb-6 pt-0 text-slate-600 leading-relaxed text-xs sm:text-sm md:text-base border-t border-brand-100/40 font-sans"
                       >
                         {f.a}
                       </div>

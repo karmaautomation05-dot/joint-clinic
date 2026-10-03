@@ -115,7 +115,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans min-h-screen flex flex-col bg-white text-slate-900 antialiased selection:bg-brand-600 selection:text-white">
         <Navbar />
-        <main className="flex-1 pb-8">{children}</main>
+        <main className="flex-1 pb-12 sm:pb-8">{children}</main>
         <Footer />
         <FloatingActions />
         <BottomInfoBar />

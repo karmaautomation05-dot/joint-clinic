@@ -153,7 +153,7 @@ export default function TreatmentsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       {/* Hero Header */}
-      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-16 lg:py-24 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-[#059B8F] to-[#0A7C97] text-white py-12 sm:py-16 lg:py-20 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#02BAB9]/20 rounded-full blur-3xl pointer-events-none translate-y-1/2 -translate-x-1/2"></div>
 
@@ -166,13 +166,13 @@ export default function TreatmentsPage() {
               <span className="text-[#F5CD09] font-medium">Treatments &amp; Recovery</span>
             </nav>
 
-            <span className="text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-4">
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-[#F5CD09] px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-xs inline-block mb-3 sm:mb-4">
               Integrated Clinical &amp; Rehabilitation Care
             </span>
-            <h1 className="text-4xl sm:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight leading-tight text-white">
               Treatments &amp; Recovery Guide
             </h1>
-            <p className="text-lg sm:text-xl text-white/90 mt-4 leading-relaxed font-sans">
+            <p className="text-base sm:text-lg md:text-xl text-white/90 mt-3 sm:mt-4 leading-relaxed font-sans">
               Expert orthopedic surgeries, minimally invasive arthroscopy, non-surgical joint care, and step-by-step patient recovery roadmaps led by Dr. Gaurav Bhargava (Best Orthopedic Surgeon in Kanpur).
             </p>
           </div>
@@ -180,31 +180,33 @@ export default function TreatmentsPage() {
       </section>
 
       {/* Main Content Area */}
-      <div className="container mt-10 sm:mt-14">
+      <div className="container mt-8 sm:mt-12">
         {/* Interactive View Toggle Tabs */}
-        <div className="flex justify-center mb-10 sm:mb-14">
-          <div className="inline-flex p-1.5 bg-slate-100/90 rounded-full border border-slate-200 shadow-xs">
+        <div className="flex justify-center mb-8 sm:mb-12">
+          <div className="flex flex-col sm:flex-row w-full sm:w-auto p-1 sm:p-1.5 bg-slate-100 rounded-2xl sm:rounded-full border border-slate-200/80 shadow-xs gap-1 sm:gap-0">
             <button
               onClick={() => setActiveTab("treatments")}
-              className={`px-5 sm:px-7 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
+              className={`w-full sm:w-auto px-4 sm:px-7 py-2.5 sm:py-3 rounded-xl sm:rounded-full text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 ${
                 activeTab === "treatments"
-                  ? "bg-[#059B8F] text-white shadow-md shadow-[#059B8F]/25 scale-[1.02]"
+                  ? "bg-[#059B8F] text-white shadow-md shadow-[#059B8F]/25 scale-[1.01]"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
               <Stethoscope size={16} />
-              <span>Surgical &amp; Clinical Treatments (7 Specialties)</span>
+              <span className="sm:hidden">Treatments (7 Specialties)</span>
+              <span className="hidden sm:inline">Surgical &amp; Clinical Treatments (7 Specialties)</span>
             </button>
             <button
               onClick={() => setActiveTab("recovery")}
-              className={`px-5 sm:px-7 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold transition-all flex items-center gap-2 ${
+              className={`w-full sm:w-auto px-4 sm:px-7 py-2.5 sm:py-3 rounded-xl sm:rounded-full text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 ${
                 activeTab === "recovery"
-                  ? "bg-[#059B8F] text-white shadow-md shadow-[#059B8F]/25 scale-[1.02]"
+                  ? "bg-[#059B8F] text-white shadow-md shadow-[#059B8F]/25 scale-[1.01]"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
               <HeartPulse size={16} />
-              <span>Rehabilitation &amp; Recovery Guides (7 Roadmaps)</span>
+              <span className="sm:hidden">Recovery Guides (7 Roadmaps)</span>
+              <span className="hidden sm:inline">Rehabilitation &amp; Recovery Guides (7 Roadmaps)</span>
             </button>
           </div>
         </div>
@@ -231,7 +233,7 @@ export default function TreatmentsPage() {
                 return (
                   <div
                     key={category.id}
-                    className="bg-white rounded-3xl border border-slate-200/90 hover:border-brand-300 p-6 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
+                    className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 hover:border-brand-300 p-5 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
                   >
                     <div>
                       {/* Top Badge & Icon */}
@@ -329,7 +331,7 @@ export default function TreatmentsPage() {
                 return (
                   <div
                     key={guide.id}
-                    className="bg-white rounded-3xl border border-slate-200/90 hover:border-brand-300 p-6 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
+                    className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 hover:border-brand-300 p-5 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
                   >
                     <div>
                       {/* Top Badge & Icon */}
@@ -404,7 +406,7 @@ export default function TreatmentsPage() {
         )}
 
         {/* Doctor Philosophy & Laminar OT Hospital Assurance */}
-        <div className="mt-16 bg-gradient-to-r from-teal-50/80 to-brand-50/80 rounded-3xl p-8 sm:p-10 border border-brand-200 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="mt-12 sm:mt-16 bg-gradient-to-r from-teal-50/80 to-brand-50/80 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 border border-brand-200 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
           <div className="max-w-2xl">
             <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] mb-2 block">
               Clinical Excellence &bull; BMTC Hospital Kidwai Nagar

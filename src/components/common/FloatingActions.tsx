@@ -6,7 +6,7 @@ import { PRIMARY_CONTACT } from "@/data/clinics";
 
 export default function FloatingActions() {
   return (
-    <div className="fixed bottom-14 right-6 z-50 flex flex-col items-end gap-3 pointer-events-auto">
+    <div className="fixed bottom-12 sm:bottom-14 right-3.5 sm:right-6 z-50 flex flex-col items-end gap-2.5 sm:gap-3 pointer-events-auto">
       {/* WhatsApp Quick Chat */}
       <a
         href={`https://wa.me/${PRIMARY_CONTACT.whatsapp}?text=Hello%20Dr.%20Gaurav%20Bhargava,%20I%20would%20like%20to%20inquire%20about%20a%20consultation%20at%20Joint%20Clinic.`}
