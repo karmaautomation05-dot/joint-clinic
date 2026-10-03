@@ -30,21 +30,21 @@ export default function Navbar() {
               priority
             />
           </div>
-          <div className="flex flex-col justify-center">
+          <div className="flex flex-col justify-center max-w-[210px]">
             <span className="text-[10px] sm:text-[11px] font-semibold text-slate-500 uppercase tracking-widest mb-0.5">
               Dr. Gaurav Bhargava&apos;s
             </span>
             <span className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 leading-none tracking-tight group-hover:text-brand-600 transition-colors">
               Joint Clinic
             </span>
-            <span className="text-[10px] sm:text-[11px] font-bold text-brand-600 uppercase tracking-widest mt-1">
+            <span className="text-[10px] sm:text-[11px] font-bold text-brand-600 uppercase tracking-wider mt-0.5 leading-tight">
               A Centre of Arthroplasty &amp; Arthroscopy
             </span>
           </div>
         </Link>
 
-        {/* Desktop Navigation - Clean, Balanced Spacing */}
-        <nav className="hidden xl:flex items-center gap-5 2xl:gap-6">
+        {/* Desktop Navigation - Clean, Balanced Spacing Matching Medfemme */}
+        <nav className="hidden xl:flex items-center gap-4 xl:gap-5 2xl:gap-6">
           <Link
             href="/"
             className={`text-sm font-semibold transition-colors whitespace-nowrap ${
@@ -56,13 +56,13 @@ export default function Navbar() {
             Home
           </Link>
 
-          {/* Medfemme-style 2-line Doctor link - Larger prominent size */}
+          {/* Medfemme-style 2-line Doctor link - Balanced, perfectly aligned */}
           <Link
             href="/about"
-            className="flex flex-col transition-colors whitespace-nowrap group/about"
+            className="flex flex-col text-sm font-semibold transition-colors whitespace-nowrap group/about"
           >
             <span
-              className={`text-base font-bold leading-tight ${
+              className={`leading-tight font-bold ${
                 isActive('/about')
                   ? 'text-brand-600'
                   : 'text-slate-900 group-hover/about:text-brand-600'
@@ -70,7 +70,7 @@ export default function Navbar() {
             >
               Dr. Gaurav Bhargava
             </span>
-            <span className="text-xs font-semibold text-slate-500 group-hover/about:text-brand-600 transition-colors leading-tight">
+            <span className="text-[10px] font-medium text-slate-400 group-hover/about:text-brand-500 transition-colors leading-tight">
               Best Orthopedic Surgeon
             </span>
           </Link>
@@ -122,8 +122,8 @@ export default function Navbar() {
           </Link>
         </nav>
 
-        {/* Right Action CTA & Phone - Medfemme Style */}
-        <div className="hidden xl:flex items-center gap-4">
+        {/* Right Action CTA & Phone - Medfemme Style with guaranteed spacing */}
+        <div className="hidden xl:flex items-center gap-3.5 2xl:gap-4 shrink-0 pl-2">
           <a
             href="tel:+917309038872"
             className="flex items-center gap-2 text-brand-700 font-bold hover:text-brand-800 transition-colors whitespace-nowrap"
@@ -172,7 +172,7 @@ export default function Navbar() {
               onClick={() => setIsMenuOpen(false)}
             >
               <span className="text-base font-bold text-slate-900 leading-tight">Dr. Gaurav Bhargava</span>
-              <span className="text-xs font-semibold text-slate-500">Best Orthopedic Surgeon</span>
+              <span className="text-xs font-medium text-slate-400">Best Orthopedic Surgeon</span>
             </Link>
             <Link
               href="/treatments"
