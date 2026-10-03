@@ -56,21 +56,21 @@ export default function Navbar() {
             Home
           </Link>
 
-          {/* Medfemme-style 2-line Doctor link */}
+          {/* Medfemme-style 2-line Doctor link - Larger prominent size */}
           <Link
             href="/about"
-            className="flex flex-col text-sm font-semibold transition-colors whitespace-nowrap group/about"
+            className="flex flex-col transition-colors whitespace-nowrap group/about"
           >
             <span
-              className={`leading-tight ${
+              className={`text-base font-bold leading-tight ${
                 isActive('/about')
-                  ? 'text-brand-600 font-bold'
-                  : 'text-slate-600 group-hover/about:text-brand-600'
+                  ? 'text-brand-600'
+                  : 'text-slate-900 group-hover/about:text-brand-600'
               }`}
             >
               Dr. Gaurav Bhargava
             </span>
-            <span className="text-[10px] font-medium text-slate-400 group-hover/about:text-brand-500 transition-colors">
+            <span className="text-xs font-semibold text-slate-500 group-hover/about:text-brand-600 transition-colors leading-tight">
               Best Orthopedic Surgeon
             </span>
           </Link>
@@ -87,17 +87,7 @@ export default function Navbar() {
             Treatments &amp; Recovery
           </Link>
 
-          <Link
-            href="/testimonials"
-            className={`text-sm font-semibold transition-colors whitespace-nowrap ${
-              isActive('/testimonials')
-                ? 'text-brand-600 font-bold'
-                : 'text-slate-600 hover:text-brand-600'
-            }`}
-          >
-            Reviews
-          </Link>
-
+          {/* Interchanged: Health Blog before Reviews */}
           <Link
             href="/blog"
             className={`text-sm font-semibold transition-colors whitespace-nowrap ${
@@ -107,6 +97,17 @@ export default function Navbar() {
             }`}
           >
             Health Blog
+          </Link>
+
+          <Link
+            href="/testimonials"
+            className={`text-sm font-semibold transition-colors whitespace-nowrap ${
+              isActive('/testimonials')
+                ? 'text-brand-600 font-bold'
+                : 'text-slate-600 hover:text-brand-600'
+            }`}
+          >
+            Reviews
           </Link>
 
           <Link
@@ -165,12 +166,13 @@ export default function Navbar() {
             </Link>
             <Link
               href="/about"
-              className={`px-2 py-1.5 transition-colors ${
-                isActive('/about') ? 'text-brand-600 font-bold' : 'hover:text-brand-600 font-semibold'
+              className={`px-2 py-1.5 transition-colors flex flex-col ${
+                isActive('/about') ? 'text-brand-600 font-bold' : 'hover:text-brand-600'
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
-              Dr. Gaurav Bhargava (Best Orthopedic Surgeon)
+              <span className="text-base font-bold text-slate-900 leading-tight">Dr. Gaurav Bhargava</span>
+              <span className="text-xs font-semibold text-slate-500">Best Orthopedic Surgeon</span>
             </Link>
             <Link
               href="/treatments"
@@ -184,15 +186,6 @@ export default function Navbar() {
               Treatments &amp; Recovery Protocols
             </Link>
             <Link
-              href="/testimonials"
-              className={`px-2 py-1.5 transition-colors ${
-                isActive('/testimonials') ? 'text-brand-600 font-bold' : 'hover:text-brand-600 font-semibold'
-              }`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Verified Patient Reviews
-            </Link>
-            <Link
               href="/blog"
               className={`px-2 py-1.5 transition-colors ${
                 isActive('/blog') ? 'text-brand-600 font-bold' : 'hover:text-brand-600 font-semibold'
@@ -200,6 +193,15 @@ export default function Navbar() {
               onClick={() => setIsMenuOpen(false)}
             >
               Health Blog
+            </Link>
+            <Link
+              href="/testimonials"
+              className={`px-2 py-1.5 transition-colors ${
+                isActive('/testimonials') ? 'text-brand-600 font-bold' : 'hover:text-brand-600 font-semibold'
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Verified Patient Reviews
             </Link>
             <Link
               href="/contact"
