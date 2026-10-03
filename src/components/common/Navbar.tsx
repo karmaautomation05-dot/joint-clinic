@@ -43,8 +43,8 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Navigation - Properly Spaced & Clean */}
-        <nav className="hidden xl:flex items-center gap-6 2xl:gap-7">
+        {/* Desktop Navigation - Properly Spaced, 6 Clean Items */}
+        <nav className="hidden xl:flex items-center gap-7 2xl:gap-8">
           <Link
             href="/"
             className={`text-sm font-semibold transition-colors whitespace-nowrap ${
@@ -75,26 +75,16 @@ export default function Navbar() {
             </span>
           </Link>
 
+          {/* Unified Treatments & Recovery Guide */}
           <Link
             href="/treatments"
             className={`text-sm font-semibold transition-colors whitespace-nowrap ${
-              isActive('/treatments')
+              isActive('/treatments') || isActive('/recovery-guide')
                 ? 'text-brand-600 font-bold'
                 : 'text-slate-600 hover:text-brand-600'
             }`}
           >
-            Treatments
-          </Link>
-
-          <Link
-            href="/recovery-guide"
-            className={`text-sm font-semibold transition-colors whitespace-nowrap ${
-              isActive('/recovery-guide')
-                ? 'text-brand-600 font-bold'
-                : 'text-slate-600 hover:text-brand-600'
-            }`}
-          >
-            Recovery Guide
+            Treatments &amp; Recovery
           </Link>
 
           <Link
@@ -143,7 +133,7 @@ export default function Navbar() {
 
           <Link
             href="/appointment"
-            className="btn-primary py-2.5 px-4 text-sm whitespace-nowrap shrink-0"
+            className="btn-primary py-2.5 px-5 text-sm whitespace-nowrap shrink-0"
           >
             Book Appointment
           </Link>
@@ -160,7 +150,7 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Drawer - Medfemme Style */}
+      {/* Mobile Drawer - Unified & Clean */}
       {isMenuOpen && (
         <div className="xl:hidden bg-white border-b border-brand-100 py-6 px-4 space-y-4 shadow-xl animate-in slide-in-from-top duration-300">
           <nav className="flex flex-col gap-3 text-base font-medium text-slate-700">
@@ -185,20 +175,13 @@ export default function Navbar() {
             <Link
               href="/treatments"
               className={`px-2 py-1.5 transition-colors ${
-                isActive('/treatments') ? 'text-brand-600 font-bold' : 'hover:text-brand-600 font-semibold'
+                isActive('/treatments') || isActive('/recovery-guide')
+                  ? 'text-brand-600 font-bold'
+                  : 'hover:text-brand-600 font-semibold'
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
-              Treatments
-            </Link>
-            <Link
-              href="/recovery-guide"
-              className={`px-2 py-1.5 transition-colors ${
-                isActive('/recovery-guide') ? 'text-brand-600 font-bold' : 'hover:text-brand-600 font-semibold'
-              }`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Recovery Guide
+              Treatments &amp; Recovery Protocols
             </Link>
             <Link
               href="/testimonials"
