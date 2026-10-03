@@ -1,13 +1,14 @@
 'use client'
 
 import React, { useEffect, useRef, useState, useCallback } from 'react'
+import type * as THREE from 'three'
 
 export interface Joint3DInfo {
   id: string
   label: string
-  pos: [number, number, number]
-  camPos: [number, number, number]
-  target: [number, number, number]
+  boneName: string
+  fallbackPos: [number, number, number]
+  camOffset: [number, number, number]
   color: string
 }
 
@@ -15,49 +16,49 @@ export const JOINTS_3D_DATA: Joint3DInfo[] = [
   {
     id: 'knee',
     label: 'Knee',
-    pos: [0.38, -0.68, 0.12],
-    camPos: [0.38, -0.68, 1.6],
-    target: [0.38, -0.68, 0.12],
+    boneName: 'RightLeg',
+    fallbackPos: [-0.12, -0.34, 0.04],
+    camOffset: [0, 0.05, 0.95],
     color: '#02BAB9',
   },
   {
     id: 'hip',
     label: 'Hip',
-    pos: [0.44, 0.12, 0.12],
-    camPos: [0.44, 0.12, 1.7],
-    target: [0.44, 0.12, 0.12],
+    boneName: 'RightUpLeg',
+    fallbackPos: [-0.12, 0.08, 0.02],
+    camOffset: [0, 0.05, 1.05],
     color: '#F18712',
   },
   {
     id: 'shoulder',
     label: 'Shoulder',
-    pos: [-0.85, 1.28, 0.08],
-    camPos: [-0.85, 1.28, 1.65],
-    target: [-0.85, 1.28, 0.08],
+    boneName: 'LeftArm',
+    fallbackPos: [0.24, 0.44, 0.0],
+    camOffset: [0, 0.05, 1.0],
     color: '#059B8F',
   },
   {
     id: 'spine',
     label: 'Spine',
-    pos: [0.0, 0.72, -0.16],
-    camPos: [0.25, 0.72, -1.75],
-    target: [0.0, 0.72, -0.16],
+    boneName: 'Spine1',
+    fallbackPos: [0.0, 0.28, -0.06],
+    camOffset: [0.15, 0.05, -1.05],
     color: '#01B3BF',
   },
   {
     id: 'elbow',
     label: 'Elbow',
-    pos: [-1.08, 0.72, 0.08],
-    camPos: [-1.08, 0.72, 1.55],
-    target: [-1.08, 0.72, 0.08],
+    boneName: 'LeftForeArm',
+    fallbackPos: [0.42, 0.24, 0.0],
+    camOffset: [0, 0.05, 0.95],
     color: '#0A7C97',
   },
   {
     id: 'ankle',
     label: 'Ankle',
-    pos: [0.36, -1.54, 0.08],
-    camPos: [0.36, -1.54, 1.5],
-    target: [0.36, -1.54, 0.08],
+    boneName: 'RightFoot',
+    fallbackPos: [-0.12, -0.78, 0.02],
+    camOffset: [0, 0.08, 0.9],
     color: '#059B8F',
   },
 ]
@@ -76,14 +77,16 @@ export default function Ortho3DHuman({
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadProgress, setLoadProgress] = useState(0)
   const [screenPins, setScreenPins] = useState<{ id: string; x: number; y: number; visible: boolean }[]>([])
 
   // Store transition targets
   const transitionRef = useRef({
-    currentCamPos: [0, 0.1, 4.8] as [number, number, number],
-    targetCamPos: [0, 0.1, 4.8] as [number, number, number],
-    currentLookAt: [0, 0.05, 0] as [number, number, number],
-    targetLookAt: [0, 0.05, 0] as [number, number, number],
+    currentCamPos: [0, 0.0, 2.5] as [number, number, number],
+    targetCamPos: [0, 0.0, 2.5] as [number, number, number],
+    currentLookAt: [0, 0.0, 0] as [number, number, number],
+    targetLookAt: [0, 0.0, 0] as [number, number, number],
     isTransitioning: false,
   })
 
@@ -98,14 +101,16 @@ export default function Ortho3DHuman({
 
     async function init3D() {
       if (!canvasRef.current || !containerRef.current || disposed) return
+
       const THREE = await import('three')
+      const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js')
 
       const canvas = canvasRef.current
       const container = containerRef.current
       const width = container.clientWidth
       const height = container.clientHeight
 
-      // ── Renderer (Pure White Background) ─────────────────────────────────
+      // ── Renderer (Pure White Clean Background) ───────────────────────────
       const renderer = new THREE.WebGLRenderer({
         canvas,
         alpha: false,
@@ -114,269 +119,65 @@ export default function Ortho3DHuman({
       })
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
       renderer.setSize(width, height, false)
-      renderer.setClearColor(0xffffff, 1) // Clean pure white studio background
+      renderer.setClearColor(0xffffff, 1)
       renderer.shadowMap.enabled = true
       renderer.shadowMap.type = THREE.PCFSoftShadowMap
+      renderer.toneMapping = THREE.ACESFilmicToneMapping
+      renderer.toneMappingExposure = 1.05
 
       // ── Scene & Camera ──────────────────────────────────────────────────
       const scene = new THREE.Scene()
       scene.background = new THREE.Color(0xffffff)
 
-      const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100)
-      camera.position.set(0, 0.1, 4.8)
+      const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100)
+      camera.position.set(0, 0.0, 2.5)
 
-      const cameraTarget = new THREE.Vector3(0, 0.05, 0)
+      const cameraTarget = new THREE.Vector3(0, 0.0, 0)
       camera.lookAt(cameraTarget)
 
       // ── Studio High-Key Lighting ─────────────────────────────────────────
-      // Ambient illumination (soft warm white)
       const ambientLight = new THREE.AmbientLight(0xffffff, 1.4)
       scene.add(ambientLight)
 
-      // Key light from top-front-right
-      const keyLight = new THREE.DirectionalLight(0xfff8f0, 1.8)
-      keyLight.position.set(4, 5, 5)
+      // Soft Key Light from front-right
+      const keyLight = new THREE.DirectionalLight(0xfff7ed, 2.0)
+      keyLight.position.set(2.5, 3.5, 3.0)
       keyLight.castShadow = true
       keyLight.shadow.mapSize.width = 1024
       keyLight.shadow.mapSize.height = 1024
       keyLight.shadow.bias = -0.001
       scene.add(keyLight)
 
-      // Fill light from left (cool medical tint)
-      const fillLight = new THREE.DirectionalLight(0xe6f7f7, 1.1)
-      fillLight.position.set(-4, 3, 3)
+      // Soft Fill Light from left
+      const fillLight = new THREE.DirectionalLight(0xf0fdfa, 1.2)
+      fillLight.position.set(-2.5, 2.5, 2.5)
       scene.add(fillLight)
 
-      // Rim light from behind for silhouette pop on white background
-      const rimLight = new THREE.DirectionalLight(0xcdeeee, 1.2)
-      rimLight.position.set(0, 3, -4)
-      scene.add(rimLight)
+      // Backlight for realistic silhouette separation
+      const backLight = new THREE.DirectionalLight(0xe0f2fe, 1.0)
+      backLight.position.set(0, 2.0, -3.0)
+      scene.add(backLight)
 
-      // Soft ground bounce light
-      const groundBounce = new THREE.DirectionalLight(0xf1f5f9, 0.6)
-      groundBounce.position.set(0, -3, 2)
-      scene.add(groundBounce)
+      // Ground bounce
+      const groundLight = new THREE.DirectionalLight(0xf8fafc, 0.7)
+      groundLight.position.set(0, -2.5, 1.5)
+      scene.add(groundLight)
 
-      // ── Master Character Group ──────────────────────────────────────────
-      const characterGroup = new THREE.Group()
-      scene.add(characterGroup)
-
-      // ── Materials ───────────────────────────────────────────────────────
-      // Realistic healthy human male skin
-      const skinMat = new THREE.MeshStandardMaterial({
-        color: 0xdfad94, // Warm natural male skin tone
-        roughness: 0.55,
-        metalness: 0.04,
-      })
-
-      // Modern dark hair
-      const hairMat = new THREE.MeshStandardMaterial({
-        color: 0x221c19, // Deep dark espresso/black hair
-        roughness: 0.7,
-        metalness: 0.05,
-      })
-
-      // Clothed: Athletic Medical Teal Fitted T-Shirt
-      const shirtMat = new THREE.MeshStandardMaterial({
-        color: 0x059b8f, // Signature Medical Teal
-        roughness: 0.65,
-        metalness: 0.08,
-      })
-
-      // Collar & Trim Accent
-      const shirtTrimMat = new THREE.MeshStandardMaterial({
-        color: 0x0a7c97, // Ocean blue collar accent
-        roughness: 0.55,
-        metalness: 0.1,
-      })
-
-      // Clothed: Athletic Training Shorts (Dark Charcoal Slate)
-      const shortsMat = new THREE.MeshStandardMaterial({
-        color: 0x1e293b, // Charcoal slate shorts
-        roughness: 0.75,
-        metalness: 0.05,
-      })
-
-      // Athletic Shoes (Crisp white with teal accents)
-      const shoeMat = new THREE.MeshStandardMaterial({
-        color: 0xf8fafc, // White sneaker upper
-        roughness: 0.35,
-        metalness: 0.1,
-      })
-
-      const soleMat = new THREE.MeshStandardMaterial({
-        color: 0x02bab9, // Teal sole accent
-        roughness: 0.5,
-        metalness: 0.1,
-      })
-
-      // Helper to add parts
-      function addPart(geom: any, mat: any, pos: [number, number, number], rot?: [number, number, number], scale?: [number, number, number], parent: any = characterGroup) {
-        const mesh = new THREE.Mesh(geom, mat)
-        mesh.position.set(pos[0], pos[1], pos[2])
-        if (rot) mesh.rotation.set(rot[0], rot[1], rot[2])
-        if (scale) mesh.scale.set(scale[0], scale[1], scale[2])
-        mesh.castShadow = true
-        mesh.receiveShadow = true
-        parent.add(mesh)
-        return mesh
-      }
-
-      // ── MODELING THE CLOTHED HUMAN MALE ─────────────────────────────────
-
-      // 1. HEAD & FACE
-      // Cranium / Face structure
-      const headGeo = new THREE.SphereGeometry(0.24, 28, 24)
-      headGeo.scale(0.85, 1.15, 0.95)
-      addPart(headGeo, skinMat, [0, 1.95, 0])
-
-      // Jaw & chin volume
-      const chinGeo = new THREE.CylinderGeometry(0.12, 0.15, 0.14, 16)
-      chinGeo.scale(0.82, 1, 0.85)
-      addPart(chinGeo, skinMat, [0, 1.82, 0.05], [0.12, 0, 0])
-
-      // Neck
-      const neckGeo = new THREE.CylinderGeometry(0.125, 0.14, 0.22, 20)
-      addPart(neckGeo, skinMat, [0, 1.70, -0.01])
-
-      // Modern stylish textured hair (side-fade volume)
-      const hairMainGeo = new THREE.SphereGeometry(0.25, 24, 20)
-      hairMainGeo.scale(0.88, 1.12, 0.98)
-      addPart(hairMainGeo, hairMat, [0, 2.01, -0.03])
-
-      const hairTopGeo = new THREE.BoxGeometry(0.36, 0.12, 0.38)
-      addPart(hairTopGeo, hairMat, [0, 2.12, 0.02], [-0.08, 0, 0])
-
-      // Ears (Left & Right)
-      const earGeo = new THREE.SphereGeometry(0.045, 12, 12)
-      earGeo.scale(0.4, 1.2, 0.8)
-      addPart(earGeo, skinMat, [-0.22, 1.94, -0.01])
-      addPart(earGeo, skinMat, [0.22, 1.94, -0.01])
-
-      // 2. TORSO (CLOTHED: FITTED TEAL ATHLETIC SHIRT)
-      // Main chest & upper torso
-      const chestGeo = new THREE.CylinderGeometry(0.46, 0.40, 0.54, 28)
-      chestGeo.scale(1.02, 1, 0.72)
-      addPart(chestGeo, shirtMat, [0, 1.35, 0.02], [-0.04, 0, 0])
-
-      // Midriff & waist (tucked shirt)
-      const waistGeo = new THREE.CylinderGeometry(0.40, 0.38, 0.44, 28)
-      waistGeo.scale(0.96, 1, 0.70)
-      addPart(waistGeo, shirtMat, [0, 0.94, 0.01])
-
-      // Shirt crew-neck collar ring
-      const collarGeo = new THREE.TorusGeometry(0.14, 0.024, 12, 24)
-      addPart(collarGeo, shirtTrimMat, [0, 1.59, 0.02], [Math.PI / 2 + 0.1, 0, 0])
-
-      // 3. SHOULDERS & ARMS (CLOTHED SLEEVES + EXPOSED MUSCULAR ARMS)
-      const sides = [-1, 1] // -1 = Left arm, 1 = Right arm
-
-      sides.forEach((s) => {
-        // T-Shirt Short Sleeve (Shoulder deltoid cap)
-        const sleeveGeo = new THREE.SphereGeometry(0.19, 20, 18)
-        sleeveGeo.scale(1, 1.2, 1)
-        addPart(sleeveGeo, shirtMat, [s * 0.56, 1.40, 0.02], [0, 0, s * 0.2])
-
-        // Sleeve hem cuff
-        const cuffGeo = new THREE.CylinderGeometry(0.13, 0.14, 0.22, 20)
-        addPart(cuffGeo, shirtMat, [s * 0.68, 1.25, 0.03], [0, 0, s * 0.28])
-
-        // Bicep / Tricep (Skin exposed below short sleeve)
-        const bicepGeo = new THREE.CylinderGeometry(0.105, 0.095, 0.34, 18)
-        addPart(bicepGeo, skinMat, [s * 0.78, 0.98, 0.04], [0, 0, s * 0.22])
-
-        // Elbow joint
-        const elbowGeo = new THREE.SphereGeometry(0.095, 16, 16)
-        addPart(elbowGeo, skinMat, [s * 0.85, 0.78, 0.05])
-
-        // Forearm (tapering to wrist)
-        const forearmGeo = new THREE.CylinderGeometry(0.09, 0.075, 0.42, 18)
-        addPart(forearmGeo, skinMat, [s * 0.92, 0.52, 0.06], [0, 0, s * 0.14])
-
-        // Wrist
-        const wristGeo = new THREE.SphereGeometry(0.07, 14, 14)
-        addPart(wristGeo, skinMat, [s * 0.98, 0.28, 0.06])
-
-        // Hand & fingers (relaxed anatomical pose)
-        const handGeo = new THREE.BoxGeometry(0.08, 0.18, 0.12)
-        addPart(handGeo, skinMat, [s * 1.01, 0.15, 0.06], [0, 0, s * 0.08])
-      })
-
-      // 4. PELVIS & SHORTS (CLOTHED: CHARCOAL ATHLETIC TRAINING SHORTS)
-      // Main shorts hip volume
-      const shortsHipGeo = new THREE.CylinderGeometry(0.41, 0.43, 0.36, 28)
-      shortsHipGeo.scale(0.98, 1, 0.76)
-      addPart(shortsHipGeo, shortsMat, [0, 0.58, 0.02])
-
-      // Shorts waistband trim
-      const waistbandGeo = new THREE.TorusGeometry(0.40, 0.022, 10, 28)
-      waistbandGeo.scale(0.98, 0.76, 1)
-      addPart(waistbandGeo, shirtTrimMat, [0, 0.73, 0.02], [Math.PI / 2, 0, 0])
-
-      // Shorts leg openings (Left & Right)
-      sides.forEach((s) => {
-        const shortLegGeo = new THREE.CylinderGeometry(0.23, 0.21, 0.44, 22)
-        shortLegGeo.scale(1, 1, 0.94)
-        addPart(shortLegGeo, shortsMat, [s * 0.24, 0.26, 0.04], [0.06, 0, s * -0.06])
-      })
-
-      // 5. LOWER LIMBS: MUSCULAR LEGS, KNEES & CALVES
-      sides.forEach((s) => {
-        // Lower Thigh (peeking out from shorts above knee)
-        const thighGeo = new THREE.CylinderGeometry(0.18, 0.155, 0.32, 20)
-        addPart(thighGeo, skinMat, [s * 0.24, -0.04, 0.05], [0.05, 0, s * -0.04])
-
-        // Knee joint complex (defined patella, femoral condyles shape)
-        const kneeGeo = new THREE.SphereGeometry(0.155, 20, 20)
-        kneeGeo.scale(0.95, 1.15, 1.05)
-        addPart(kneeGeo, skinMat, [s * 0.24, -0.28, 0.06])
-
-        // Patellar kneecap prominence
-        const patellaCap = new THREE.SphereGeometry(0.065, 14, 14)
-        patellaCap.scale(1, 1.25, 0.6)
-        addPart(patellaCap, skinMat, [s * 0.24, -0.27, 0.16])
-
-        // Calf & Shin (muscular gastrocnemius curve)
-        const calfGeo = new THREE.CylinderGeometry(0.145, 0.105, 0.76, 20)
-        calfGeo.scale(0.94, 1, 1.08)
-        addPart(calfGeo, skinMat, [s * 0.23, -0.74, 0.04], [-0.03, 0, 0])
-
-        // Ankle joint (medial/lateral malleolus)
-        const ankleGeo = new THREE.SphereGeometry(0.105, 16, 16)
-        addPart(ankleGeo, skinMat, [s * 0.23, -1.18, 0.04])
-
-        // 6. ATHLETIC SNEAKERS (WHITE UPPER WITH TEAL DETAIL)
-        // Sneaker upper body
-        const shoeUpperGeo = new THREE.BoxGeometry(0.18, 0.14, 0.44)
-        shoeUpperGeo.scale(0.95, 1, 1)
-        addPart(shoeUpperGeo, shoeMat, [s * 0.23, -1.30, 0.12], [0.08, 0, 0])
-
-        // Sneaker sole (Teal bounce layer)
-        const shoeSoleGeo = new THREE.BoxGeometry(0.20, 0.055, 0.48)
-        addPart(shoeSoleGeo, soleMat, [s * 0.23, -1.38, 0.13])
-
-        // Sneaker toe cap curve
-        const toeGeo = new THREE.SphereGeometry(0.09, 14, 14)
-        toeGeo.scale(1.05, 0.7, 1.2)
-        addPart(toeGeo, shoeMat, [s * 0.23, -1.32, 0.28])
-      })
-
-      // ── SOFT GROUND STUDIO SHADOW ─────────────────────────────────────────
-      // High-resolution soft radial shadow disc beneath character feet
+      // ── Soft Radial Ground Studio Shadow Disc ────────────────────────────
       const shadowCanvas = document.createElement('canvas')
       shadowCanvas.width = 256
       shadowCanvas.height = 256
       const sCtx = shadowCanvas.getContext('2d')!
       const sGrad = sCtx.createRadialGradient(128, 128, 10, 128, 128, 120)
       sGrad.addColorStop(0, 'rgba(15, 23, 42, 0.28)')
-      sGrad.addColorStop(0.4, 'rgba(15, 23, 42, 0.15)')
-      sGrad.addColorStop(0.8, 'rgba(15, 23, 42, 0.04)')
+      sGrad.addColorStop(0.35, 'rgba(15, 23, 42, 0.14)')
+      sGrad.addColorStop(0.7, 'rgba(15, 23, 42, 0.03)')
       sGrad.addColorStop(1, 'rgba(255, 255, 255, 0)')
       sCtx.fillStyle = sGrad
       sCtx.fillRect(0, 0, 256, 256)
 
       const shadowTex = new THREE.CanvasTexture(shadowCanvas)
-      const shadowPlaneGeo = new THREE.PlaneGeometry(3.2, 3.2)
+      const shadowPlaneGeo = new THREE.PlaneGeometry(2.2, 2.2)
       const shadowPlaneMat = new THREE.MeshBasicMaterial({
         map: shadowTex,
         transparent: true,
@@ -384,78 +185,191 @@ export default function Ortho3DHuman({
       })
       const shadowMesh = new THREE.Mesh(shadowPlaneGeo, shadowPlaneMat)
       shadowMesh.rotation.x = -Math.PI / 2
-      shadowMesh.position.y = -1.41
+      shadowMesh.position.y = -0.96
       scene.add(shadowMesh)
 
-      // ── 3D FLOATING JOINT HOTSPOT PINS ────────────────────────────────────
+      // ── Model & Pins Groups ──────────────────────────────────────────────
+      const characterGroup = new THREE.Group()
+      scene.add(characterGroup)
+
       const pinsGroup = new THREE.Group()
       characterGroup.add(pinsGroup)
 
+      const jointWorldPositions: Record<string, THREE.Vector3> = {}
       const pinMeshes: Record<string, { orb: any; ring: any; glow: any }> = {}
 
+      // Initialize default fallback positions
       JOINTS_3D_DATA.forEach((j) => {
-        const jColor = new THREE.Color(j.color)
-
-        // Center jewel sphere
-        const orbGeo = new THREE.SphereGeometry(0.065, 18, 18)
-        const orbMat = new THREE.MeshStandardMaterial({
-          color: jColor,
-          emissive: jColor,
-          emissiveIntensity: 0.6,
-          roughness: 0.2,
-          metalness: 0.2,
-        })
-        const orb = new THREE.Mesh(orbGeo, orbMat)
-        orb.position.set(...j.pos)
-        pinsGroup.add(orb)
-
-        // Pulsing radar ring
-        const ringGeo = new THREE.RingGeometry(0.09, 0.115, 32)
-        const ringMat = new THREE.MeshBasicMaterial({
-          color: jColor,
-          transparent: true,
-          opacity: 0.8,
-          side: THREE.DoubleSide,
-        })
-        const ring = new THREE.Mesh(ringGeo, ringMat)
-        ring.position.set(...j.pos)
-        pinsGroup.add(ring)
-
-        // Soft outer glow halo
-        const glowGeo = new THREE.SphereGeometry(0.12, 14, 14)
-        const glowMat = new THREE.MeshBasicMaterial({
-          color: jColor,
-          transparent: true,
-          opacity: 0.25,
-        })
-        const glow = new THREE.Mesh(glowGeo, glowMat)
-        glow.position.set(...j.pos)
-        pinsGroup.add(glow)
-
-        pinMeshes[j.id] = { orb, ring, glow }
+        jointWorldPositions[j.id] = new THREE.Vector3(...j.fallbackPos)
       })
+
+      // Setup 3D Hotspot Pins
+      function setupPins() {
+        JOINTS_3D_DATA.forEach((j) => {
+          const jColor = new THREE.Color(j.color)
+          const pos = jointWorldPositions[j.id] || new THREE.Vector3(...j.fallbackPos)
+
+          // Center jewel sphere
+          const orbGeo = new THREE.SphereGeometry(0.032, 16, 16)
+          const orbMat = new THREE.MeshStandardMaterial({
+            color: jColor,
+            emissive: jColor,
+            emissiveIntensity: 0.7,
+            roughness: 0.2,
+            metalness: 0.2,
+          })
+          const orb = new THREE.Mesh(orbGeo, orbMat)
+          orb.position.copy(pos)
+          pinsGroup.add(orb)
+
+          // Pulsing radar ring
+          const ringGeo = new THREE.RingGeometry(0.045, 0.058, 32)
+          const ringMat = new THREE.MeshBasicMaterial({
+            color: jColor,
+            transparent: true,
+            opacity: 0.8,
+            side: THREE.DoubleSide,
+          })
+          const ring = new THREE.Mesh(ringGeo, ringMat)
+          ring.position.copy(pos)
+          pinsGroup.add(ring)
+
+          // Glow halo
+          const glowGeo = new THREE.SphereGeometry(0.065, 14, 14)
+          const glowMat = new THREE.MeshBasicMaterial({
+            color: jColor,
+            transparent: true,
+            opacity: 0.25,
+          })
+          const glow = new THREE.Mesh(glowGeo, glowMat)
+          glow.position.copy(pos)
+          pinsGroup.add(glow)
+
+          pinMeshes[j.id] = { orb, ring, glow }
+        })
+      }
+
+      setupPins()
+
+      // ── LOAD REAL 3D CLOTHED HUMAN MALE GLB ──────────────────────────────
+      const loader = new GLTFLoader()
+
+      loader.load(
+        '/models/human-male.glb',
+        (gltf) => {
+          if (disposed) return
+          const model = gltf.scene
+
+          // Compute bounding box & center character vertically
+          const box = new THREE.Box3().setFromObject(model)
+          const size = new THREE.Vector3()
+          box.getSize(size)
+          const center = new THREE.Vector3()
+          box.getCenter(center)
+
+          // Normalize height to ~1.85m within 3D world
+          const targetHeight = 1.85
+          const scale = targetHeight / (size.y || 1)
+          model.scale.setScalar(scale)
+
+          // Center the model horizontally and place feet at ground
+          model.position.x = -center.x * scale
+          model.position.y = -box.min.y * scale - 0.95
+          model.position.z = -center.z * scale
+
+          // Enable shadows and configure high quality rendering
+          model.traverse((child: any) => {
+            if (child.isMesh) {
+              child.castShadow = true
+              child.receiveShadow = true
+              if (child.material) {
+                child.material.roughness = Math.max(0.35, child.material.roughness || 0.4)
+                child.material.metalness = Math.min(0.25, child.material.metalness || 0.1)
+                child.material.needsUpdate = true
+              }
+            }
+          })
+
+          characterGroup.add(model)
+          model.updateMatrixWorld(true)
+
+          // Extract exact anatomical bone positions
+          const boneMap: Record<string, any> = {}
+          model.traverse((child: any) => {
+            if (child.isBone) {
+              boneMap[child.name] = child
+            }
+          })
+
+          // Update joint pin positions from real model bones
+          JOINTS_3D_DATA.forEach((j) => {
+            const bone = boneMap[j.boneName]
+            if (bone) {
+              const worldPos = new THREE.Vector3()
+              bone.getWorldPosition(worldPos)
+              // Convert to local position in characterGroup
+              characterGroup.worldToLocal(worldPos)
+
+              // Subtle natural surface offsets so pins sit on skin/clothing surface
+              if (j.id === 'knee') worldPos.z += 0.08
+              if (j.id === 'hip') worldPos.z += 0.08
+              if (j.id === 'shoulder') worldPos.z += 0.06
+              if (j.id === 'elbow') worldPos.z += 0.05
+              if (j.id === 'ankle') worldPos.z += 0.06
+              if (j.id === 'spine') worldPos.z -= 0.08
+
+              jointWorldPositions[j.id].copy(worldPos)
+
+              const pin = pinMeshes[j.id]
+              if (pin) {
+                pin.orb.position.copy(worldPos)
+                pin.ring.position.copy(worldPos)
+                pin.glow.position.copy(worldPos)
+              }
+            }
+          })
+
+          setIsLoading(false)
+
+          // Fly to active joint on initial load
+          flyToJoint(activeJointId)
+        },
+        (xhr) => {
+          if (xhr.lengthComputable && xhr.total > 0) {
+            setLoadProgress(Math.round((xhr.loaded / xhr.total) * 100))
+          }
+        },
+        (error) => {
+          console.error('Error loading 3D human model:', error)
+          setIsLoading(false)
+        }
+      )
 
       // ── CAMERA FLIGHT / ZOOM TO JOINT ─────────────────────────────────────
       function flyToJoint(jointId: string) {
         const joint = JOINTS_3D_DATA.find((j) => j.id === jointId)
         if (!joint) return
 
-        transitionRef.current.targetCamPos = [...joint.camPos]
-        transitionRef.current.targetLookAt = [...joint.target]
+        const jointPos = jointWorldPositions[jointId] || new THREE.Vector3(...joint.fallbackPos)
+
+        // Target camera position offset from the joint
+        transitionRef.current.targetCamPos = [
+          jointPos.x + joint.camOffset[0],
+          jointPos.y + joint.camOffset[1],
+          jointPos.z + joint.camOffset[2],
+        ]
+        transitionRef.current.targetLookAt = [jointPos.x, jointPos.y, jointPos.z]
         transitionRef.current.isTransitioning = true
       }
 
       function resetView() {
-        transitionRef.current.targetCamPos = [0, 0.1, 4.8]
-        transitionRef.current.targetLookAt = [0, 0.05, 0]
+        transitionRef.current.targetCamPos = [0, 0.0, 2.5]
+        transitionRef.current.targetLookAt = [0, 0.0, 0]
         transitionRef.current.isTransitioning = true
       }
 
       stateRef.current.selectJoint = flyToJoint
       stateRef.current.resetView = resetView
-
-      // Fly to initial active joint
-      flyToJoint(activeJointId)
 
       // ── 360° MOUSE & TOUCH ORBIT CONTROLS ─────────────────────────────────
       let isDragging = false
@@ -489,9 +403,9 @@ export default function Ortho3DHuman({
 
       function onWheel(e: WheelEvent) {
         e.preventDefault()
-        const zoomDelta = e.deltaY * 0.002
+        const zoomDelta = e.deltaY * 0.0015
         const currentDist = camera.position.distanceTo(cameraTarget)
-        const newDist = Math.max(1.4, Math.min(6.0, currentDist + zoomDelta))
+        const newDist = Math.max(0.8, Math.min(3.8, currentDist + zoomDelta))
         const dir = camera.position.clone().sub(cameraTarget).normalize()
         camera.position.copy(cameraTarget.clone().add(dir.multiplyScalar(newDist)))
       }
@@ -536,7 +450,8 @@ export default function Ortho3DHuman({
 
       function updateScreenPins() {
         const pins = JOINTS_3D_DATA.map((j) => {
-          tempVec.set(...j.pos)
+          const pos = jointWorldPositions[j.id] || new THREE.Vector3(...j.fallbackPos)
+          tempVec.copy(pos)
           tempVec.applyMatrix4(characterGroup.matrixWorld)
           tempVec.project(camera)
 
@@ -571,7 +486,7 @@ export default function Ortho3DHuman({
 
         // Gentle idle character sway
         if (!isDragging) {
-          targetRotY += 0.0018
+          targetRotY += 0.0016
         }
 
         // Smooth rotation interpolation
@@ -596,7 +511,7 @@ export default function Ortho3DHuman({
             trans.targetCamPos[1] - camera.position.y,
             trans.targetCamPos[2] - camera.position.z
           )
-          if (posDist < 0.015) {
+          if (posDist < 0.012) {
             trans.isTransitioning = false
           }
         }
@@ -607,8 +522,8 @@ export default function Ortho3DHuman({
           if (pin) {
             pin.ring.lookAt(camera.position)
 
-            const wave = (elapsedTime * 1.6 + idx * 0.35) % 1
-            pin.ring.scale.setScalar(1 + wave * 1.6)
+            const wave = (elapsedTime * 1.5 + idx * 0.35) % 1
+            pin.ring.scale.setScalar(1 + wave * 1.5)
             pin.ring.material.opacity = (1 - wave) * 0.75
 
             const isSelected = j.id === activeJointId
@@ -618,7 +533,7 @@ export default function Ortho3DHuman({
             if (isSelected) {
               pin.glow.scale.setScalar(1.5 + Math.sin(elapsedTime * 4) * 0.2)
               pin.glow.material.opacity = 0.4
-              pin.orb.material.emissiveIntensity = 1.0
+              pin.orb.material.emissiveIntensity = 1.1
             } else {
               pin.glow.scale.setScalar(1.0)
               pin.glow.material.opacity = 0.2
@@ -626,10 +541,6 @@ export default function Ortho3DHuman({
             }
           }
         })
-
-        // Subtle breathing expansion on chest
-        const breathe = 1 + Math.sin(elapsedTime * 1.5) * 0.01
-        chestGeo.scale(1.02 * breathe, 1, 0.72 * breathe)
 
         // Update 2D Screen Hotspot Tags
         updateScreenPins()
@@ -679,13 +590,29 @@ export default function Ortho3DHuman({
       ref={containerRef}
       className="relative w-full h-[520px] sm:h-[600px] md:h-[660px] rounded-3xl overflow-hidden bg-white border border-slate-200/90 shadow-xl select-none"
     >
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 z-30 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
+          <div className="relative flex items-center justify-center">
+            <div className="w-14 h-14 rounded-full border-3 border-brand-200 border-t-brand-600 animate-spin" />
+            <span className="absolute text-xs font-bold text-brand-600 font-sans">3D</span>
+          </div>
+          <div className="text-center">
+            <div className="text-sm font-bold text-slate-800">Loading 3D Anatomy Model...</div>
+            <div className="text-xs text-slate-500 font-mono mt-0.5">
+              {loadProgress > 0 ? `${loadProgress}% loaded` : 'Preparing realistic human avatar'}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 3D WebGL Canvas (Pure White Background) */}
       <canvas
         ref={canvasRef}
         className="w-full h-full cursor-grab active:cursor-grabbing block"
       />
 
-      {/* Clean Subtle Reset Button (Top Right) */}
+      {/* Clean Reset Button (Top Right) */}
       <div className="absolute top-4 right-4 z-20">
         <button
           onClick={handleResetCamera}
@@ -713,7 +640,7 @@ export default function Ortho3DHuman({
           <button
             key={pin.id}
             onClick={() => onSelectJoint(pin.id)}
-            className={`absolute z-30 flex items-center gap-1.5 px-3 py-1 rounded-full backdrop-blur-md transition-all duration-300 cursor-pointer ${
+            className={`absolute z-20 flex items-center gap-1.5 px-3 py-1 rounded-full backdrop-blur-md transition-all duration-300 cursor-pointer ${
               isSelected
                 ? 'scale-110 shadow-md ring-2 ring-brand-500'
                 : 'hover:scale-105 opacity-90 hover:opacity-100 shadow-xs'
