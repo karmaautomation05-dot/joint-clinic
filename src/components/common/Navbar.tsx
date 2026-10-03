@@ -43,8 +43,8 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Navigation - Properly Spaced, 6 Clean Items */}
-        <nav className="hidden xl:flex items-center gap-7 2xl:gap-8">
+        {/* Desktop Navigation - Clean, Balanced Spacing */}
+        <nav className="hidden xl:flex items-center gap-5 2xl:gap-6">
           <Link
             href="/"
             className={`text-sm font-semibold transition-colors whitespace-nowrap ${
