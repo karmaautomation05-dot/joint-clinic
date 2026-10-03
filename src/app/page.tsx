@@ -13,11 +13,11 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      <BodyMapSelector />
       <AboutDr />
       <ServicesOverview />
       <WhyChooseUs />
       <Statistics />
-      <BodyMapSelector />
       <VideoTestimonials />
       <FAQ />
       <AppointmentForm />
