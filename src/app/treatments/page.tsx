@@ -241,7 +241,7 @@ export default function TreatmentsPage() {
                         <div className="w-12 h-12 rounded-2xl bg-brand-50 flex items-center justify-center text-[#059B8F] group-hover:bg-[#059B8F] group-hover:text-white transition-colors">
                           <CatIcon size={24} />
                         </div>
-                        <span className="text-xs font-bold text-[#059B8F] px-3 py-1 rounded-full bg-brand-50/70 border border-brand-100">
+                        <span className="text-xs font-bold text-[#059B8F] px-3 py-1 rounded-full bg-brand-50 border border-brand-200">
                           {category.items.length} Treatments
                         </span>
                       </div>
@@ -258,7 +258,7 @@ export default function TreatmentsPage() {
                       </p>
 
                       {/* Procedures Preview List */}
-                      <div className="bg-slate-50/70 rounded-2xl p-4 border border-slate-100/90 mb-6 space-y-2">
+                      <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 mb-6 space-y-2">
                         <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                           Featured Procedures:
                         </span>
@@ -339,7 +339,7 @@ export default function TreatmentsPage() {
                         <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-[#F18712] group-hover:bg-[#F18712] group-hover:text-white transition-colors">
                           <CatIcon size={24} />
                         </div>
-                        <span className="text-xs font-bold text-[#F18712] px-3 py-1 rounded-full bg-amber-50/70 border border-amber-200">
+                        <span className="text-xs font-bold text-[#F18712] px-3 py-1 rounded-full bg-amber-50 border border-amber-200">
                           {guide.phases.length} Recovery Phases
                         </span>
                       </div>
@@ -356,7 +356,7 @@ export default function TreatmentsPage() {
                       </p>
 
                       {/* Key Milestones Snapshot */}
-                      <div className="bg-slate-50/70 rounded-2xl p-4 border border-slate-100/90 mb-6 space-y-2">
+                      <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 mb-6 space-y-2">
                         <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                           Key Healing Milestones:
                         </span>
@@ -406,7 +406,7 @@ export default function TreatmentsPage() {
         )}
 
         {/* Doctor Philosophy & Laminar OT Hospital Assurance */}
-        <div className="mt-12 sm:mt-16 bg-gradient-to-r from-teal-50/80 to-brand-50/80 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 border border-brand-200 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
+        <div className="mt-12 sm:mt-16 bg-gradient-to-r from-teal-50 to-brand-50 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 border border-brand-200 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
           <div className="max-w-2xl">
             <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] mb-2 block">
               Clinical Excellence &bull; BMTC Hospital Kidwai Nagar
@@ -439,7 +439,7 @@ export default function TreatmentsPage() {
         <section
           itemScope
           itemType="https://schema.org/FAQPage"
-          className="mt-16 bg-slate-50/80 rounded-3xl p-6 sm:p-10 border border-slate-200/80 space-y-6"
+          className="mt-16 bg-slate-50 rounded-3xl p-6 sm:p-10 border border-slate-200 space-y-6"
         >
           <div>
             <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block mb-1">

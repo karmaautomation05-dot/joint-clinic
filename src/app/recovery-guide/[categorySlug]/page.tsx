@@ -238,7 +238,7 @@ export default function DedicatedRecoveryCategoryPage({
       {/* Main Container */}
       <div className="container mt-12 sm:mt-16 space-y-16">
         {/* AEO Rehabilitation Milestone Summary Box for Search & AI Assistants */}
-        <div className="bg-brand-50/60 rounded-3xl border border-brand-200/80 p-6 sm:p-8 space-y-3 shadow-xs aeo-summary">
+        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 space-y-3 shadow-md aeo-summary">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#059B8F] text-white flex items-center justify-center shrink-0">
               <GuideIcon className="w-5 h-5" />
@@ -478,7 +478,7 @@ export default function DedicatedRecoveryCategoryPage({
                 <Link
                   key={og.id}
                   href={`/recovery-guide/${og.id}`}
-                  className="p-4 rounded-2xl bg-slate-50 hover:bg-brand-50/80 border border-slate-200/70 hover:border-brand-200 transition-all flex flex-col items-center text-center group"
+                  className="p-4 rounded-2xl bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-200 transition-all flex flex-col items-center text-center group"
                 >
                   <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center text-[#059B8F] group-hover:bg-[#059B8F] group-hover:text-white transition-colors mb-2 shadow-2xs">
                     <OGIcon size={18} />

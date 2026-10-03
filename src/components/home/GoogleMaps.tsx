@@ -104,7 +104,7 @@ export default function GoogleMaps() {
                   </div>
                   
                   <div className="space-y-3.5 mb-6">
-                    <div className="flex gap-3 sm:gap-3.5 p-3 sm:p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100">
+                    <div className="flex gap-3 sm:gap-3.5 p-3 sm:p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
                       <div className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-50 rounded-xl flex items-center justify-center shrink-0 text-brand-600">
                         <MapPin size={18} />
                       </div>
@@ -116,7 +116,7 @@ export default function GoogleMaps() {
                       </div>
                     </div>
 
-                    <div className="flex gap-3 sm:gap-3.5 p-3 sm:p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100">
+                    <div className="flex gap-3 sm:gap-3.5 p-3 sm:p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
                       <div className="w-9 h-9 sm:w-10 sm:h-10 bg-brand-50 rounded-xl flex items-center justify-center shrink-0 text-brand-600">
                         <Clock size={18} />
                       </div>

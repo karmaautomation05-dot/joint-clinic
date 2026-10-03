@@ -19,6 +19,17 @@ import {
 } from "lucide-react";
 import { TREATMENTS, TREATMENT_CATEGORIES } from "@/data/treatments";
 import { PRIMARY_CONTACT } from "@/data/clinics";
+import dynamic from "next/dynamic";
+
+const JointAnatomy3D = dynamic(() => import("@/components/common/JointAnatomy3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[460px] sm:h-[520px] rounded-3xl bg-white border border-slate-200 flex flex-col items-center justify-center gap-3 shadow-sm">
+      <div className="w-12 h-12 rounded-full border-2 border-brand-500/20 border-t-brand-600 animate-spin" />
+      <span className="text-xs text-slate-500 font-mono">Loading 3D Joint Reconstruction...</span>
+    </div>
+  ),
+});
 
 const ICON_MAP: Record<string, typeof Bone> = {
   Bone: Bone,
@@ -229,8 +240,8 @@ export default function TreatmentDetailPage({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
           {/* Main Article & Procedures */}
           <div className="lg:col-span-8 space-y-6 sm:space-y-8">
-            {/* AEO Quick Fact / Answer Box for Search Engines & Patients */}
-            <div className="bg-brand-50/60 rounded-2xl sm:rounded-3xl border border-brand-200/80 p-5 sm:p-7 space-y-3 shadow-xs aeo-summary">
+            {/* AEO Quick Fact / Answer Box (100% Solid Opaque Pure White Card) */}
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-7 space-y-3 shadow-xl aeo-summary">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[#059B8F] text-white flex items-center justify-center shrink-0">
                   <IconComponent className="w-5 h-5" />
@@ -249,6 +260,24 @@ export default function TreatmentDetailPage({
               </p>
             </div>
 
+            {/* Embedded 3D Bone & Joint Arthroplasty Reconstruction for Knee Treatments */}
+            {treatment.slug.includes("knee") && (
+              <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-8 md:p-10 shadow-sm space-y-5">
+                <div>
+                  <span className="text-brand-600 font-bold uppercase tracking-widest text-xs mb-2 block">
+                    3D Surgical Technology &amp; Alignment
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
+                    Interactive 3D Knee Joint &amp; Implant Articulation
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                    Rotate the 3D joint model in 360° to inspect the Femur, Tibia, Patella, and the tissue-sparing cobalt-chrome implant with UHMWPE shock-absorbing bearing insert.
+                  </p>
+                </div>
+                <JointAnatomy3D />
+              </div>
+            )}
+
             {/* Overview */}
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-4 sm:space-y-5">
               <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">Clinical Overview</h2>
@@ -266,7 +295,7 @@ export default function TreatmentDetailPage({
                 {treatment.indications.map((ind, idx) => (
                   <div
                     key={idx}
-                    className="flex items-start gap-3 p-3.5 sm:p-4 rounded-2xl bg-brand-50/30 border border-brand-100 text-xs sm:text-sm text-slate-800 font-medium"
+                    className="flex items-start gap-3 p-3.5 sm:p-4 rounded-2xl bg-brand-50 border border-brand-200 text-xs sm:text-sm text-slate-800 font-medium"
                   >
                     <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-brand-600 shrink-0 mt-0.5" />
                     <span>{ind}</span>
@@ -284,7 +313,7 @@ export default function TreatmentDetailPage({
                 {treatment.techniques.map((tech, idx) => (
                   <div
                     key={idx}
-                    className="p-4 sm:p-6 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-2"
+                    className="p-4 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-2"
                   >
                     <h3 className="text-base sm:text-lg font-serif font-bold text-slate-900">{tech.name}</h3>
                     <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
@@ -306,7 +335,7 @@ export default function TreatmentDetailPage({
                     <div className="sm:w-28 text-xs font-bold uppercase tracking-wider text-brand-700 shrink-0 sm:pt-2 font-mono">
                       {rec.timeline}
                     </div>
-                    <div className="p-3.5 sm:p-4 rounded-2xl bg-brand-50/30 border border-brand-100 flex-1 text-xs sm:text-sm text-slate-800">
+                    <div className="p-3.5 sm:p-4 rounded-2xl bg-brand-50 border border-brand-200 flex-1 text-xs sm:text-sm text-slate-800">
                       {rec.milestone}
                     </div>
                   </div>
@@ -336,7 +365,7 @@ export default function TreatmentDetailPage({
                       itemScope
                       itemProp="mainEntity"
                       itemType="https://schema.org/Question"
-                      className="p-4 sm:p-6 rounded-2xl bg-slate-50/70 border border-slate-100 space-y-2"
+                      className="p-4 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-2"
                     >
                       <h3 itemProp="name" className="text-sm sm:text-base font-serif font-bold text-slate-900 flex items-center gap-2">
                         <HelpCircle className="w-4 h-4 text-brand-600 shrink-0" />
@@ -398,11 +427,11 @@ export default function TreatmentDetailPage({
               {/* Clinic Availability Card */}
               <div className="pt-4 border-t border-slate-100 space-y-3 text-xs">
                 <p className="font-bold text-slate-900">Visiting Hours &amp; Locations:</p>
-                <div className="p-3.5 rounded-2xl bg-brand-50/40 border border-brand-100/60 space-y-1">
+                <div className="p-3.5 rounded-2xl bg-brand-50 border border-brand-200 space-y-1">
                   <p className="font-semibold text-slate-900">Joint Clinic (Swaroop Nagar)</p>
                   <p className="text-slate-600 text-[11px]">05:00 PM – 07:00 PM (Mon–Sat)</p>
                 </div>
-                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
                   <p className="font-semibold text-slate-900">BMTC (Kidwai Nagar)</p>
                   <p className="text-slate-600 text-[11px]">10:00 AM – 02:00 PM (OPD &amp; Modular OTs)</p>
                 </div>

@@ -18,6 +18,17 @@ import {
 import { DOCTOR_DATA } from "@/data/doctor";
 import { CLINIC_LOCATIONS, PRIMARY_CONTACT } from "@/data/clinics";
 import DoctorAnimatedCard from "@/components/common/DoctorAnimatedCard";
+import dynamic from "next/dynamic";
+
+const JointAnatomy3D = dynamic(() => import("@/components/common/JointAnatomy3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[460px] sm:h-[520px] rounded-3xl bg-white border border-slate-200 flex flex-col items-center justify-center gap-3 shadow-sm">
+      <div className="w-12 h-12 rounded-full border-2 border-brand-500/20 border-t-brand-600 animate-spin" />
+      <span className="text-xs text-slate-500 font-mono">Loading 3D Joint Reconstruction...</span>
+    </div>
+  ),
+});
 
 export const metadata: Metadata = {
   title: "Best Orthopedic Doctor in Kanpur | Dr. Gaurav Bhargava | Bone & Joint Specialist",
@@ -145,7 +156,7 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
           {/* Left Column: Doctor Card & Fast Facts */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-7 shadow-xl space-y-6">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-7 shadow-xl space-y-6">
               <div className="w-full">
                 <DoctorAnimatedCard variant="compact" showBadges={false} priority={true} />
               </div>
@@ -156,7 +167,7 @@ export default function AboutPage() {
                   {DOCTOR_DATA.qualifications.map((q, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-2.5 text-xs text-slate-800 font-semibold p-3 rounded-2xl bg-brand-50/50 border border-brand-100/60"
+                      className="flex items-center gap-2.5 text-xs text-slate-800 font-semibold p-3 rounded-2xl bg-slate-50 border border-slate-200"
                     >
                       <CheckCircle2 className="w-4 h-4 text-brand-600 shrink-0" />
                       <span>{q}</span>
@@ -193,8 +204,8 @@ export default function AboutPage() {
 
           {/* Right Column: In-Depth Clinical Background */}
           <div className="lg:col-span-8 space-y-8 pt-4 lg:pt-0">
-            {/* AEO Fast Facts & Verified Clinical Summary for Search & AI Assistants */}
-            <div className="bg-brand-50/60 rounded-3xl border border-brand-200/80 p-6 sm:p-8 space-y-4 shadow-xs aeo-summary">
+            {/* AEO Fast Facts & Verified Clinical Summary (100% Solid Opaque Pure White Card) */}
+            <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 space-y-4 shadow-xl aeo-summary">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[#059B8F] text-white flex items-center justify-center shrink-0">
                   <Stethoscope className="w-5 h-5" />
@@ -211,7 +222,7 @@ export default function AboutPage() {
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans aeo-answer">
                 <strong>Dr. Gaurav Bhargava</strong> is a senior consultant orthopedic doctor, bone specialist, and joint replacement surgeon in Kanpur with over <strong>20 years of clinical experience</strong> and <strong>10,000+ completed procedures</strong>. An alumnus of <strong>Maulana Azad Medical College (MAMC) and Lok Nayak Hospital, New Delhi</strong>, he directs <strong>Joint Clinic (Swaroop Nagar)</strong> for evening specialist OPD consultations and <strong>Bhargava Medical &amp; Trauma Centre - BMTC (Kidwai Nagar)</strong> for morning OPD, modular laminar-airflow joint replacement surgeries, and 24/7 bone fracture trauma emergency care.
               </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-brand-200/60 text-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-100 text-xs">
                 <div>
                   <span className="text-slate-500 block text-[11px]">Primary Specialty</span>
                   <strong className="text-slate-900 font-bold">Joint Replacement &amp; Trauma</strong>
@@ -261,7 +272,7 @@ export default function AboutPage() {
               </div>
 
               {/* Quote */}
-              <div className="p-4 sm:p-6 md:p-8 rounded-2xl bg-brand-50/50 border-l-4 border-brand-600 border border-brand-100/60">
+              <div className="p-4 sm:p-6 md:p-8 rounded-2xl bg-slate-50 border-l-4 border-brand-600 border border-slate-200">
                 <p className="text-sm sm:text-base font-serif italic text-slate-800 leading-relaxed">
                   &ldquo;{DOCTOR_DATA.philosophy.quote}&rdquo;
                 </p>
@@ -271,15 +282,32 @@ export default function AboutPage() {
               </div>
             </div>
 
+            {/* Interactive 3D Bone & Joint Reconstruction Section */}
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-8 md:p-10 shadow-sm space-y-6">
+              <div>
+                <span className="text-brand-600 font-bold uppercase tracking-widest text-xs mb-2 block">
+                  3D Surgical Technology &amp; Precision
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 leading-tight">
+                  Interactive 3D Knee Joint &amp; Bone Reconstruction
+                </h3>
+                <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                  Rotate the 3D anatomical joint below to inspect the Femur, Tibia, Patella, and the tissue-sparing cobalt-chrome/titanium arthroplasty prosthesis with high-density UHMWPE shock-absorbing bearing cushion.
+                </p>
+              </div>
+
+              <JointAnatomy3D />
+            </div>
+
             {/* Academic & Training Journey */}
-            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-6">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-8 md:p-10 shadow-sm space-y-6">
               <h3 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
                 Education &amp; Advanced Training
               </h3>
 
               <div className="space-y-4 sm:space-y-6">
                 {/* MAMC Item */}
-                <div className="flex items-start gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-brand-50/30 border border-brand-100">
+                <div className="flex items-start gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200">
                   <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-brand-600 text-white flex items-center justify-center shrink-0 shadow-sm">
                     <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
@@ -303,7 +331,7 @@ export default function AboutPage() {
                 {DOCTOR_DATA.education.map((edu, idx) => (
                   <div
                     key={idx}
-                    className="flex items-start gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-slate-50/70 border border-slate-100"
+                    className="flex items-start gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200"
                   >
                     <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-accent-100 text-accent-700 flex items-center justify-center shrink-0">
                       <Award className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -319,7 +347,7 @@ export default function AboutPage() {
             </div>
 
             {/* Affiliated Facilities Overview */}
-            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-6">
+            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-8 md:p-10 shadow-sm space-y-6">
               <h3 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
                 Clinical Centers &amp; Surgical Infrastructure
               </h3>
@@ -328,7 +356,7 @@ export default function AboutPage() {
                 {CLINIC_LOCATIONS.map((loc) => (
                   <div
                     key={loc.id}
-                    className="p-6 rounded-2xl bg-brand-50/20 border border-brand-100 space-y-3 flex flex-col justify-between"
+                    className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 flex flex-col justify-between"
                   >
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700 px-2.5 py-0.5 rounded-full bg-white border border-brand-200 inline-block">
@@ -343,7 +371,7 @@ export default function AboutPage() {
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-brand-100">
+                    <div className="pt-3 border-t border-slate-200">
                       <Link
                         href="/contact"
                         className="text-xs font-bold text-brand-600 hover:text-brand-800 flex items-center gap-1"

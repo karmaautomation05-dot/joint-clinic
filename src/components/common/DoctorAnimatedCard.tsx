@@ -68,14 +68,14 @@ export default function DoctorAnimatedCard({
         </>
       )}
 
-      {/* Main Portrait Container */}
+      {/* Main Portrait Container (100% Solid Opaque) */}
       <div
-        className={`relative z-10 overflow-hidden bg-gradient-to-br from-brand-50 via-white to-brand-100/50 group ${
+        className={`relative z-10 overflow-hidden bg-white group ${
           variant === 'about'
-            ? 'aspect-[3/4] rounded-3xl shadow-2xl border-4 sm:border-8 border-white'
+            ? 'aspect-[3/4] rounded-3xl shadow-xl border-4 sm:border-8 border-white'
             : variant === 'compact'
-            ? 'aspect-square rounded-2xl shadow-md border-2 border-brand-100'
-            : 'aspect-[4/5] rounded-3xl shadow-2xl border-4 sm:border-8 border-white'
+            ? 'aspect-[4/5] rounded-2xl shadow-md border-2 border-slate-200'
+            : 'aspect-[4/5] rounded-3xl shadow-xl border-4 sm:border-8 border-white'
         }`}
       >
         {/* Render stacked photos for seamless crossfade and Ken-Burns zoom */}
@@ -141,7 +141,7 @@ export default function DoctorAnimatedCard({
       {showBadges && variant === 'hero' && (
         <>
           {/* Floating 20+ Years Experience Card */}
-          <div className="absolute -bottom-4 sm:-bottom-6 left-2 sm:-left-6 z-20 bg-white/95 backdrop-blur-md p-3.5 sm:p-5 rounded-2xl shadow-xl max-w-[170px] sm:max-w-[210px] border border-brand-100 hover:scale-105 transition-transform duration-300">
+          <div className="absolute -bottom-4 sm:-bottom-6 left-2 sm:-left-6 z-20 bg-white p-3.5 sm:p-5 rounded-2xl shadow-xl max-w-[170px] sm:max-w-[210px] border border-slate-200 hover:scale-105 transition-transform duration-300">
             <div className="text-brand-600 font-serif font-bold text-2xl sm:text-3xl mb-0.5">
               20+
             </div>
@@ -151,7 +151,7 @@ export default function DoctorAnimatedCard({
           </div>
 
           {/* Floating Verified Rating Badge (Floating Animation) */}
-          <div className="absolute -top-3 sm:-top-4 right-2 sm:-right-4 z-20 bg-white/95 backdrop-blur-md px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-lg border border-brand-100 flex items-center gap-1.5 sm:gap-2 animate-float">
+          <div className="absolute -top-3 sm:-top-4 right-2 sm:-right-4 z-20 bg-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-lg border border-slate-200 flex items-center gap-1.5 sm:gap-2 animate-float">
             <div className="flex text-[#F18712]">
               <Star size={14} className="fill-[#F5CD09] text-[#F18712]" />
             </div>
@@ -166,7 +166,7 @@ export default function DoctorAnimatedCard({
           </div>
 
           {/* Rapid Mobilization Floating Pill (Counter-Float Animation) */}
-          <div className="absolute top-1/2 right-2 sm:-right-6 z-20 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-md border border-brand-100 hidden sm:flex items-center gap-1.5 animate-float-delayed">
+          <div className="absolute top-1/2 right-2 sm:-right-6 z-20 bg-white px-3 py-1.5 rounded-xl shadow-md border border-slate-200 hidden sm:flex items-center gap-1.5 animate-float-delayed">
             <div className="w-5 h-5 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center shrink-0">
               <Activity size={12} />
             </div>
@@ -178,7 +178,7 @@ export default function DoctorAnimatedCard({
       )}
 
       {showBadges && variant === 'about' && (
-        <div className="absolute -bottom-4 sm:-bottom-6 left-2 sm:-left-6 z-20 bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl shadow-xl max-w-[170px] sm:max-w-[200px] border border-brand-100 animate-float">
+        <div className="absolute -bottom-4 sm:-bottom-6 left-2 sm:-left-6 z-20 bg-white p-4 sm:p-5 rounded-2xl shadow-xl max-w-[170px] sm:max-w-[200px] border border-slate-200 animate-float">
           <div className="text-brand-600 font-serif font-bold text-2xl sm:text-3xl mb-0.5">
             20+
           </div>

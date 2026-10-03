@@ -194,7 +194,7 @@ export default function BlogPostPage({
             </div>
 
             {/* AEO Clinical Article Key Takeaways / Answer Engine Snapshot */}
-            <div className="bg-brand-50/60 rounded-3xl border border-brand-200/80 p-6 sm:p-8 mb-8 space-y-3 shadow-xs aeo-summary">
+            <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 mb-8 space-y-3 shadow-md aeo-summary">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[#059B8F] text-white flex items-center justify-center shrink-0">
                   <BookOpen className="w-5 h-5" />
@@ -221,7 +221,7 @@ export default function BlogPostPage({
             </div>
 
             {/* Author Footer Card */}
-            <div className="mt-10 sm:mt-12 pt-6 border-t border-slate-100 flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-brand-50/40 border border-brand-100/60">
+            <div className="mt-10 sm:mt-12 pt-6 border-t border-slate-100 flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200">
               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-gradient-to-b from-brand-50 to-brand-100 border border-brand-200/50 relative shrink-0 shadow-sm">
                 <Image
                   src="/images/doctor/gaurav-bhargava.png"

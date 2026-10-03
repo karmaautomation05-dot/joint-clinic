@@ -181,7 +181,7 @@ export default function RecoveryGuideIndexPage() {
       {/* Recovery Category Cards Grid */}
       <div className="container mt-8 sm:mt-14">
         {/* AEO Rehabilitation Knowledge Snapshot for Search Engines & AI Assistants */}
-        <div className="bg-brand-50/60 rounded-2xl sm:rounded-3xl border border-brand-200/80 p-5 sm:p-7 mb-10 sm:mb-12 space-y-3 shadow-xs aeo-summary">
+        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-7 mb-10 sm:mb-12 space-y-3 shadow-md aeo-summary">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#059B8F] text-white flex items-center justify-center shrink-0">
               <HeartPulse className="w-5 h-5" />
@@ -231,7 +231,7 @@ export default function RecoveryGuideIndexPage() {
                     <div className="w-12 h-12 rounded-2xl bg-brand-50 flex items-center justify-center text-[#059B8F] group-hover:bg-[#059B8F] group-hover:text-white transition-colors">
                       <GuideIcon size={24} />
                     </div>
-                    <span className="text-xs font-bold text-[#059B8F] px-3 py-1 rounded-full bg-brand-50/70 border border-brand-100">
+                    <span className="text-xs font-bold text-[#059B8F] px-3 py-1 rounded-full bg-brand-50 border border-brand-200">
                       {guide.phases.length} Phases
                     </span>
                   </div>
@@ -248,7 +248,7 @@ export default function RecoveryGuideIndexPage() {
                   </p>
 
                   {/* Phases Preview Box */}
-                  <div className="bg-slate-50/70 rounded-2xl p-4 border border-slate-100/90 mb-6 space-y-2">
+                  <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 mb-6 space-y-2">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
                       Key Roadmap Milestones:
                     </span>
@@ -324,7 +324,7 @@ export default function RecoveryGuideIndexPage() {
             itemScope 
             itemProp="mainEntity" 
             itemType="https://schema.org/Question"
-            className="p-6 sm:p-7 rounded-3xl bg-slate-50/80 border border-slate-200/80 space-y-3 hover:bg-brand-50/40 hover:border-brand-200 transition-all shadow-2xs"
+            className="p-6 sm:p-7 rounded-3xl bg-slate-50 border border-slate-200 space-y-3 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-2xs"
           >
             <h4 itemProp="name" className="text-base font-serif font-bold text-slate-900">
               How soon do patients walk after joint surgery at Joint Clinic?
@@ -340,7 +340,7 @@ export default function RecoveryGuideIndexPage() {
             itemScope 
             itemProp="mainEntity" 
             itemType="https://schema.org/Question"
-            className="p-6 sm:p-7 rounded-3xl bg-slate-50/80 border border-slate-200/80 space-y-3 hover:bg-brand-50/40 hover:border-brand-200 transition-all shadow-2xs"
+            className="p-6 sm:p-7 rounded-3xl bg-slate-50 border border-slate-200 space-y-3 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-2xs"
           >
             <h4 itemProp="name" className="text-base font-serif font-bold text-slate-900">
               What physiotherapy is required during home recovery?
@@ -356,7 +356,7 @@ export default function RecoveryGuideIndexPage() {
             itemScope 
             itemProp="mainEntity" 
             itemType="https://schema.org/Question"
-            className="p-6 sm:p-7 rounded-3xl bg-slate-50/80 border border-slate-200/80 space-y-3 hover:bg-brand-50/40 hover:border-brand-200 transition-all shadow-2xs"
+            className="p-6 sm:p-7 rounded-3xl bg-slate-50 border border-slate-200 space-y-3 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-2xs"
           >
             <h4 itemProp="name" className="text-base font-serif font-bold text-slate-900">
               When can patients resume driving and work after joint replacement?
@@ -372,7 +372,7 @@ export default function RecoveryGuideIndexPage() {
             itemScope 
             itemProp="mainEntity" 
             itemType="https://schema.org/Question"
-            className="p-6 sm:p-7 rounded-3xl bg-slate-50/80 border border-slate-200/80 space-y-3 hover:bg-brand-50/40 hover:border-brand-200 transition-all shadow-2xs"
+            className="p-6 sm:p-7 rounded-3xl bg-slate-50 border border-slate-200 space-y-3 hover:bg-brand-50 hover:border-brand-200 transition-all shadow-2xs"
           >
             <h4 itemProp="name" className="text-base font-serif font-bold text-slate-900">
               Where are follow-up recovery reviews conducted in Kanpur?

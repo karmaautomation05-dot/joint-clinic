@@ -90,7 +90,7 @@ export default function VideoTestimonials() {
             {PATIENT_REVIEWS.slice(0, 3).map((review) => (
               <div
                 key={review.id}
-                className="p-6 sm:p-8 rounded-3xl bg-slate-50/70 border border-slate-200/80 shadow-xs hover:shadow-xl hover:bg-white hover:border-brand-300 transition-all duration-300 flex flex-col justify-between space-y-4 sm:space-y-6 group"
+                className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-xs hover:shadow-xl hover:border-brand-300 transition-all duration-300 flex flex-col justify-between space-y-4 sm:space-y-6 group"
               >
                 <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center justify-between">

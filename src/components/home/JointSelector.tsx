@@ -203,7 +203,7 @@ export default function JointSelector() {
         </div>
 
         {/* Selected Joint Card */}
-        <div className="bg-slate-50/60 rounded-3xl border border-slate-200 p-6 sm:p-10">
+        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-sm">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left: Clinical Symptoms & Likely Etiology */}
             <div className="lg:col-span-7 space-y-6">

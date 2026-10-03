@@ -110,7 +110,7 @@ export default function TestimonialsPage() {
             {PATIENT_REVIEWS.map((review) => (
               <div
                 key={review.id}
-                className="p-6 rounded-2xl bg-brand-50/30 border border-brand-100/60 shadow-sm flex flex-col justify-between space-y-4"
+                className="p-6 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm flex flex-col justify-between space-y-4 hover:border-brand-300 transition-colors"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -127,7 +127,7 @@ export default function TestimonialsPage() {
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-brand-100/60 flex items-center justify-between text-xs">
+                <div className="pt-3 border-t border-slate-200 flex items-center justify-between text-xs">
                   <span className="font-bold text-slate-900">{review.author}</span>
                   <span className="font-medium text-brand-700">{review.procedure}</span>
                 </div>

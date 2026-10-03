@@ -73,7 +73,7 @@ export default function AboutDr() {
             {/* 4 Feature Highlights */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 mb-8">
               {highlights.map((item, idx) => (
-                <div key={idx} className="flex gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl bg-slate-50/80 hover:bg-white border border-slate-100 hover:border-brand-200 transition-all shadow-2xs hover:shadow-md group">
+                <div key={idx} className="flex gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 hover:border-brand-200 transition-all shadow-xs hover:shadow-md group">
                   <div className="shrink-0 w-10 h-10 sm:w-11 sm:h-11 bg-white rounded-xl shadow-xs flex items-center justify-center text-brand-600 group-hover:scale-105 transition-transform border border-slate-100">
                     <item.icon size={20} className="sm:w-[22px] sm:h-[22px]" />
                   </div>

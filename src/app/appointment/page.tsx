@@ -107,8 +107,8 @@ export default function AppointmentPage() {
                           onClick={() => setClinicId(c.id)}
                           className={`p-5 rounded-2xl border text-left transition-all ${
                             isSelected
-                              ? "border-brand-600 bg-brand-50/50 shadow-sm ring-2 ring-brand-600/20"
-                              : "border-slate-200 bg-slate-50/50 hover:bg-white hover:border-brand-200"
+                              ? "border-brand-600 bg-brand-50 shadow-sm ring-2 ring-brand-600/20"
+                              : "border-slate-200 bg-slate-50 hover:bg-white hover:border-brand-200"
                           }`}
                         >
                           <span className="text-[10px] font-bold uppercase tracking-wider text-brand-700 block">
@@ -233,7 +233,7 @@ export default function AppointmentPage() {
                   </div>
 
                   {consultType === "second-opinion" && (
-                    <div className="p-4 rounded-2xl bg-brand-50/50 border border-brand-200 text-xs text-slate-800 space-y-1">
+                    <div className="p-4 rounded-2xl bg-brand-50 border border-brand-200 text-xs text-slate-800 space-y-1">
                       <p className="font-bold flex items-center gap-1.5 text-brand-700">
                         <FileCheck className="w-4 h-4" />
                         <span>Second Opinion MRI / X-Ray Review</span>
@@ -277,7 +277,7 @@ export default function AppointmentPage() {
               </h3>
 
               {CLINIC_LOCATIONS.map((loc) => (
-                <div key={loc.id} className="p-4 rounded-2xl bg-brand-50/30 border border-brand-100 space-y-1 text-xs">
+                <div key={loc.id} className="p-4 rounded-2xl bg-brand-50 border border-brand-200 space-y-1 text-xs">
                   <p className="font-serif font-bold text-slate-900">{loc.name}</p>
                   <p className="text-slate-500 text-[11px]">{loc.address.full}</p>
                   <p className="text-brand-700 font-semibold pt-1">

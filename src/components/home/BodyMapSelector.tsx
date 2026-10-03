@@ -380,7 +380,7 @@ export default function BodyMapSelector() {
                     ))}
                   </div>
 
-                  <div className="p-3.5 sm:p-4 rounded-2xl bg-brand-50/70 border border-brand-200/80 text-xs text-brand-900 leading-relaxed mb-6">
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-brand-50 border border-brand-200 text-xs text-brand-900 leading-relaxed mb-6">
                     💡 <strong>Tip:</strong> Tap on the <strong>Knee</strong>, <strong>Hip</strong>, <strong>Shoulder</strong>, <strong>Spine</strong>, <strong>Elbow</strong>, or <strong>Ankle</strong> pins to zoom the 3D camera into that joint.
                   </div>
                 </div>

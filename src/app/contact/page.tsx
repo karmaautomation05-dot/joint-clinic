@@ -150,7 +150,7 @@ export default function ContactPage() {
                 </div>
 
                 <div className="space-y-4 text-xs sm:text-sm">
-                  <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-brand-50/30 border border-brand-100">
+                  <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-brand-50 border border-brand-200">
                     <MapPin className="w-5 h-5 text-brand-600 shrink-0 mt-0.5" />
                     <div>
                       <strong className="text-slate-900 block font-bold text-xs uppercase tracking-wider mb-0.5">
@@ -160,7 +160,7 @@ export default function ContactPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-brand-50/30 border border-brand-100">
+                  <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-brand-50 border border-brand-200">
                     <Clock className="w-5 h-5 text-brand-600 shrink-0 mt-0.5" />
                     <div>
                       <strong className="text-slate-900 block font-bold text-xs uppercase tracking-wider mb-0.5">
@@ -171,7 +171,7 @@ export default function ContactPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-brand-50/30 border border-brand-100">
+                  <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-brand-50 border border-brand-200">
                     <Phone className="w-5 h-5 text-brand-600 shrink-0 mt-0.5" />
                     <div>
                       <strong className="text-slate-900 block font-bold text-xs uppercase tracking-wider mb-0.5">
