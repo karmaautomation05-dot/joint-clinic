@@ -13,52 +13,52 @@ export interface Joint3DInfo {
 
 export const JOINTS_3D_DATA: Joint3DInfo[] = [
   {
-    id: 'shoulder',
-    label: 'Shoulder Joint',
-    pos: [-0.95, 1.35, 0.05],
-    camPos: [-0.95, 1.35, 1.7],
-    target: [-0.95, 1.35, 0.05],
-    color: '#059B8F',
-  },
-  {
-    id: 'elbow',
-    label: 'Elbow Joint',
-    pos: [-1.22, 0.78, 0.05],
-    camPos: [-1.22, 0.78, 1.6],
-    target: [-1.22, 0.78, 0.05],
-    color: '#0A7C97',
-  },
-  {
-    id: 'hip',
-    label: 'Hip Arthroplasty',
-    pos: [0.52, 0.15, 0.08],
-    camPos: [0.52, 0.15, 1.8],
-    target: [0.52, 0.15, 0.08],
-    color: '#F18712',
-  },
-  {
     id: 'knee',
-    label: 'Knee Arthroplasty',
-    pos: [0.46, -0.72, 0.1],
-    camPos: [0.46, -0.72, 1.7],
-    target: [0.46, -0.72, 0.1],
+    label: 'Knee',
+    pos: [0.38, -0.68, 0.12],
+    camPos: [0.38, -0.68, 1.6],
+    target: [0.38, -0.68, 0.12],
     color: '#02BAB9',
   },
   {
-    id: 'ankle',
-    label: 'Ankle Joint',
-    pos: [0.44, -1.62, 0.05],
-    camPos: [0.44, -1.62, 1.6],
-    target: [0.44, -1.62, 0.05],
+    id: 'hip',
+    label: 'Hip',
+    pos: [0.44, 0.12, 0.12],
+    camPos: [0.44, 0.12, 1.7],
+    target: [0.44, 0.12, 0.12],
+    color: '#F18712',
+  },
+  {
+    id: 'shoulder',
+    label: 'Shoulder',
+    pos: [-0.85, 1.28, 0.08],
+    camPos: [-0.85, 1.28, 1.65],
+    target: [-0.85, 1.28, 0.08],
     color: '#059B8F',
   },
   {
     id: 'spine',
-    label: 'Spinal Column',
-    pos: [0.0, 0.75, -0.12],
-    camPos: [0.2, 0.75, -1.8],
-    target: [0.0, 0.75, -0.12],
+    label: 'Spine',
+    pos: [0.0, 0.72, -0.16],
+    camPos: [0.25, 0.72, -1.75],
+    target: [0.0, 0.72, -0.16],
     color: '#01B3BF',
+  },
+  {
+    id: 'elbow',
+    label: 'Elbow',
+    pos: [-1.08, 0.72, 0.08],
+    camPos: [-1.08, 0.72, 1.55],
+    target: [-1.08, 0.72, 0.08],
+    color: '#0A7C97',
+  },
+  {
+    id: 'ankle',
+    label: 'Ankle',
+    pos: [0.36, -1.54, 0.08],
+    camPos: [0.36, -1.54, 1.5],
+    target: [0.36, -1.54, 0.08],
+    color: '#059B8F',
   },
 ]
 
@@ -76,26 +76,20 @@ export default function Ortho3DHuman({
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  const [isRotating, setIsRotating] = useState(false)
-  const [autoRotate, setAutoRotate] = useState(true)
-  const [viewMode, setViewMode] = useState<'anatomy' | 'xray' | 'heatmap'>('anatomy')
-  const [hudAngles, setHudAngles] = useState({ yaw: 0, pitch: 0 })
   const [screenPins, setScreenPins] = useState<{ id: string; x: number; y: number; visible: boolean }[]>([])
 
   // Store transition targets
   const transitionRef = useRef({
     currentCamPos: [0, 0.1, 4.8] as [number, number, number],
     targetCamPos: [0, 0.1, 4.8] as [number, number, number],
-    currentLookAt: [0, 0.1, 0] as [number, number, number],
-    targetLookAt: [0, 0.1, 0] as [number, number, number],
+    currentLookAt: [0, 0.05, 0] as [number, number, number],
+    targetLookAt: [0, 0.05, 0] as [number, number, number],
     isTransitioning: false,
   })
 
-  // Reference to 3D internal state
   const stateRef = useRef<{
     selectJoint?: (id: string) => void
     resetView?: () => void
-    changeMode?: (mode: 'anatomy' | 'xray' | 'heatmap') => void
   }>({})
 
   useEffect(() => {
@@ -111,409 +105,349 @@ export default function Ortho3DHuman({
       const width = container.clientWidth
       const height = container.clientHeight
 
-      // ── Renderer ────────────────────────────────────────────────────────
+      // ── Renderer (Pure White Background) ─────────────────────────────────
       const renderer = new THREE.WebGLRenderer({
         canvas,
-        alpha: true,
+        alpha: false,
         antialias: true,
         powerPreference: 'high-performance',
       })
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
       renderer.setSize(width, height, false)
-      renderer.setClearColor(0x000000, 0)
+      renderer.setClearColor(0xffffff, 1) // Clean pure white studio background
+      renderer.shadowMap.enabled = true
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
       // ── Scene & Camera ──────────────────────────────────────────────────
       const scene = new THREE.Scene()
-      const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100)
+      scene.background = new THREE.Color(0xffffff)
+
+      const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100)
       camera.position.set(0, 0.1, 4.8)
 
-      const cameraTarget = new THREE.Vector3(0, 0.1, 0)
+      const cameraTarget = new THREE.Vector3(0, 0.05, 0)
       camera.lookAt(cameraTarget)
 
-      // ── Lighting ────────────────────────────────────────────────────────
-      const ambientLight = new THREE.AmbientLight(0xd4f6f6, 1.2)
+      // ── Studio High-Key Lighting ─────────────────────────────────────────
+      // Ambient illumination (soft warm white)
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.4)
       scene.add(ambientLight)
 
-      const mainLight = new THREE.DirectionalLight(0xffffff, 2.4)
-      mainLight.position.set(3, 4, 5)
-      scene.add(mainLight)
+      // Key light from top-front-right
+      const keyLight = new THREE.DirectionalLight(0xfff8f0, 1.8)
+      keyLight.position.set(4, 5, 5)
+      keyLight.castShadow = true
+      keyLight.shadow.mapSize.width = 1024
+      keyLight.shadow.mapSize.height = 1024
+      keyLight.shadow.bias = -0.001
+      scene.add(keyLight)
 
-      const rimLight1 = new THREE.DirectionalLight(0x02bab9, 2.0)
-      rimLight1.position.set(-4, 2, -4)
-      scene.add(rimLight1)
+      // Fill light from left (cool medical tint)
+      const fillLight = new THREE.DirectionalLight(0xe6f7f7, 1.1)
+      fillLight.position.set(-4, 3, 3)
+      scene.add(fillLight)
 
-      const rimLight2 = new THREE.DirectionalLight(0x0a7c97, 1.8)
-      rimLight2.position.set(4, -3, -3)
-      scene.add(rimLight2)
+      // Rim light from behind for silhouette pop on white background
+      const rimLight = new THREE.DirectionalLight(0xcdeeee, 1.2)
+      rimLight.position.set(0, 3, -4)
+      scene.add(rimLight)
 
-      const bottomGlow = new THREE.PointLight(0x059b8f, 2.5, 8)
-      bottomGlow.position.set(0, -2.5, 1)
-      scene.add(bottomGlow)
+      // Soft ground bounce light
+      const groundBounce = new THREE.DirectionalLight(0xf1f5f9, 0.6)
+      groundBounce.position.set(0, -3, 2)
+      scene.add(groundBounce)
 
       // ── Master Character Group ──────────────────────────────────────────
       const characterGroup = new THREE.Group()
       scene.add(characterGroup)
 
       // ── Materials ───────────────────────────────────────────────────────
-      // Bone Material (Medical Ceramic/Bone Texture with specular sheen)
-      const boneMat = new THREE.MeshStandardMaterial({
-        color: 0xebf4f6,
-        roughness: 0.28,
-        metalness: 0.12,
+      // Realistic healthy human male skin
+      const skinMat = new THREE.MeshStandardMaterial({
+        color: 0xdfad94, // Warm natural male skin tone
+        roughness: 0.55,
+        metalness: 0.04,
       })
 
-      // Cartilage / Articular Joint Material (Luminescent Teal)
-      const jointMat = new THREE.MeshStandardMaterial({
-        color: 0x02bab9,
-        emissive: 0x018b8a,
-        emissiveIntensity: 0.6,
-        roughness: 0.2,
-        metalness: 0.3,
+      // Modern dark hair
+      const hairMat = new THREE.MeshStandardMaterial({
+        color: 0x221c19, // Deep dark espresso/black hair
+        roughness: 0.7,
+        metalness: 0.05,
       })
 
-      // Active Highlight Material
-      const activeJointMat = new THREE.MeshStandardMaterial({
-        color: 0xf18712,
-        emissive: 0xd36e09,
-        emissiveIntensity: 1.2,
-        roughness: 0.1,
+      // Clothed: Athletic Medical Teal Fitted T-Shirt
+      const shirtMat = new THREE.MeshStandardMaterial({
+        color: 0x059b8f, // Signature Medical Teal
+        roughness: 0.65,
+        metalness: 0.08,
       })
 
-      // Translucent Body Envelope Material (Fresnel/X-Ray silhouette)
-      const silhouetteMat = new THREE.MeshPhysicalMaterial({
-        color: 0x0a2238,
-        emissive: 0x044055,
-        emissiveIntensity: 0.25,
-        transparent: true,
-        opacity: 0.28,
-        roughness: 0.15,
+      // Collar & Trim Accent
+      const shirtTrimMat = new THREE.MeshStandardMaterial({
+        color: 0x0a7c97, // Ocean blue collar accent
+        roughness: 0.55,
         metalness: 0.1,
-        transmission: 0.65,
-        ior: 1.2,
       })
 
-      // Wireframe / Edge Material for holographic effect
-      const wireMat = new THREE.LineBasicMaterial({
-        color: 0x059b8f,
-        transparent: true,
-        opacity: 0.22,
+      // Clothed: Athletic Training Shorts (Dark Charcoal Slate)
+      const shortsMat = new THREE.MeshStandardMaterial({
+        color: 0x1e293b, // Charcoal slate shorts
+        roughness: 0.75,
+        metalness: 0.05,
       })
 
-      // ── PROCEDURAL 3D ANATOMICAL SKELETON ───────────────────────────────
-      const skeletonGroup = new THREE.Group()
-      characterGroup.add(skeletonGroup)
+      // Athletic Shoes (Crisp white with teal accents)
+      const shoeMat = new THREE.MeshStandardMaterial({
+        color: 0xf8fafc, // White sneaker upper
+        roughness: 0.35,
+        metalness: 0.1,
+      })
 
-      // Helper for mirrored limbs
-      function addBone(geom: any, mat: any, pos: [number, number, number], rot?: [number, number, number], parent: any = skeletonGroup) {
+      const soleMat = new THREE.MeshStandardMaterial({
+        color: 0x02bab9, // Teal sole accent
+        roughness: 0.5,
+        metalness: 0.1,
+      })
+
+      // Helper to add parts
+      function addPart(geom: any, mat: any, pos: [number, number, number], rot?: [number, number, number], scale?: [number, number, number], parent: any = characterGroup) {
         const mesh = new THREE.Mesh(geom, mat)
         mesh.position.set(pos[0], pos[1], pos[2])
         if (rot) mesh.rotation.set(rot[0], rot[1], rot[2])
+        if (scale) mesh.scale.set(scale[0], scale[1], scale[2])
+        mesh.castShadow = true
+        mesh.receiveShadow = true
         parent.add(mesh)
         return mesh
       }
 
-      // 1. CRANIUM & SKULL
-      const craniumGeo = new THREE.SphereGeometry(0.24, 24, 20)
-      craniumGeo.scale(0.88, 1.1, 0.95)
-      addBone(craniumGeo, boneMat, [0, 1.95, 0])
+      // ── MODELING THE CLOTHED HUMAN MALE ─────────────────────────────────
 
-      // Facial / Jaw structure
-      const jawGeo = new THREE.CylinderGeometry(0.12, 0.16, 0.16, 12)
-      jawGeo.scale(0.8, 1, 0.8)
-      addBone(jawGeo, boneMat, [0, 1.80, 0.05], [0.15, 0, 0])
+      // 1. HEAD & FACE
+      // Cranium / Face structure
+      const headGeo = new THREE.SphereGeometry(0.24, 28, 24)
+      headGeo.scale(0.85, 1.15, 0.95)
+      addPart(headGeo, skinMat, [0, 1.95, 0])
 
-      // 2. CERVICAL SPINE (Neck)
-      for (let i = 0; i < 6; i++) {
-        const vertGeo = new THREE.CylinderGeometry(0.065, 0.065, 0.03, 14)
-        addBone(vertGeo, i % 2 === 0 ? boneMat : jointMat, [0, 1.70 - i * 0.038, -0.01])
-      }
+      // Jaw & chin volume
+      const chinGeo = new THREE.CylinderGeometry(0.12, 0.15, 0.14, 16)
+      chinGeo.scale(0.82, 1, 0.85)
+      addPart(chinGeo, skinMat, [0, 1.82, 0.05], [0.12, 0, 0])
 
-      // 3. CLAVICLES (Collarbones)
-      const clavicleCurveLeft = new THREE.CubicBezierCurve3(
-        new THREE.Vector3(0, 1.48, 0.08),
-        new THREE.Vector3(-0.35, 1.50, 0.05),
-        new THREE.Vector3(-0.65, 1.46, -0.02),
-        new THREE.Vector3(-0.95, 1.38, 0.0)
-      )
-      const clavicleGeoLeft = new THREE.TubeGeometry(clavicleCurveLeft, 16, 0.032, 8, false)
-      addBone(clavicleGeoLeft, boneMat, [0, 0, 0])
+      // Neck
+      const neckGeo = new THREE.CylinderGeometry(0.125, 0.14, 0.22, 20)
+      addPart(neckGeo, skinMat, [0, 1.70, -0.01])
 
-      const clavicleCurveRight = new THREE.CubicBezierCurve3(
-        new THREE.Vector3(0, 1.48, 0.08),
-        new THREE.Vector3(0.35, 1.50, 0.05),
-        new THREE.Vector3(0.65, 1.46, -0.02),
-        new THREE.Vector3(0.95, 1.38, 0.0)
-      )
-      const clavicleGeoRight = new THREE.TubeGeometry(clavicleCurveRight, 16, 0.032, 8, false)
-      addBone(clavicleGeoRight, boneMat, [0, 0, 0])
+      // Modern stylish textured hair (side-fade volume)
+      const hairMainGeo = new THREE.SphereGeometry(0.25, 24, 20)
+      hairMainGeo.scale(0.88, 1.12, 0.98)
+      addPart(hairMainGeo, hairMat, [0, 2.01, -0.03])
 
-      // 4. STERNUM (Breastbone)
-      const sternumGeo = new THREE.BoxGeometry(0.09, 0.38, 0.03)
-      addBone(sternumGeo, boneMat, [0, 1.25, 0.17], [-0.05, 0, 0])
+      const hairTopGeo = new THREE.BoxGeometry(0.36, 0.12, 0.38)
+      addPart(hairTopGeo, hairMat, [0, 2.12, 0.02], [-0.08, 0, 0])
 
-      // 5. RIBCAGE (10 Anatomical Rib Pairs)
-      for (let r = 0; r < 9; r++) {
-        const yPos = 1.40 - r * 0.055
-        const scaleW = 0.38 + Math.sin((r / 8) * Math.PI) * 0.14
-        const scaleD = 0.22 + Math.sin((r / 8) * Math.PI) * 0.07
+      // Ears (Left & Right)
+      const earGeo = new THREE.SphereGeometry(0.045, 12, 12)
+      earGeo.scale(0.4, 1.2, 0.8)
+      addPart(earGeo, skinMat, [-0.22, 1.94, -0.01])
+      addPart(earGeo, skinMat, [0.22, 1.94, -0.01])
 
-        // Elliptical rib ring
-        const ribCurve = new THREE.EllipseCurve(0, 0, scaleW, scaleD, 0, Math.PI * 2, false, 0)
-        const pts = ribCurve.getPoints(36)
-        const rib3DPoints = pts.map(p => new THREE.Vector3(p.x, yPos + p.y * 0.2, p.y + 0.04))
-        const ribSpline = new THREE.CatmullRomCurve3(rib3DPoints, true)
-        const ribMeshGeo = new THREE.TubeGeometry(ribSpline, 32, 0.016, 6, true)
-        addBone(ribMeshGeo, boneMat, [0, 0, 0])
-      }
+      // 2. TORSO (CLOTHED: FITTED TEAL ATHLETIC SHIRT)
+      // Main chest & upper torso
+      const chestGeo = new THREE.CylinderGeometry(0.46, 0.40, 0.54, 28)
+      chestGeo.scale(1.02, 1, 0.72)
+      addPart(chestGeo, shirtMat, [0, 1.35, 0.02], [-0.04, 0, 0])
 
-      // 6. FULL VERTEBRAL COLUMN (Thoracic & Lumbar Spine)
-      const spineVertebrae: any[] = []
-      for (let v = 0; v < 18; v++) {
-        const t = v / 17
-        // Spinal curvature (kyphosis & lordosis)
-        const y = 1.42 - v * 0.062
-        const z = -0.04 + Math.sin(t * Math.PI * 2) * 0.055
-        const vertGeo = new THREE.CylinderGeometry(0.075, 0.078, 0.038, 12)
-        const m = addBone(vertGeo, v % 2 === 0 ? boneMat : jointMat, [0, y, z], [0.1, 0, 0])
-        spineVertebrae.push(m)
-      }
+      // Midriff & waist (tucked shirt)
+      const waistGeo = new THREE.CylinderGeometry(0.40, 0.38, 0.44, 28)
+      waistGeo.scale(0.96, 1, 0.70)
+      addPart(waistGeo, shirtMat, [0, 0.94, 0.01])
 
-      // 7. PELVIS & SACRUM
-      // Sacrum wedge
-      const sacrumGeo = new THREE.ConeGeometry(0.16, 0.25, 8)
-      addBone(sacrumGeo, boneMat, [0, 0.32, -0.08], [Math.PI, 0, 0])
+      // Shirt crew-neck collar ring
+      const collarGeo = new THREE.TorusGeometry(0.14, 0.024, 12, 24)
+      addPart(collarGeo, shirtTrimMat, [0, 1.59, 0.02], [Math.PI / 2 + 0.1, 0, 0])
 
-      // Iliac wings (Left & Right)
-      const iliumLeftGeo = new THREE.TorusGeometry(0.24, 0.055, 10, 16, Math.PI * 1.1)
-      addBone(iliumLeftGeo, boneMat, [-0.34, 0.32, 0], [0.4, 0.4, -0.6])
+      // 3. SHOULDERS & ARMS (CLOTHED SLEEVES + EXPOSED MUSCULAR ARMS)
+      const sides = [-1, 1] // -1 = Left arm, 1 = Right arm
 
-      const iliumRightGeo = new THREE.TorusGeometry(0.24, 0.055, 10, 16, Math.PI * 1.1)
-      addBone(iliumRightGeo, boneMat, [0.34, 0.32, 0], [0.4, -0.4, 0.6])
+      sides.forEach((s) => {
+        // T-Shirt Short Sleeve (Shoulder deltoid cap)
+        const sleeveGeo = new THREE.SphereGeometry(0.19, 20, 18)
+        sleeveGeo.scale(1, 1.2, 1)
+        addPart(sleeveGeo, shirtMat, [s * 0.56, 1.40, 0.02], [0, 0, s * 0.2])
 
-      // Pubic Arch
-      const pubicGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.32, 8)
-      addBone(pubicGeo, boneMat, [0, 0.12, 0.08], [0, 0, Math.PI / 2])
+        // Sleeve hem cuff
+        const cuffGeo = new THREE.CylinderGeometry(0.13, 0.14, 0.22, 20)
+        addPart(cuffGeo, shirtMat, [s * 0.68, 1.25, 0.03], [0, 0, s * 0.28])
 
-      // 8. UPPER LIMBS (LEFT & RIGHT)
-      const sideFactors = [-1, 1] // -1 = Left (viewer's left), 1 = Right
+        // Bicep / Tricep (Skin exposed below short sleeve)
+        const bicepGeo = new THREE.CylinderGeometry(0.105, 0.095, 0.34, 18)
+        addPart(bicepGeo, skinMat, [s * 0.78, 0.98, 0.04], [0, 0, s * 0.22])
 
-      sideFactors.forEach((s) => {
-        // Shoulder Ball Joint (Glenohumeral)
-        const shoulderGeo = new THREE.SphereGeometry(0.08, 16, 16)
-        addBone(shoulderGeo, jointMat, [s * 0.95, 1.35, 0.05])
+        // Elbow joint
+        const elbowGeo = new THREE.SphereGeometry(0.095, 16, 16)
+        addPart(elbowGeo, skinMat, [s * 0.85, 0.78, 0.05])
 
-        // Scapula (back shoulder blade)
-        const scapGeo = new THREE.BoxGeometry(0.18, 0.24, 0.03)
-        addBone(scapGeo, boneMat, [s * 0.58, 1.32, -0.16], [0.1, s * 0.3, s * 0.2])
+        // Forearm (tapering to wrist)
+        const forearmGeo = new THREE.CylinderGeometry(0.09, 0.075, 0.42, 18)
+        addPart(forearmGeo, skinMat, [s * 0.92, 0.52, 0.06], [0, 0, s * 0.14])
 
-        // Humerus (Upper arm bone)
-        const humerusGeo = new THREE.CylinderGeometry(0.046, 0.042, 0.52, 12)
-        addBone(humerusGeo, boneMat, [s * 1.08, 1.05, 0.04], [0, 0, s * 0.18])
+        // Wrist
+        const wristGeo = new THREE.SphereGeometry(0.07, 14, 14)
+        addPart(wristGeo, skinMat, [s * 0.98, 0.28, 0.06])
 
-        // Elbow Joint (Trochlea)
-        const elbowGeo = new THREE.SphereGeometry(0.065, 14, 14)
-        addBone(elbowGeo, jointMat, [s * 1.22, 0.78, 0.05])
-
-        // Forearm (Radius & Ulna pair)
-        const radiusGeo = new THREE.CylinderGeometry(0.035, 0.03, 0.46, 10)
-        addBone(radiusGeo, boneMat, [s * 1.30, 0.52, 0.06], [0, 0, s * 0.14])
-
-        const ulnaGeo = new THREE.CylinderGeometry(0.032, 0.026, 0.46, 10)
-        addBone(ulnaGeo, boneMat, [s * 1.36, 0.52, 0.01], [0, 0, s * 0.14])
-
-        // Wrist & Hand
-        const wristGeo = new THREE.SphereGeometry(0.048, 12, 12)
-        addBone(wristGeo, jointMat, [s * 1.40, 0.26, 0.05])
-
-        const handGeo = new THREE.BoxGeometry(0.08, 0.18, 0.03)
-        addBone(handGeo, boneMat, [s * 1.43, 0.14, 0.05], [0, 0, s * 0.1])
+        // Hand & fingers (relaxed anatomical pose)
+        const handGeo = new THREE.BoxGeometry(0.08, 0.18, 0.12)
+        addPart(handGeo, skinMat, [s * 1.01, 0.15, 0.06], [0, 0, s * 0.08])
       })
 
-      // 9. LOWER LIMBS (HIP, FEMUR, KNEE, TIBIA, ANKLE, FOOT)
-      const jointMeshes: Record<string, any> = {}
+      // 4. PELVIS & SHORTS (CLOTHED: CHARCOAL ATHLETIC TRAINING SHORTS)
+      // Main shorts hip volume
+      const shortsHipGeo = new THREE.CylinderGeometry(0.41, 0.43, 0.36, 28)
+      shortsHipGeo.scale(0.98, 1, 0.76)
+      addPart(shortsHipGeo, shortsMat, [0, 0.58, 0.02])
 
-      sideFactors.forEach((s) => {
-        const sidePrefix = s === 1 ? 'right' : 'left'
+      // Shorts waistband trim
+      const waistbandGeo = new THREE.TorusGeometry(0.40, 0.022, 10, 28)
+      waistbandGeo.scale(0.98, 0.76, 1)
+      addPart(waistbandGeo, shirtTrimMat, [0, 0.73, 0.02], [Math.PI / 2, 0, 0])
 
-        // Hip Joint Ball (Femoral Head & Acetabulum)
-        const hipHeadGeo = new THREE.SphereGeometry(0.09, 18, 18)
-        const hipMesh = addBone(hipHeadGeo, jointMat, [s * 0.52, 0.15, 0.08])
-        if (s === 1) jointMeshes['hip'] = hipMesh
-
-        // Femoral Neck Angled
-        const neckGeo = new THREE.CylinderGeometry(0.048, 0.055, 0.16, 12)
-        addBone(neckGeo, boneMat, [s * 0.59, 0.08, 0.08], [0, 0, s * 0.7])
-
-        // Greater Trochanter
-        const trochGeo = new THREE.SphereGeometry(0.075, 12, 12)
-        addBone(trochGeo, boneMat, [s * 0.65, 0.07, 0.08])
-
-        // Femur Bone Shaft (Thigh bone)
-        const femurGeo = new THREE.CylinderGeometry(0.058, 0.052, 0.74, 14)
-        addBone(femurGeo, boneMat, [s * 0.55, -0.32, 0.09], [0.05, 0, s * -0.06])
-
-        // ── KNEE JOINT ARTHROPLASTY APPARATUS ──
-        // Femoral Condyles (dual lateral & medial curved heads)
-        const condyleLeftGeo = new THREE.SphereGeometry(0.065, 14, 14)
-        condyleLeftGeo.scale(0.8, 1, 1.2)
-        addBone(condyleLeftGeo, boneMat, [s * 0.42, -0.68, 0.09])
-
-        const condyleRightGeo = new THREE.SphereGeometry(0.065, 14, 14)
-        condyleRightGeo.scale(0.8, 1, 1.2)
-        addBone(condyleRightGeo, boneMat, [s * 0.50, -0.68, 0.09])
-
-        // Meniscus Cartilage Disc (Cushion)
-        const meniscusGeo = new THREE.CylinderGeometry(0.095, 0.095, 0.03, 16)
-        const kneeMesh = addBone(meniscusGeo, jointMat, [s * 0.46, -0.72, 0.1])
-        if (s === 1) jointMeshes['knee'] = kneeMesh
-
-        // Patella (Kneecap)
-        const patellaGeo = new THREE.SphereGeometry(0.052, 14, 14)
-        patellaGeo.scale(1, 1.2, 0.5)
-        addBone(patellaGeo, boneMat, [s * 0.46, -0.68, 0.17])
-
-        // Tibial Plateau (Shin top shelf)
-        const plateauGeo = new THREE.CylinderGeometry(0.085, 0.07, 0.05, 14)
-        addBone(plateauGeo, boneMat, [s * 0.46, -0.76, 0.1])
-
-        // Tibia (Main shin bone)
-        const tibiaGeo = new THREE.CylinderGeometry(0.055, 0.046, 0.76, 12)
-        addBone(tibiaGeo, boneMat, [s * 0.45, -1.18, 0.09])
-
-        // Fibula (Slender lateral bone)
-        const fibulaGeo = new THREE.CylinderGeometry(0.024, 0.022, 0.74, 8)
-        addBone(fibulaGeo, boneMat, [s * (0.45 + s * 0.09), -1.18, 0.06])
-
-        // Ankle Joint (Malleolus)
-        const ankleGeo = new THREE.SphereGeometry(0.065, 14, 14)
-        const ankleMesh = addBone(ankleGeo, jointMat, [s * 0.44, -1.62, 0.05])
-        if (s === 1) jointMeshes['ankle'] = ankleMesh
-
-        // Foot & Calcaneus
-        const footGeo = new THREE.BoxGeometry(0.12, 0.08, 0.32)
-        addBone(footGeo, boneMat, [s * 0.44, -1.72, 0.16], [0.15, 0, 0])
+      // Shorts leg openings (Left & Right)
+      sides.forEach((s) => {
+        const shortLegGeo = new THREE.CylinderGeometry(0.23, 0.21, 0.44, 22)
+        shortLegGeo.scale(1, 1, 0.94)
+        addPart(shortLegGeo, shortsMat, [s * 0.24, 0.26, 0.04], [0.06, 0, s * -0.06])
       })
 
-      // Store other joint keys
-      jointMeshes['shoulder'] = addBone(new THREE.SphereGeometry(0.1, 16, 16), jointMat, [-0.95, 1.35, 0.05])
-      jointMeshes['elbow'] = addBone(new THREE.SphereGeometry(0.085, 14, 14), jointMat, [-1.22, 0.78, 0.05])
-      jointMeshes['spine'] = spineVertebrae[9] // mid lumbar
+      // 5. LOWER LIMBS: MUSCULAR LEGS, KNEES & CALVES
+      sides.forEach((s) => {
+        // Lower Thigh (peeking out from shorts above knee)
+        const thighGeo = new THREE.CylinderGeometry(0.18, 0.155, 0.32, 20)
+        addPart(thighGeo, skinMat, [s * 0.24, -0.04, 0.05], [0.05, 0, s * -0.04])
 
-      // ── TRANSLUCENT ANATOMICAL SILHOUETTE ENVELOPE ──────────────────────
-      const envelopeGroup = new THREE.Group()
-      characterGroup.add(envelopeGroup)
+        // Knee joint complex (defined patella, femoral condyles shape)
+        const kneeGeo = new THREE.SphereGeometry(0.155, 20, 20)
+        kneeGeo.scale(0.95, 1.15, 1.05)
+        addPart(kneeGeo, skinMat, [s * 0.24, -0.28, 0.06])
 
-      // Torso body contour
-      const torsoGeo = new THREE.CylinderGeometry(0.48, 0.38, 1.35, 24, 6)
-      torsoGeo.scale(1.0, 1.0, 0.65)
-      const torsoMesh = new THREE.Mesh(torsoGeo, silhouetteMat)
-      torsoMesh.position.set(0, 0.95, 0.02)
-      envelopeGroup.add(torsoMesh)
+        // Patellar kneecap prominence
+        const patellaCap = new THREE.SphereGeometry(0.065, 14, 14)
+        patellaCap.scale(1, 1.25, 0.6)
+        addPart(patellaCap, skinMat, [s * 0.24, -0.27, 0.16])
 
-      // Head silhouette
-      const headEnv = new THREE.SphereGeometry(0.28, 20, 20)
-      headEnv.scale(0.9, 1.15, 0.95)
-      const headMesh = new THREE.Mesh(headEnv, silhouetteMat)
-      headMesh.position.set(0, 1.95, 0)
-      envelopeGroup.add(headMesh)
+        // Calf & Shin (muscular gastrocnemius curve)
+        const calfGeo = new THREE.CylinderGeometry(0.145, 0.105, 0.76, 20)
+        calfGeo.scale(0.94, 1, 1.08)
+        addPart(calfGeo, skinMat, [s * 0.23, -0.74, 0.04], [-0.03, 0, 0])
 
-      // Thigh silhouettes
-      sideFactors.forEach(s => {
-        const thighEnv = new THREE.CylinderGeometry(0.19, 0.13, 0.82, 16)
-        thighEnv.scale(1, 1, 0.9)
-        const tm = new THREE.Mesh(thighEnv, silhouetteMat)
-        tm.position.set(s * 0.55, -0.32, 0.08)
-        envelopeGroup.add(tm)
+        // Ankle joint (medial/lateral malleolus)
+        const ankleGeo = new THREE.SphereGeometry(0.105, 16, 16)
+        addPart(ankleGeo, skinMat, [s * 0.23, -1.18, 0.04])
 
-        const calfEnv = new THREE.CylinderGeometry(0.13, 0.09, 0.82, 16)
-        calfEnv.scale(1, 1, 0.9)
-        const cm = new THREE.Mesh(calfEnv, silhouetteMat)
-        cm.position.set(s * 0.45, -1.18, 0.08)
-        envelopeGroup.add(cm)
+        // 6. ATHLETIC SNEAKERS (WHITE UPPER WITH TEAL DETAIL)
+        // Sneaker upper body
+        const shoeUpperGeo = new THREE.BoxGeometry(0.18, 0.14, 0.44)
+        shoeUpperGeo.scale(0.95, 1, 1)
+        addPart(shoeUpperGeo, shoeMat, [s * 0.23, -1.30, 0.12], [0.08, 0, 0])
+
+        // Sneaker sole (Teal bounce layer)
+        const shoeSoleGeo = new THREE.BoxGeometry(0.20, 0.055, 0.48)
+        addPart(shoeSoleGeo, soleMat, [s * 0.23, -1.38, 0.13])
+
+        // Sneaker toe cap curve
+        const toeGeo = new THREE.SphereGeometry(0.09, 14, 14)
+        toeGeo.scale(1.05, 0.7, 1.2)
+        addPart(toeGeo, shoeMat, [s * 0.23, -1.32, 0.28])
       })
 
-      // Wireframe overlay on envelope for holographic medical grid
-      const torsoWire = new THREE.LineSegments(new THREE.EdgesGeometry(torsoGeo, 25), wireMat)
-      torsoWire.position.copy(torsoMesh.position)
-      envelopeGroup.add(torsoWire)
+      // ── SOFT GROUND STUDIO SHADOW ─────────────────────────────────────────
+      // High-resolution soft radial shadow disc beneath character feet
+      const shadowCanvas = document.createElement('canvas')
+      shadowCanvas.width = 256
+      shadowCanvas.height = 256
+      const sCtx = shadowCanvas.getContext('2d')!
+      const sGrad = sCtx.createRadialGradient(128, 128, 10, 128, 128, 120)
+      sGrad.addColorStop(0, 'rgba(15, 23, 42, 0.28)')
+      sGrad.addColorStop(0.4, 'rgba(15, 23, 42, 0.15)')
+      sGrad.addColorStop(0.8, 'rgba(15, 23, 42, 0.04)')
+      sGrad.addColorStop(1, 'rgba(255, 255, 255, 0)')
+      sCtx.fillStyle = sGrad
+      sCtx.fillRect(0, 0, 256, 256)
 
-      // ── MEDICAL HUD & 3D GROUND GRID ────────────────────────────────────
-      const gridHelper = new THREE.GridHelper(4.5, 18, 0x059b8f, 0x0a2238)
-      gridHelper.position.y = -1.82
-      scene.add(gridHelper)
+      const shadowTex = new THREE.CanvasTexture(shadowCanvas)
+      const shadowPlaneGeo = new THREE.PlaneGeometry(3.2, 3.2)
+      const shadowPlaneMat = new THREE.MeshBasicMaterial({
+        map: shadowTex,
+        transparent: true,
+        depthWrite: false,
+      })
+      const shadowMesh = new THREE.Mesh(shadowPlaneGeo, shadowPlaneMat)
+      shadowMesh.rotation.x = -Math.PI / 2
+      shadowMesh.position.y = -1.41
+      scene.add(shadowMesh)
 
-      // Concentric rings on floor
-      const ringGeo1 = new THREE.RingGeometry(0.8, 0.83, 48)
-      const ringMat = new THREE.MeshBasicMaterial({ color: 0x059b8f, transparent: true, opacity: 0.3, side: THREE.DoubleSide })
-      const ringMesh1 = new THREE.Mesh(ringGeo1, ringMat)
-      ringMesh1.rotation.x = Math.PI / 2
-      ringMesh1.position.y = -1.81
-      scene.add(ringMesh1)
-
-      const ringGeo2 = new THREE.RingGeometry(1.6, 1.63, 64)
-      const ringMesh2 = new THREE.Mesh(ringGeo2, ringMat)
-      ringMesh2.rotation.x = Math.PI / 2
-      ringMesh2.position.y = -1.81
-      scene.add(ringMesh2)
-
-      // ── 3D PINS & PULSE RINGS AT JOINTS ─────────────────────────────────
+      // ── 3D FLOATING JOINT HOTSPOT PINS ────────────────────────────────────
       const pinsGroup = new THREE.Group()
       characterGroup.add(pinsGroup)
 
-      const pinObjects: Record<string, { orb: any; ring1: any; ring2: any; beacon: any }> = {}
+      const pinMeshes: Record<string, { orb: any; ring: any; glow: any }> = {}
 
-      JOINTS_3D_DATA.forEach(j => {
+      JOINTS_3D_DATA.forEach((j) => {
         const jColor = new THREE.Color(j.color)
 
-        // Center glowing orb
-        const orbGeo = new THREE.SphereGeometry(0.055, 16, 16)
-        const orbMat = new THREE.MeshBasicMaterial({ color: jColor })
+        // Center jewel sphere
+        const orbGeo = new THREE.SphereGeometry(0.065, 18, 18)
+        const orbMat = new THREE.MeshStandardMaterial({
+          color: jColor,
+          emissive: jColor,
+          emissiveIntensity: 0.6,
+          roughness: 0.2,
+          metalness: 0.2,
+        })
         const orb = new THREE.Mesh(orbGeo, orbMat)
         orb.position.set(...j.pos)
         pinsGroup.add(orb)
 
-        // Pulse ring 1
-        const ringGeo = new THREE.RingGeometry(0.08, 0.095, 32)
-        const pRingMat = new THREE.MeshBasicMaterial({ color: jColor, transparent: true, opacity: 0.8, side: THREE.DoubleSide })
-        const ring1 = new THREE.Mesh(ringGeo, pRingMat)
-        ring1.position.set(...j.pos)
-        pinsGroup.add(ring1)
+        // Pulsing radar ring
+        const ringGeo = new THREE.RingGeometry(0.09, 0.115, 32)
+        const ringMat = new THREE.MeshBasicMaterial({
+          color: jColor,
+          transparent: true,
+          opacity: 0.8,
+          side: THREE.DoubleSide,
+        })
+        const ring = new THREE.Mesh(ringGeo, ringMat)
+        ring.position.set(...j.pos)
+        pinsGroup.add(ring)
 
-        // Pulse ring 2
-        const ring2 = new THREE.Mesh(ringGeo.clone(), pRingMat.clone())
-        ring2.position.set(...j.pos)
-        pinsGroup.add(ring2)
+        // Soft outer glow halo
+        const glowGeo = new THREE.SphereGeometry(0.12, 14, 14)
+        const glowMat = new THREE.MeshBasicMaterial({
+          color: jColor,
+          transparent: true,
+          opacity: 0.25,
+        })
+        const glow = new THREE.Mesh(glowGeo, glowMat)
+        glow.position.set(...j.pos)
+        pinsGroup.add(glow)
 
-        // Vertical Laser Beacon
-        const beaconGeo = new THREE.CylinderGeometry(0.006, 0.006, 0.45, 8)
-        const beaconMat = new THREE.MeshBasicMaterial({ color: jColor, transparent: true, opacity: 0.6 })
-        const beacon = new THREE.Mesh(beaconGeo, beaconMat)
-        beacon.position.set(j.pos[0], j.pos[1] + 0.24, j.pos[2])
-        pinsGroup.add(beacon)
-
-        pinObjects[j.id] = { orb, ring1, ring2, beacon }
+        pinMeshes[j.id] = { orb, ring, glow }
       })
 
-      // ── CAMERA INTERPOLATION LOGIC ──────────────────────────────────────
+      // ── CAMERA FLIGHT / ZOOM TO JOINT ─────────────────────────────────────
       function flyToJoint(jointId: string) {
-        const joint = JOINTS_3D_DATA.find(j => j.id === jointId)
+        const joint = JOINTS_3D_DATA.find((j) => j.id === jointId)
         if (!joint) return
 
         transitionRef.current.targetCamPos = [...joint.camPos]
         transitionRef.current.targetLookAt = [...joint.target]
         transitionRef.current.isTransitioning = true
-
-        // Highlight active joint in 3D
-        Object.entries(jointMeshes).forEach(([id, m]) => {
-          if (m && m.material) {
-            m.material = id === jointId ? activeJointMat : jointMat
-          }
-        })
       }
 
       function resetView() {
         transitionRef.current.targetCamPos = [0, 0.1, 4.8]
-        transitionRef.current.targetLookAt = [0, 0.1, 0]
+        transitionRef.current.targetLookAt = [0, 0.05, 0]
         transitionRef.current.isTransitioning = true
       }
 
@@ -523,18 +457,17 @@ export default function Ortho3DHuman({
       // Fly to initial active joint
       flyToJoint(activeJointId)
 
-      // ── MOUSE & TOUCH ORBIT CONTROLS ────────────────────────────────────
+      // ── 360° MOUSE & TOUCH ORBIT CONTROLS ─────────────────────────────────
       let isDragging = false
       let prevMouseX = 0
       let prevMouseY = 0
-      let rotSpeed = 0.006
+      let rotSpeed = 0.007
       let targetRotY = 0
       let targetRotX = 0
 
       function onMouseDown(e: MouseEvent) {
         if (e.button !== 0) return
         isDragging = true
-        setIsRotating(true)
         prevMouseX = e.clientX
         prevMouseY = e.clientY
       }
@@ -547,30 +480,28 @@ export default function Ortho3DHuman({
         prevMouseY = e.clientY
 
         targetRotY += deltaX * rotSpeed
-        targetRotX = Math.max(-0.45, Math.min(0.45, targetRotX + deltaY * rotSpeed * 0.6))
+        targetRotX = Math.max(-0.35, Math.min(0.35, targetRotX + deltaY * rotSpeed * 0.5))
       }
 
       function onMouseUp() {
         isDragging = false
-        setIsRotating(false)
       }
 
       function onWheel(e: WheelEvent) {
         e.preventDefault()
         const zoomDelta = e.deltaY * 0.002
         const currentDist = camera.position.distanceTo(cameraTarget)
-        const newDist = Math.max(1.2, Math.min(6.5, currentDist + zoomDelta))
+        const newDist = Math.max(1.4, Math.min(6.0, currentDist + zoomDelta))
         const dir = camera.position.clone().sub(cameraTarget).normalize()
         camera.position.copy(cameraTarget.clone().add(dir.multiplyScalar(newDist)))
       }
 
-      // Touch handlers
+      // Touch handling for mobile
       let touchStartX = 0
       let touchStartY = 0
       function onTouchStart(e: TouchEvent) {
         if (e.touches.length === 1) {
           isDragging = true
-          setIsRotating(true)
           touchStartX = e.touches[0].clientX
           touchStartY = e.touches[0].clientY
         }
@@ -584,12 +515,11 @@ export default function Ortho3DHuman({
         touchStartY = e.touches[0].clientY
 
         targetRotY += deltaX * rotSpeed * 1.2
-        targetRotX = Math.max(-0.45, Math.min(0.45, targetRotX + deltaY * rotSpeed * 0.8))
+        targetRotX = Math.max(-0.35, Math.min(0.35, targetRotX + deltaY * rotSpeed * 0.6))
       }
 
       function onTouchEnd() {
         isDragging = false
-        setIsRotating(false)
       }
 
       const canvasEl = canvasRef.current
@@ -601,12 +531,11 @@ export default function Ortho3DHuman({
       window.addEventListener('touchmove', onTouchMove, { passive: true })
       window.addEventListener('touchend', onTouchEnd)
 
-      // ── SCREEN PROJECTION FOR 2D LABELS ─────────────────────────────────
+      // ── SCREEN PROJECTION FOR 2D JOINT HOTSPOT TAGS ───────────────────────
       const tempVec = new THREE.Vector3()
 
       function updateScreenPins() {
-        const pins = JOINTS_3D_DATA.map(j => {
-          // Transform joint position with characterGroup rotation
+        const pins = JOINTS_3D_DATA.map((j) => {
           tempVec.set(...j.pos)
           tempVec.applyMatrix4(characterGroup.matrixWorld)
           tempVec.project(camera)
@@ -620,7 +549,7 @@ export default function Ortho3DHuman({
         setScreenPins(pins)
       }
 
-      // ── RESIZE HANDLER ──────────────────────────────────────────────────
+      // ── RESIZE HANDLER ────────────────────────────────────────────────────
       function onResize() {
         if (!containerRef.current || !canvasRef.current) return
         const w = containerRef.current.clientWidth
@@ -631,7 +560,7 @@ export default function Ortho3DHuman({
       }
       window.addEventListener('resize', onResize)
 
-      // ── ANIMATION LOOP ──────────────────────────────────────────────────
+      // ── ANIMATION LOOP ────────────────────────────────────────────────────
       let clock = new THREE.Clock()
 
       function animate() {
@@ -640,30 +569,25 @@ export default function Ortho3DHuman({
 
         const elapsedTime = clock.getElapsedTime()
 
-        // Auto rotate when idle
-        if (autoRotate && !isDragging) {
-          targetRotY += 0.003
+        // Gentle idle character sway
+        if (!isDragging) {
+          targetRotY += 0.0018
         }
 
-        // Smooth character rotation
+        // Smooth rotation interpolation
         characterGroup.rotation.y += (targetRotY - characterGroup.rotation.y) * 0.08
         characterGroup.rotation.x += (targetRotX - characterGroup.rotation.x) * 0.08
 
-        // Update HUD angles
-        const yawDeg = Math.round(((characterGroup.rotation.y * 180) / Math.PI) % 360)
-        const pitchDeg = Math.round((characterGroup.rotation.x * 180) / Math.PI)
-        setHudAngles({ yaw: yawDeg >= 0 ? yawDeg : 360 + yawDeg, pitch: pitchDeg })
-
-        // 3D Camera Glide Transition
+        // Smooth 3D Camera Glide
         const trans = transitionRef.current
         if (trans.isTransitioning) {
-          camera.position.x += (trans.targetCamPos[0] - camera.position.x) * 0.06
-          camera.position.y += (trans.targetCamPos[1] - camera.position.y) * 0.06
-          camera.position.z += (trans.targetCamPos[2] - camera.position.z) * 0.06
+          camera.position.x += (trans.targetCamPos[0] - camera.position.x) * 0.065
+          camera.position.y += (trans.targetCamPos[1] - camera.position.y) * 0.065
+          camera.position.z += (trans.targetCamPos[2] - camera.position.z) * 0.065
 
-          cameraTarget.x += (trans.targetLookAt[0] - cameraTarget.x) * 0.06
-          cameraTarget.y += (trans.targetLookAt[1] - cameraTarget.y) * 0.06
-          cameraTarget.z += (trans.targetLookAt[2] - cameraTarget.z) * 0.06
+          cameraTarget.x += (trans.targetLookAt[0] - cameraTarget.x) * 0.065
+          cameraTarget.y += (trans.targetLookAt[1] - cameraTarget.y) * 0.065
+          cameraTarget.z += (trans.targetLookAt[2] - cameraTarget.z) * 0.065
 
           camera.lookAt(cameraTarget)
 
@@ -679,71 +603,40 @@ export default function Ortho3DHuman({
 
         // Animate Hotspot Pins
         JOINTS_3D_DATA.forEach((j, idx) => {
-          const pin = pinObjects[j.id]
+          const pin = pinMeshes[j.id]
           if (pin) {
-            // Billboard pulse rings to face camera
-            pin.ring1.lookAt(camera.position)
-            pin.ring2.lookAt(camera.position)
+            pin.ring.lookAt(camera.position)
 
-            // Pulse ring scale & opacity
-            const wave1 = (elapsedTime * 1.8 + idx * 0.4) % 1
-            const wave2 = (elapsedTime * 1.8 + idx * 0.4 + 0.5) % 1
+            const wave = (elapsedTime * 1.6 + idx * 0.35) % 1
+            pin.ring.scale.setScalar(1 + wave * 1.6)
+            pin.ring.material.opacity = (1 - wave) * 0.75
 
-            pin.ring1.scale.setScalar(1 + wave1 * 1.8)
-            pin.ring1.material.opacity = (1 - wave1) * 0.7
+            const isSelected = j.id === activeJointId
+            const pulse = 1 + Math.sin(elapsedTime * 3 + idx) * (isSelected ? 0.2 : 0.1)
+            pin.orb.scale.setScalar(pulse)
 
-            pin.ring2.scale.setScalar(1 + wave2 * 1.8)
-            pin.ring2.material.opacity = (1 - wave2) * 0.7
-
-            // Orb breathing
-            const orbPulse = 1 + Math.sin(elapsedTime * 3 + idx) * 0.15
-            pin.orb.scale.setScalar(orbPulse)
-
-            // Active joint halo boost
-            if (j.id === activeJointId) {
-              pin.beacon.scale.set(1.4, 1.3, 1.4)
-              pin.orb.material.color.setHex(0xf18712)
+            if (isSelected) {
+              pin.glow.scale.setScalar(1.5 + Math.sin(elapsedTime * 4) * 0.2)
+              pin.glow.material.opacity = 0.4
+              pin.orb.material.emissiveIntensity = 1.0
             } else {
-              pin.beacon.scale.set(1, 1, 1)
-              pin.orb.material.color.set(j.color)
+              pin.glow.scale.setScalar(1.0)
+              pin.glow.material.opacity = 0.2
+              pin.orb.material.emissiveIntensity = 0.4
             }
           }
         })
 
-        // Gentle breathing animation on ribcage
-        const breathe = 1 + Math.sin(elapsedTime * 1.4) * 0.012
-        skeletonGroup.scale.set(breathe, 1, breathe)
+        // Subtle breathing expansion on chest
+        const breathe = 1 + Math.sin(elapsedTime * 1.5) * 0.01
+        chestGeo.scale(1.02 * breathe, 1, 0.72 * breathe)
 
-        // Ground rings rotation
-        ringMesh1.rotation.z = elapsedTime * 0.08
-        ringMesh2.rotation.z = -elapsedTime * 0.05
-
-        // Update 2D Screen-Pinned HTML Hotspot Coordinates
+        // Update 2D Screen Hotspot Tags
         updateScreenPins()
 
         renderer.render(scene, camera)
       }
       animate()
-
-      // ── Mode Switcher Logic ─────────────────────────────────────────────
-      stateRef.current.changeMode = (mode: 'anatomy' | 'xray' | 'heatmap') => {
-        if (mode === 'xray') {
-          silhouetteMat.opacity = 0.55
-          silhouetteMat.color.setHex(0x02bab9)
-          boneMat.roughness = 0.1
-          boneMat.metalness = 0.8
-        } else if (mode === 'heatmap') {
-          silhouetteMat.opacity = 0.15
-          boneMat.roughness = 0.4
-          boneMat.metalness = 0.1
-        } else {
-          // Default medical anatomy
-          silhouetteMat.opacity = 0.28
-          silhouetteMat.color.setHex(0x0a2238)
-          boneMat.roughness = 0.28
-          boneMat.metalness = 0.12
-        }
-      }
 
       // Cleanup
       return () => {
@@ -764,11 +657,11 @@ export default function Ortho3DHuman({
     const cleanupPromise = init3D()
     return () => {
       disposed = true
-      cleanupPromise.then(fn => fn?.())
+      cleanupPromise.then((fn) => fn?.())
     }
-  }, [activeJointId, autoRotate])
+  }, [activeJointId])
 
-  // React to prop change for active joint
+  // React to external active joint change
   useEffect(() => {
     if (stateRef.current.selectJoint) {
       stateRef.current.selectJoint(activeJointId)
@@ -781,142 +674,75 @@ export default function Ortho3DHuman({
     }
   }, [])
 
-  const handleModeChange = useCallback((mode: 'anatomy' | 'xray' | 'heatmap') => {
-    setViewMode(mode)
-    if (stateRef.current.changeMode) {
-      stateRef.current.changeMode(mode)
-    }
-  }, [])
-
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[540px] sm:h-[620px] md:h-[680px] rounded-3xl overflow-hidden border border-slate-700/60 bg-gradient-to-b from-[#06111f] via-[#081729] to-[#040c17] select-none shadow-2xl"
+      className="relative w-full h-[520px] sm:h-[600px] md:h-[660px] rounded-3xl overflow-hidden bg-white border border-slate-200/90 shadow-xl select-none"
     >
-      {/* Three.js Canvas */}
+      {/* 3D WebGL Canvas (Pure White Background) */}
       <canvas
         ref={canvasRef}
         className="w-full h-full cursor-grab active:cursor-grabbing block"
       />
 
-      {/* ── ORTHORACLE-STYLE CLINICAL HUD OVERLAYS ── */}
-
-      {/* Top Left: System Status & Diagnostic Header */}
-      <div className="absolute top-4 left-4 sm:top-6 sm:left-6 pointer-events-none z-20">
-        <div className="flex items-center gap-2 mb-1.5">
-          <span className="w-2 h-2 rounded-full bg-brand-400 animate-ping" />
-          <span className="font-mono text-[10px] sm:text-xs font-bold tracking-widest text-brand-300 uppercase">
-            ORTHORACLE 3D ATLAS // CLINICAL ANATOMY
-          </span>
-        </div>
-        <div className="text-white text-base sm:text-lg font-serif font-bold tracking-tight">
-          Human Musculoskeletal Framework
-        </div>
-        <div className="font-mono text-[10px] text-slate-400">
-          SURGEON-DIRECTED MODEL • SUB-MILLIMETER JOINT ALIGNMENT
-        </div>
-      </div>
-
-      {/* Top Right: Real-time 3D Rotation Angle & Reset Button */}
-      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 flex flex-col items-end gap-2 z-20">
-        <div className="bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-slate-700/80 font-mono text-[11px] text-slate-300 flex items-center gap-2">
-          <span className="text-brand-400">3D ORIENT:</span>
-          <span>Y: {hudAngles.yaw}°</span>
-          <span className="text-slate-600">|</span>
-          <span>X: {hudAngles.pitch}°</span>
-        </div>
-
+      {/* Clean Subtle Reset Button (Top Right) */}
+      <div className="absolute top-4 right-4 z-20">
         <button
           onClick={handleResetCamera}
-          className="bg-brand-600/30 hover:bg-brand-600/50 backdrop-blur-md px-3 py-1.5 rounded-lg border border-brand-400/40 text-brand-200 text-xs font-bold flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-lg"
+          className="bg-white/95 hover:bg-slate-50 text-slate-700 hover:text-brand-700 px-3.5 py-1.5 rounded-full border border-slate-200 shadow-sm text-xs font-semibold flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer"
         >
-          <span>↺ Reset 3D View</span>
+          <span>↺ Reset View</span>
         </button>
       </div>
 
-      {/* Bottom Left: Visual Mode Switcher (Anatomy / X-Ray / Heatmap) */}
-      <div className="absolute bottom-5 left-4 sm:left-6 z-20 flex flex-wrap gap-1.5">
-        {(['anatomy', 'xray', 'heatmap'] as const).map(m => (
-          <button
-            key={m}
-            onClick={() => handleModeChange(m)}
-            className={`px-3 py-1 rounded-lg font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
-              viewMode === m
-                ? 'bg-brand-500 text-slate-950 shadow-md font-black'
-                : 'bg-slate-900/70 text-slate-400 hover:text-slate-200 border border-slate-700/60'
-            }`}
-          >
-            {m === 'anatomy' ? 'Skeletal Anatomy' : m === 'xray' ? 'CT / X-Ray' : 'Joint Heatmap'}
-          </button>
-        ))}
-
-        <button
-          onClick={() => setAutoRotate(prev => !prev)}
-          className={`px-2.5 py-1 rounded-lg font-mono text-[10px] sm:text-xs font-bold transition-all cursor-pointer ${
-            autoRotate
-              ? 'bg-slate-800 text-brand-300 border border-brand-400/40'
-              : 'bg-slate-900/60 text-slate-500 border border-slate-700/50'
-          }`}
-          title="Toggle 360° Auto-Rotation"
-        >
-          {autoRotate ? '⏸ Auto-Spin' : '▶ Auto-Spin'}
-        </button>
-      </div>
-
-      {/* Bottom Center: Gesture & Mouse Guidance */}
+      {/* Subtle Drag Hint (Bottom Center) */}
       <div className="absolute bottom-3 inset-x-0 pointer-events-none text-center hidden sm:block z-10">
-        <span className="font-mono text-[10.5px] text-slate-400 bg-slate-950/70 px-4 py-1 rounded-full border border-slate-800/80 backdrop-blur-sm">
-          🖱 Drag to rotate 360° • 🔍 Scroll / Pinch to zoom • 📍 Tap pins to focus joint
+        <span className="text-[11px] font-medium text-slate-500 bg-white/90 px-3.5 py-1 rounded-full border border-slate-200/80 shadow-xs">
+          Drag to rotate 360° • Click any joint to inspect
         </span>
       </div>
 
-      {/* ── 2D SCREEN-PROJECTED HOTSPOT BADGES (Synced to 3D Coordinates) ── */}
-      {screenPins.map(pin => {
+      {/* ── 2D SCREEN-PROJECTED HOTSPOT BADGES (Clean White/Teal Style) ── */}
+      {screenPins.map((pin) => {
         if (!pin.visible) return null
         const isSelected = pin.id === activeJointId
-        const jointData = JOINTS_3D_DATA.find(j => j.id === pin.id)
+        const jointData = JOINTS_3D_DATA.find((j) => j.id === pin.id)
         if (!jointData) return null
 
         return (
           <button
             key={pin.id}
             onClick={() => onSelectJoint(pin.id)}
-            className={`absolute z-30 flex items-center gap-1.5 px-2.5 py-1 rounded-full backdrop-blur-md transition-all duration-300 cursor-pointer ${
+            className={`absolute z-30 flex items-center gap-1.5 px-3 py-1 rounded-full backdrop-blur-md transition-all duration-300 cursor-pointer ${
               isSelected
-                ? 'scale-110 shadow-lg ring-2 ring-amber-400'
-                : 'hover:scale-105 opacity-85 hover:opacity-100'
+                ? 'scale-110 shadow-md ring-2 ring-brand-500'
+                : 'hover:scale-105 opacity-90 hover:opacity-100 shadow-xs'
             }`}
             style={{
               left: `${pin.x}px`,
               top: `${pin.y}px`,
               transform: 'translate(-50%, -50%)',
-              backgroundColor: isSelected ? 'rgba(15, 23, 42, 0.95)' : 'rgba(10, 25, 40, 0.82)',
-              border: `1.5px solid ${isSelected ? '#F18712' : jointData.color}`,
-              boxShadow: isSelected ? '0 0 16px rgba(241, 135, 18, 0.6)' : `0 0 10px ${jointData.color}40`,
+              backgroundColor: isSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.95)',
+              border: `1.5px solid ${isSelected ? jointData.color : '#e2e8f0'}`,
+              boxShadow: isSelected ? `0 4px 14px ${jointData.color}40` : '0 2px 6px rgba(0,0,0,0.06)',
             }}
           >
             <span
-              className="w-2 h-2 rounded-full shrink-0"
+              className="w-2.5 h-2.5 rounded-full shrink-0"
               style={{
-                backgroundColor: isSelected ? '#F18712' : jointData.color,
-                boxShadow: `0 0 6px ${isSelected ? '#F18712' : jointData.color}`,
+                backgroundColor: jointData.color,
+                boxShadow: isSelected ? `0 0 8px ${jointData.color}` : 'none',
               }}
             />
             <span
-              className="text-[11px] font-bold tracking-tight whitespace-nowrap"
-              style={{ color: isSelected ? '#ffffff' : jointData.color }}
+              className="text-xs font-bold whitespace-nowrap"
+              style={{ color: isSelected ? '#0f172a' : '#334155' }}
             >
               {jointData.label}
             </span>
           </button>
         )
       })}
-
-      {/* Viewport Corner Brackets */}
-      <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-brand-500/40 pointer-events-none" />
-      <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-brand-500/40 pointer-events-none" />
-      <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-brand-500/40 pointer-events-none" />
-      <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-brand-500/40 pointer-events-none" />
     </div>
   )
 }
