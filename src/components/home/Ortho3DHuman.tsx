@@ -444,17 +444,50 @@ export default function Ortho3DHuman({
             boneMap['Spine1'].rotation.x -= 0.03
           }
 
-          // Enable shadows and configure distinguished middle-aged doctor / clinical aesthetic
+          // Enable shadows and configure distinguished Indian middle-aged orthopedic surgeon aesthetic
           model.traverse((child: any) => {
             if (child.isMesh) {
               child.castShadow = true
               child.receiveShadow = true
+
+              // Morph targets for Indian facial structure: expressive eyes, distinguished jawline
+              if (child.morphTargetDictionary && child.morphTargetInfluences) {
+                const dict = child.morphTargetDictionary
+                const infl = child.morphTargetInfluences
+                if (dict['eyeWideLeft'] !== undefined) infl[dict['eyeWideLeft']] = 0.22
+                if (dict['eyeWideRight'] !== undefined) infl[dict['eyeWideRight']] = 0.22
+                if (dict['eyeSquintLeft'] !== undefined) infl[dict['eyeSquintLeft']] = 0.0
+                if (dict['eyeSquintRight'] !== undefined) infl[dict['eyeSquintRight']] = 0.0
+                if (dict['browInnerUp'] !== undefined) infl[dict['browInnerUp']] = 0.08
+                if (dict['jawForward'] !== undefined) infl[dict['jawForward']] = 0.12
+                if (dict['mouthSmile'] !== undefined) infl[dict['mouthSmile']] = 0.09
+              }
+
               if (child.material) {
                 if (child.name === 'Wolf3D_Hair') {
-                  // Mature salt-and-pepper / refined charcoal tone
-                  child.material.color.setHex(0x52525b)
-                  child.material.roughness = 0.85
-                  child.material.metalness = 0.02
+                  // Natural Indian deep black with subtle mature charcoal luster
+                  child.material.color.setHex(0x18181b)
+                  child.material.roughness = 0.72
+                  child.material.metalness = 0.04
+                } else if (
+                  child.name === 'Wolf3D_Head' ||
+                  child.name === 'Wolf3D_Body' ||
+                  child.material.name === 'Wolf3D_Skin' ||
+                  child.material.name === 'Wolf3D_Body'
+                ) {
+                  // Authentic warm Indian wheatish-caramel skin tone with healthy warm bronze undertones
+                  child.material.color.setHex(0xb87548)
+                  child.material.roughness = 0.52
+                  child.material.metalness = 0.0
+                } else if (
+                  child.name === 'EyeLeft' ||
+                  child.name === 'EyeRight' ||
+                  child.material.name === 'Wolf3D_Eye'
+                ) {
+                  // Deep warm espresso Indian eyes
+                  child.material.color.setHex(0x2d1b10)
+                  child.material.roughness = 0.10
+                  child.material.metalness = 0.0
                 } else if (child.name === 'Wolf3D_Outfit_Top') {
                   // Tailored deep navy clinical/orthopedic shirt
                   child.material.color.setHex(0x1e293b)
@@ -470,13 +503,6 @@ export default function Ortho3DHuman({
                   child.material.color.setHex(0x111827)
                   child.material.roughness = 0.35
                   child.material.metalness = 0.15
-                } else if (child.name === 'Wolf3D_Skin' || child.name === 'Wolf3D_Body') {
-                  // Natural mature skin tone with realistic subsurface roughness
-                  child.material.roughness = 0.58
-                  child.material.metalness = 0.0
-                } else if (child.name === 'Wolf3D_Eye') {
-                  child.material.roughness = 0.12
-                  child.material.metalness = 0.0
                 } else {
                   child.material.roughness = Math.max(0.35, child.material.roughness || 0.4)
                   child.material.metalness = Math.min(0.25, child.material.metalness || 0.1)
