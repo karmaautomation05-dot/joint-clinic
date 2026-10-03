@@ -486,10 +486,26 @@ export default function Ortho3DHuman({
             }
           })
 
+          characterGroup.add(model)
+          model.updateMatrixWorld(true)
+
+          // Dark Radiograph Film Backdrop Plane (Placed directly behind the body)
+          // Clipped to the exact scanner window in 'scanner' mode, so inside the window is black radiograph!
+          const backdropGeo = new THREE.PlaneGeometry(1.2, 2.3)
+          const backdropMat = new THREE.MeshBasicMaterial({
+            color: 0x050a14, // deep radiograph black
+            side: THREE.DoubleSide,
+            depthWrite: false,
+          })
+          const backdropMesh = new THREE.Mesh(backdropGeo, backdropMat)
+          backdropMesh.position.set(0, -0.05, -0.25)
+          backdropMesh.renderOrder = -5
+          characterGroup.add(backdropMesh)
+
           renderer.localClippingEnabled = true
 
-          // Build smooth, realistic anatomical skeleton and surgical implants directly on armature bones
-          const skeletonResult = buildFullBodySkeleton(THREE as any, boneMap)
+          // Build smooth, realistic anatomical skeleton and surgical implants matching exact bone positions
+          const skeletonResult = buildFullBodySkeleton(THREE as any, boneMap, characterGroup)
           characterGroup.add(skeletonResult.skeletonGroup)
 
           // Clipping planes for dynamic scanner beam window
@@ -498,14 +514,6 @@ export default function Ortho3DHuman({
           const planeSkelBottom = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.19)
           const planeClothesTop = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.19)
           const planeClothesBottom = new THREE.Plane(new THREE.Vector3(0, -1, 0), -0.19)
-
-          // Collect all skeleton meshes for clipping
-          const skeletonGroupMeshes: any[] = []
-          skeletonResult.skeletonGroup.traverse((child: any) => {
-            if (child.isMesh && child.material) {
-              skeletonGroupMeshes.push(child)
-            }
-          })
 
           // Store mesh material information for switching between Normal and Skeleton/X-Ray
           const avatarMeshes: Array<{
@@ -553,7 +561,10 @@ export default function Ortho3DHuman({
             }
 
             if (mode === 'normal' && !jointId) {
-              // 1. NO SCANNER (Normal Clothed Gentleman)
+              // 1. NO SCANNER (Normal Clothed Gentleman on White Background)
+              scene.background = new THREE.Color(0xffffff)
+              shadowMesh.visible = true
+              backdropMesh.visible = false
               skeletonResult.skeletonGroup.visible = false
               avatarMeshes.forEach((item) => {
                 const mat = item.mesh.material
@@ -569,11 +580,17 @@ export default function Ortho3DHuman({
                 }
               })
             } else if (mode === 'skeleton' && !jointId) {
-              // 2. BIG SCANNER (Full Body Skeleton)
+              // 2. BIG SCANNER (Full Body Skeleton - Black Radiograph Suite!)
+              scene.background = new THREE.Color(0x050a14)
+              shadowMesh.visible = false
+              backdropMesh.visible = false
               skeletonResult.skeletonGroup.visible = true
-              skeletonGroupMeshes.forEach((m) => {
-                m.material.clippingPlanes = null
-                m.material.needsUpdate = true
+              skeletonResult.skeletonMeshes.forEach((m) => {
+                const mat = m.material as any
+                if (mat) {
+                  mat.clippingPlanes = null
+                  mat.needsUpdate = true
+                }
               })
               avatarMeshes.forEach((item) => {
                 const mat = item.mesh.material
@@ -587,14 +604,27 @@ export default function Ortho3DHuman({
                 }
               })
             } else {
-              // 3. DYNAMIC X-RAY SCANNER (or Focused Joint): Clipping beam active!
+              // 3. DYNAMIC X-RAY SCANNER (White background with black beam window & glowing skeleton!)
+              scene.background = new THREE.Color(0xffffff)
+              shadowMesh.visible = true
               updateScannerPlanes(activeY)
-              skeletonResult.skeletonGroup.visible = true
 
-              skeletonGroupMeshes.forEach((m) => {
-                m.material.clippingPlanes = [planeSkelTop, planeSkelBottom]
-                m.material.clipIntersection = false
-                m.material.needsUpdate = true
+              // Black radiograph backing plane active inside beam window
+              backdropMesh.visible = true
+              const bgMat = backdropMesh.material as any
+              if (bgMat) {
+                bgMat.clippingPlanes = [planeSkelTop, planeSkelBottom]
+                bgMat.needsUpdate = true
+              }
+
+              skeletonResult.skeletonGroup.visible = true
+              skeletonResult.skeletonMeshes.forEach((m) => {
+                const mat = m.material as any
+                if (mat) {
+                  mat.clippingPlanes = [planeSkelTop, planeSkelBottom]
+                  mat.clipIntersection = false
+                  mat.needsUpdate = true
+                }
               })
 
               avatarMeshes.forEach((item) => {
@@ -626,12 +656,6 @@ export default function Ortho3DHuman({
             })
           }
 
-          stateRef.current.applyVisualMode = applyVisualMode
-          applyVisualMode(viewMode, activeJointId, showImplant, scannerY)
-
-          characterGroup.add(model)
-          model.updateMatrixWorld(true)
-
           // Attach each 3D Pin RIGIDLY directly to the exact bone surface
           JOINTS_3D_DATA.forEach((j) => {
             const bone = boneMap[j.boneName]
@@ -654,6 +678,9 @@ export default function Ortho3DHuman({
 
             create3DPin(j, pinPos)
           })
+
+          stateRef.current.applyVisualMode = applyVisualMode
+          applyVisualMode(viewMode, activeJointId, showImplant, scannerY)
 
           setIsLoading(false)
 
@@ -969,7 +996,9 @@ export default function Ortho3DHuman({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[520px] sm:h-[600px] md:h-[660px] rounded-3xl overflow-hidden bg-white border border-slate-200/90 shadow-xl select-none"
+      className={`relative w-full h-[520px] sm:h-[600px] md:h-[660px] rounded-3xl overflow-hidden transition-colors duration-500 shadow-xl select-none ${
+        viewMode === 'skeleton' ? 'bg-[#050a14] border-slate-800' : 'bg-white border-slate-200/90'
+      }`}
     >
       {/* Loading Overlay */}
       {isLoading && (

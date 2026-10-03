@@ -2,46 +2,50 @@ import type * as THREE_TYPES from 'three'
 
 /**
  * Procedural Medical Anatomical Human Skeleton & Implants for Three.js
- * Creates a smooth, anatomically-accurate human skeleton attached directly
- * to the rig bones of human-male.glb, ensuring 100% synchronized posing and motion.
+ * Creates a smooth, anatomically-accurate human skeleton positioned exactly
+ * within the coordinates of the 3D character avatar.
  */
 
 export interface SkeletonBuildResult {
   skeletonGroup: THREE_TYPES.Group
   jointImplants: Record<string, THREE_TYPES.Group>
   jointBones: Record<string, THREE_TYPES.Group>
+  skeletonMeshes: THREE_TYPES.Mesh[]
 }
 
 export function buildFullBodySkeleton(
   THREE: typeof import('three'),
-  boneMap: Record<string, any>
+  boneMap: Record<string, any>,
+  characterGroup?: THREE_TYPES.Group
 ): SkeletonBuildResult {
   const skeletonGroup = new THREE.Group()
   skeletonGroup.name = 'FullBodySkeleton'
 
+  const skeletonMeshes: THREE_TYPES.Mesh[] = []
+
   // ── High-Grade Medical Materials ──────────────────────────────────────────
-  // Cortical bone ivory with natural subsurface gloss
+  // Cortical bone ivory with realistic medical PBR response
   const boneMat = new THREE.MeshStandardMaterial({
-    color: 0xf5f1e8,
-    roughness: 0.28,
-    metalness: 0.05,
+    color: 0xfbf8ee,
+    roughness: 0.35,
+    metalness: 0.04,
     name: 'CorticalBoneIvory',
   })
 
-  // Translucent articular cartilage (subtle sky/pearl tint)
+  // Translucent articular cartilage (sky-cyan radiograph tint)
   const cartilageMat = new THREE.MeshStandardMaterial({
-    color: 0xbae6fd,
-    roughness: 0.15,
-    metalness: 0.1,
+    color: 0x93e6fb,
+    roughness: 0.18,
+    metalness: 0.08,
     transparent: true,
-    opacity: 0.75,
+    opacity: 0.82,
     name: 'ArticularCartilage',
   })
 
-  // Surgical Grade Cobalt-Chrome (mirror luster)
+  // Surgical Grade Cobalt-Chrome (mirror finish)
   const coCrMat = new THREE.MeshStandardMaterial({
-    color: 0xe2e8f0,
-    metalness: 0.92,
+    color: 0xf1f5f9,
+    metalness: 0.94,
     roughness: 0.12,
     name: 'CobaltChromeImplant',
   })
@@ -49,590 +53,593 @@ export function buildFullBodySkeleton(
   // Surgical Titanium (matte porous titanium)
   const titaniumMat = new THREE.MeshStandardMaterial({
     color: 0x94a3b8,
-    metalness: 0.82,
+    metalness: 0.84,
     roughness: 0.28,
     name: 'TitaniumAlloy',
   })
 
-  // Medical UHMWPE Polyethylene (smooth milky white)
+  // Medical UHMWPE Polyethylene (smooth milky polymer)
   const polyMat = new THREE.MeshStandardMaterial({
     color: 0xffffff,
-    roughness: 0.22,
+    roughness: 0.20,
     metalness: 0.02,
     transparent: true,
     opacity: 0.88,
     name: 'UHMWPE_Polymer',
   })
 
+  // BIOLOX Ceramic (ceramic femoral head)
+  const ceramicMat = new THREE.MeshStandardMaterial({
+    color: 0xff8c42,
+    roughness: 0.12,
+    metalness: 0.10,
+    name: 'CeramicHead',
+  })
+
   const jointImplants: Record<string, THREE_TYPES.Group> = {}
   const jointBones: Record<string, THREE_TYPES.Group> = {}
 
-  // ── 1. SKULL & CRANIUM (Attached to 'Head') ───────────────────────────────
-  if (boneMap['Head']) {
-    const skullGroup = new THREE.Group()
-    skullGroup.name = 'Skull'
+  // Helper to query bone world position converted to characterGroup local coordinates
+  function getBonePos(name: string, fallback: THREE_TYPES.Vector3): THREE_TYPES.Vector3 {
+    const b = boneMap[name]
+    if (!b || !characterGroup) return fallback.clone()
+    const p = new THREE.Vector3()
+    b.getWorldPosition(p)
+    characterGroup.worldToLocal(p)
+    return p
+  }
 
-    // Cranial Vault (Neurocranium)
-    const craniumGeo = new THREE.SphereGeometry(0.084, 24, 20)
-    craniumGeo.scale(0.92, 1.14, 1.08)
-    const cranium = new THREE.Mesh(craniumGeo, boneMat)
-    cranium.position.set(0, 0.088, 0.01)
-    skullGroup.add(cranium)
+  // ── 0. Anatomical Key Landmarks ───────────────────────────────────────────
+  const headPos = getBonePos('Head', new THREE.Vector3(0, 0.65, 0.02))
+  const neckPos = getBonePos('Neck', new THREE.Vector3(0, 0.52, -0.01))
+  const spine2Pos = getBonePos('Spine2', new THREE.Vector3(0, 0.38, -0.02))
+  const spine1Pos = getBonePos('Spine1', new THREE.Vector3(0, 0.24, -0.01))
+  const spinePos = getBonePos('Spine', new THREE.Vector3(0, 0.12, 0.0))
+  const hipsPos = getBonePos('Hips', new THREE.Vector3(0, 0.03, 0.0))
 
-    // Facial Skeleton / Orbits / Zygomatic arches
-    const faceGeo = new THREE.CylinderGeometry(0.052, 0.038, 0.075, 16)
-    faceGeo.scale(1.15, 1, 0.85)
-    const face = new THREE.Mesh(faceGeo, boneMat)
-    face.position.set(0, 0.045, 0.062)
-    face.rotation.x = 0.12
-    skullGroup.add(face)
+  const leftUpLeg = getBonePos('LeftUpLeg', new THREE.Vector3(0.10, 0.03, 0.0))
+  const rightUpLeg = getBonePos('RightUpLeg', new THREE.Vector3(-0.10, 0.03, 0.0))
+  const leftKnee = getBonePos('LeftLeg', new THREE.Vector3(0.10, -0.34, 0.02))
+  const rightKnee = getBonePos('RightLeg', new THREE.Vector3(-0.10, -0.34, 0.02))
+  const leftAnkle = getBonePos('LeftFoot', new THREE.Vector3(0.10, -0.78, 0.04))
+  const rightAnkle = getBonePos('RightFoot', new THREE.Vector3(-0.10, -0.78, 0.04))
 
-    // Left & Right Orbital cavities (recessed eye sockets)
-    ;[-0.032, 0.032].forEach((xSide) => {
-      const orbitRingGeo = new THREE.TorusGeometry(0.016, 0.0035, 10, 16)
-      const orbitRing = new THREE.Mesh(orbitRingGeo, boneMat)
-      orbitRing.position.set(xSide, 0.065, 0.075)
-      skullGroup.add(orbitRing)
+  const leftShoulder = getBonePos('LeftShoulder', new THREE.Vector3(0.14, 0.44, 0.0))
+  const rightShoulder = getBonePos('RightShoulder', new THREE.Vector3(-0.14, 0.44, 0.0))
+  const leftArm = getBonePos('LeftArm', new THREE.Vector3(0.22, 0.42, 0.0))
+  const rightArm = getBonePos('RightArm', new THREE.Vector3(-0.22, 0.42, 0.0))
+  const leftElbow = getBonePos('LeftForeArm', new THREE.Vector3(0.25, 0.14, 0.06))
+  const rightElbow = getBonePos('RightForeArm', new THREE.Vector3(-0.25, 0.14, 0.06))
+  const leftWrist = getBonePos('LeftHand', new THREE.Vector3(0.26, -0.14, 0.10))
+  const rightWrist = getBonePos('RightHand', new THREE.Vector3(-0.26, -0.14, 0.10))
+
+  // Utility to register meshes for clipping planes
+  function addMesh(parent: THREE_TYPES.Group, mesh: THREE_TYPES.Mesh) {
+    mesh.castShadow = true
+    mesh.receiveShadow = true
+    parent.add(mesh)
+    skeletonMeshes.push(mesh)
+    return mesh
+  }
+
+  // Utility to create a tubular bone segment between two 3D points
+  function addCylinderSegment(
+    parent: THREE_TYPES.Group,
+    pA: THREE_TYPES.Vector3,
+    pB: THREE_TYPES.Vector3,
+    radiusTop: number,
+    radiusBottom: number,
+    mat: THREE_TYPES.Material
+  ): THREE_TYPES.Mesh {
+    const v = new THREE.Vector3().subVectors(pB, pA)
+    const len = v.length()
+    const geo = new THREE.CylinderGeometry(radiusTop, radiusBottom, Math.max(0.01, len), 16)
+    const mesh = new THREE.Mesh(geo, mat)
+    const mid = new THREE.Vector3().addVectors(pA, pB).multiplyScalar(0.5)
+    mesh.position.copy(mid)
+    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), v.clone().normalize())
+    return addMesh(parent, mesh)
+  }
+
+  // ── 1. SKULL & CRANIUM (Anatomical Neurocranium + Orbits + Mandible) ────────
+  const skullGroup = new THREE.Group()
+  skullGroup.name = 'Skull'
+
+  // Cranial Vault (Neurocranium dome)
+  const craniumGeo = new THREE.SphereGeometry(0.082, 24, 20)
+  craniumGeo.scale(0.92, 1.15, 1.08)
+  const cranium = new THREE.Mesh(craniumGeo, boneMat)
+  cranium.position.set(headPos.x, headPos.y + 0.055, headPos.z - 0.01)
+  addMesh(skullGroup, cranium)
+
+  // Maxilla & Facial bridge
+  const faceGeo = new THREE.CylinderGeometry(0.052, 0.038, 0.075, 16)
+  faceGeo.scale(1.12, 1, 0.88)
+  const face = new THREE.Mesh(faceGeo, boneMat)
+  face.position.set(headPos.x, headPos.y - 0.01, headPos.z + 0.055)
+  face.rotation.x = 0.12
+  addMesh(skullGroup, face)
+
+  // Orbital Cavities (Recessed Eye Sockets)
+  ;[-0.032, 0.032].forEach((xSide) => {
+    const orbitRingGeo = new THREE.TorusGeometry(0.016, 0.004, 10, 18)
+    const orbitRing = new THREE.Mesh(orbitRingGeo, boneMat)
+    orbitRing.position.set(headPos.x + xSide, headPos.y + 0.018, headPos.z + 0.068)
+    addMesh(skullGroup, orbitRing)
+  })
+
+  // Mandible (Jawbone)
+  const jawCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(headPos.x - 0.044, headPos.y - 0.015, headPos.z + 0.01),
+    new THREE.Vector3(headPos.x - 0.036, headPos.y - 0.055, headPos.z + 0.05),
+    new THREE.Vector3(headPos.x, headPos.y - 0.060, headPos.z + 0.068),
+    new THREE.Vector3(headPos.x + 0.036, headPos.y - 0.055, headPos.z + 0.05),
+    new THREE.Vector3(headPos.x + 0.044, headPos.y - 0.015, headPos.z + 0.01),
+  ])
+  const jaw = new THREE.Mesh(new THREE.TubeGeometry(jawCurve, 16, 0.007, 8, false), boneMat)
+  addMesh(skullGroup, jaw)
+
+  // Teeth rows
+  ;[-0.035, -0.048].forEach((yOff) => {
+    const teethGeo = new THREE.CylinderGeometry(0.024, 0.024, 0.007, 14, 1, false, -Math.PI * 0.4, Math.PI * 0.8)
+    const teeth = new THREE.Mesh(teethGeo, boneMat)
+    teeth.position.set(headPos.x, headPos.y + yOff, headPos.z + 0.06)
+    addMesh(skullGroup, teeth)
+  })
+
+  skeletonGroup.add(skullGroup)
+
+  // ── 2. VERTEBRAL COLUMN & INTERVERTEBRAL DISCS (C1 to L5) ─────────────────
+  const spineGroup = new THREE.Group()
+  spineGroup.name = 'SpineColumn'
+
+  // Spine anchor trajectory
+  const spinePath = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(neckPos.x, neckPos.y, neckPos.z),
+    new THREE.Vector3(spine2Pos.x, spine2Pos.y, spine2Pos.z),
+    new THREE.Vector3(spine1Pos.x, spine1Pos.y, spine1Pos.z),
+    new THREE.Vector3(spinePos.x, spinePos.y, spinePos.z),
+    new THREE.Vector3(hipsPos.x, hipsPos.y, hipsPos.z),
+  ])
+
+  const numVertebrae = 22
+  for (let v = 0; v < numVertebrae; v++) {
+    const t = v / (numVertebrae - 1)
+    const pt = spinePath.getPoint(t)
+    const scale = 0.016 + t * 0.010 // grows wider down the spine
+
+    // Vertebral body
+    const bodyGeo = new THREE.CylinderGeometry(scale, scale, 0.012, 14)
+    const body = new THREE.Mesh(bodyGeo, boneMat)
+    body.position.set(pt.x, pt.y, pt.z)
+    addMesh(spineGroup, body)
+
+    // Intervertebral Cushion Disc
+    if (v < numVertebrae - 1) {
+      const discGeo = new THREE.CylinderGeometry(scale * 1.05, scale * 1.05, 0.004, 14)
+      const disc = new THREE.Mesh(discGeo, cartilageMat)
+      disc.position.set(pt.x, pt.y - 0.008, pt.z)
+      addMesh(spineGroup, disc)
+    }
+
+    // Posterior Spinous Process
+    const spinousGeo = new THREE.ConeGeometry(scale * 0.4, scale * 1.4, 6)
+    const spinous = new THREE.Mesh(spinousGeo, boneMat)
+    spinous.position.set(pt.x, pt.y, pt.z - scale * 0.9)
+    spinous.rotation.x = -Math.PI / 2
+    addMesh(spineGroup, spinous)
+
+    // Bilateral Transverse Processes
+    ;[-scale * 1.2, scale * 1.2].forEach((xSide) => {
+      const transGeo = new THREE.BoxGeometry(0.012, 0.006, 0.008)
+      const transMesh = new THREE.Mesh(transGeo, boneMat)
+      transMesh.position.set(pt.x + xSide, pt.y, pt.z - scale * 0.3)
+      addMesh(spineGroup, transMesh)
     })
-
-    // Mandible (Jawbone)
-    const jawCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-0.045, 0.04, 0.02),
-      new THREE.Vector3(-0.038, 0.01, 0.06),
-      new THREE.Vector3(0, 0.005, 0.075),
-      new THREE.Vector3(0.038, 0.01, 0.06),
-      new THREE.Vector3(0.045, 0.04, 0.02),
-    ])
-    const jaw = new THREE.Mesh(new THREE.TubeGeometry(jawCurve, 16, 0.007, 8, false), boneMat)
-    skullGroup.add(jaw)
-
-    boneMap['Head'].add(skullGroup)
-    skeletonGroup.add(skullGroup)
   }
 
-  // ── 2. CERVICAL SPINE (Attached to 'Neck') ────────────────────────────────
-  if (boneMap['Neck']) {
-    const cervicalGroup = new THREE.Group()
-    cervicalGroup.name = 'CervicalSpine'
-    for (let c = 0; c < 7; c++) {
-      const y = (c / 7) * 0.11
-      const vertGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.012, 12)
-      const vert = new THREE.Mesh(vertGeo, boneMat)
-      vert.position.set(0, y, -0.006)
-      cervicalGroup.add(vert)
+  // Spine Surgical PEEK Interbody Fusion Cage & Pedicle Fixation
+  const spineImplant = new THREE.Group()
+  spineImplant.name = 'SpineImplant'
 
-      // Spinous process
-      const spinousGeo = new THREE.ConeGeometry(0.006, 0.016, 6)
-      const spinous = new THREE.Mesh(spinousGeo, boneMat)
-      spinous.position.set(0, y, -0.022)
-      spinous.rotation.x = -Math.PI / 2
-      cervicalGroup.add(spinous)
+  const cageGeo = new THREE.BoxGeometry(0.024, 0.012, 0.018)
+  const cage = new THREE.Mesh(cageGeo, polyMat)
+  cage.position.set(spinePos.x, spinePos.y, spinePos.z)
+  spineImplant.add(cage)
+
+  // Pedicle Screws & Titanium Rods (Left & Right)
+  ;[-0.018, 0.018].forEach((xSide) => {
+    const rodGeo = new THREE.CylinderGeometry(0.003, 0.003, 0.045, 10)
+    const rod = new THREE.Mesh(rodGeo, titaniumMat)
+    rod.position.set(spinePos.x + xSide, spinePos.y, spinePos.z - 0.025)
+    spineImplant.add(rod)
+
+    for (let s = -1; s <= 1; s += 2) {
+      const screwGeo = new THREE.CylinderGeometry(0.003, 0.003, 0.022, 8)
+      const screw = new THREE.Mesh(screwGeo, coCrMat)
+      screw.position.set(spinePos.x + xSide, spinePos.y + s * 0.016, spinePos.z - 0.012)
+      screw.rotation.x = Math.PI / 2
+      spineImplant.add(screw)
     }
-    boneMap['Neck'].add(cervicalGroup)
-    skeletonGroup.add(cervicalGroup)
-  }
+  })
 
-  // ── 3. THORACIC RIBCAGE & STERNUM (Attached to 'Spine2') ───────────────────
-  if (boneMap['Spine2']) {
-    const thoraxGroup = new THREE.Group()
-    thoraxGroup.name = 'ThoraxRibcage'
+  spineImplant.visible = false
+  skeletonGroup.add(spineImplant)
+  jointImplants['spine'] = spineImplant
+  jointBones['spine'] = spineGroup
+  skeletonGroup.add(spineGroup)
 
-    // Sternum (Chest bone)
-    const sternumGeo = new THREE.BoxGeometry(0.032, 0.16, 0.012)
-    const sternum = new THREE.Mesh(sternumGeo, boneMat)
-    sternum.position.set(0, -0.01, 0.12)
-    thoraxGroup.add(sternum)
+  // ── 3. THORAX: STERNUM & 10 PAIRS OF CURVED RIBS ──────────────────────────
+  const thoraxGroup = new THREE.Group()
+  thoraxGroup.name = 'ThoraxRibcage'
 
-    // 10 Anatomical Rib Pairs (Smooth 3D CatmullRom splines)
-    for (let i = 0; i < 10; i++) {
-      const frac = i / 10
-      const yOffset = 0.07 - i * 0.022
-      const ribW = 0.085 + Math.sin(frac * Math.PI) * 0.048
-      const ribD = 0.080 + Math.sin(frac * Math.PI) * 0.042
+  // Sternum (Chest bone at anterior thorax)
+  const sternumGeo = new THREE.BoxGeometry(0.034, 0.17, 0.012)
+  const sternum = new THREE.Mesh(sternumGeo, boneMat)
+  sternum.position.set(spine2Pos.x, spine2Pos.y - 0.02, spine2Pos.z + 0.14)
+  addMesh(thoraxGroup, sternum)
 
-      ;[-1, 1].forEach((side) => {
-        const curve = new THREE.CatmullRomCurve3([
-          new THREE.Vector3(side * 0.018, yOffset + 0.01, -ribD * 0.65),
-          new THREE.Vector3(side * ribW * 0.72, yOffset + 0.005, -ribD * 0.50),
-          new THREE.Vector3(side * ribW, yOffset - 0.008, 0.01),
-          new THREE.Vector3(side * ribW * 0.75, yOffset - 0.022, ribD * 0.62),
-          new THREE.Vector3(side * 0.022, yOffset - 0.030, ribD * 0.78),
-        ])
-        const ribMesh = new THREE.Mesh(
-          new THREE.TubeGeometry(curve, 14, 0.0048, 8, false),
-          boneMat
-        )
-        thoraxGroup.add(ribMesh)
-      })
-    }
+  // 10 Anatomical Rib Pairs (Curved 3D splines wrapping from spine to sternum)
+  for (let i = 0; i < 10; i++) {
+    const frac = i / 9
+    const yLevel = spine2Pos.y + 0.06 - i * 0.022
+    const ribWidth = 0.095 + Math.sin(frac * Math.PI) * 0.052
+    const ribDepth = 0.125 + Math.sin(frac * Math.PI) * 0.020
 
-    // Thoracic vertebrae column
-    for (let t = 0; t < 10; t++) {
-      const y = 0.07 - t * 0.022
-      const vert = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.016, 14), boneMat)
-      vert.position.set(0, y, -0.08)
-      thoraxGroup.add(vert)
-    }
-
-    boneMap['Spine2'].add(thoraxGroup)
-    skeletonGroup.add(thoraxGroup)
-  }
-
-  // ── 4. LUMBAR SPINE (Attached to 'Spine1' & 'Spine') ───────────────────────
-  const spineJointGroup = new THREE.Group()
-  spineJointGroup.name = 'LumbarSpineStructure'
-
-  if (boneMap['Spine1']) {
-    for (let l = 0; l < 4; l++) {
-      const y = (l / 4) * 0.11
-      const vertGeo = new THREE.CylinderGeometry(0.026, 0.028, 0.022, 16)
-      const vert = new THREE.Mesh(vertGeo, boneMat)
-      vert.position.set(0, y, -0.04)
-      spineJointGroup.add(vert)
-
-      // Intervertebral disc space
-      if (l < 3) {
-        const discGeo = new THREE.CylinderGeometry(0.027, 0.027, 0.008, 16)
-        const disc = new THREE.Mesh(discGeo, cartilageMat)
-        disc.position.set(0, y + 0.015, -0.04)
-        spineJointGroup.add(disc)
-      }
-
-      // Spinous process
-      const spinous = new THREE.Mesh(new THREE.ConeGeometry(0.010, 0.026, 8), boneMat)
-      spinous.position.set(0, y, -0.065)
-      spinous.rotation.x = -Math.PI / 2
-      spineJointGroup.add(spinous)
-    }
-    boneMap['Spine1'].add(spineJointGroup)
-    skeletonGroup.add(spineJointGroup)
-    jointBones['spine'] = spineJointGroup
-
-    // Spine Surgical Implant: Titanium Interbody Cage & Pedicle Fixation
-    const spineImplant = new THREE.Group()
-    spineImplant.name = 'SpineImplant'
-    const cageGeo = new THREE.BoxGeometry(0.038, 0.014, 0.034)
-    const cage = new THREE.Mesh(cageGeo, titaniumMat)
-    cage.position.set(0, 0.045, -0.04)
-    spineImplant.add(cage)
-
-    ;[-0.026, 0.026].forEach((xSide) => {
-      const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.08, 12), coCrMat)
-      rod.position.set(xSide, 0.045, -0.055)
-      spineImplant.add(rod)
+    ;[-1, 1].forEach((dir) => {
+      const ribSpline = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(spine2Pos.x, yLevel, spine2Pos.z - 0.01),
+        new THREE.Vector3(spine2Pos.x + dir * (ribWidth * 0.55), yLevel + 0.005, spine2Pos.z + ribDepth * 0.2),
+        new THREE.Vector3(spine2Pos.x + dir * ribWidth, yLevel - 0.005, spine2Pos.z + ribDepth * 0.6),
+        new THREE.Vector3(spine2Pos.x + dir * (ribWidth * 0.6), yLevel - 0.020, spine2Pos.z + ribDepth * 0.95),
+        new THREE.Vector3(spine2Pos.x + dir * 0.022, yLevel - 0.025, spine2Pos.z + 0.14),
+      ])
+      const ribMesh = new THREE.Mesh(
+        new THREE.TubeGeometry(ribSpline, 18, 0.0042, 6, false),
+        i > 6 ? cartilageMat : boneMat
+      )
+      addMesh(thoraxGroup, ribMesh)
     })
-    spineImplant.visible = false
-    boneMap['Spine1'].add(spineImplant)
-    jointImplants['spine'] = spineImplant
   }
 
-  // ── 5. PELVIS & SACRUM (Attached to 'Hips') ───────────────────────────────
-  if (boneMap['Hips']) {
-    const pelvisGroup = new THREE.Group()
-    pelvisGroup.name = 'PelvicGirdle'
+  skeletonGroup.add(thoraxGroup)
 
-    // Sacrum central wedge
-    const sacrumGeo = new THREE.ConeGeometry(0.048, 0.12, 14)
-    const sacrum = new THREE.Mesh(sacrumGeo, boneMat)
-    sacrum.position.set(0, 0.01, -0.045)
-    sacrum.rotation.x = Math.PI
-    pelvisGroup.add(sacrum)
+  // ── 4. PELVIS & SACRUM (Pelvic Girdle & Hip Sockets) ──────────────────────
+  const pelvisGroup = new THREE.Group()
+  pelvisGroup.name = 'Pelvis'
 
-    // Left & Right Iliac Blades (Pelvic Wings)
-    ;[-1, 1].forEach((side) => {
-      const iliumShape = new THREE.Shape()
-      iliumShape.moveTo(0, 0)
-      iliumShape.quadraticCurveTo(side * 0.08, 0.06, side * 0.11, 0.10)
-      iliumShape.quadraticCurveTo(side * 0.12, 0.15, side * 0.06, 0.16)
-      iliumShape.quadraticCurveTo(0, 0.12, 0, 0)
+  // Sacrum & Coccyx
+  const sacrumGeo = new THREE.ConeGeometry(0.042, 0.09, 8)
+  const sacrum = new THREE.Mesh(sacrumGeo, boneMat)
+  sacrum.position.set(hipsPos.x, hipsPos.y + 0.01, hipsPos.z - 0.04)
+  sacrum.rotation.x = Math.PI
+  addMesh(pelvisGroup, sacrum)
 
-      const extrudeSettings = { depth: 0.016, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.004, bevelThickness: 0.004 }
-      const iliumMesh = new THREE.Mesh(new THREE.ExtrudeGeometry(iliumShape, extrudeSettings), boneMat)
-      iliumMesh.position.set(0, -0.04, -0.02)
-      pelvisGroup.add(iliumMesh)
+  // Bilateral Iliac Wings & Acetabular Sockets
+  ;[-1, 1].forEach((dir) => {
+    // Broad flaring iliac crest
+    const iliumGeo = new THREE.CylinderGeometry(0.082, 0.055, 0.09, 14, 1, false, 0, Math.PI * 0.7)
+    const ilium = new THREE.Mesh(iliumGeo, boneMat)
+    ilium.position.set(hipsPos.x + dir * 0.065, hipsPos.y + 0.03, hipsPos.z - 0.01)
+    ilium.rotation.y = dir > 0 ? -0.4 : Math.PI - 0.4
+    ilium.rotation.z = dir * 0.2
+    addMesh(pelvisGroup, ilium)
 
-      // Acetabular socket
-      const acetabulum = new THREE.Mesh(new THREE.SphereGeometry(0.034, 16, 16, 0, Math.PI), boneMat)
-      acetabulum.position.set(side * 0.095, -0.02, 0.01)
-      acetabulum.rotation.y = side * Math.PI * 0.5
-      pelvisGroup.add(acetabulum)
-    })
+    // Acetabulum Socket Cup (houses the femoral head)
+    const acetabulumGeo = new THREE.SphereGeometry(0.030, 16, 16, 0, Math.PI)
+    const acetabulum = new THREE.Mesh(acetabulumGeo, boneMat)
+    acetabulum.position.set(dir > 0 ? leftUpLeg.x : rightUpLeg.x, leftUpLeg.y, leftUpLeg.z)
+    acetabulum.rotation.y = dir * Math.PI * 0.5
+    addMesh(pelvisGroup, acetabulum)
 
-    boneMap['Hips'].add(pelvisGroup)
-    skeletonGroup.add(pelvisGroup)
-  }
+    // Pubic & Ischial rings
+    const pubicGeo = new THREE.TorusGeometry(0.024, 0.006, 8, 12)
+    const pubic = new THREE.Mesh(pubicGeo, boneMat)
+    pubic.position.set(hipsPos.x + dir * 0.038, hipsPos.y - 0.045, hipsPos.z + 0.03)
+    addMesh(pelvisGroup, pubic)
+  })
 
-  // ── 6. SHOULDER & ARMS (Left & Right) ─────────────────────────────────────
-  ;['Left', 'Right'].forEach((side) => {
+  skeletonGroup.add(pelvisGroup)
+
+  // ── 5. LOWER EXTREMITIES (FEMURS, KNEES, TIBIAE, FIBULAE, ANKLES, FEET) ────
+  const legPairs = [
+    { side: 'Left', upLeg: leftUpLeg, knee: leftKnee, ankle: leftAnkle, isFocus: true },
+    { side: 'Right', upLeg: rightUpLeg, knee: rightKnee, ankle: rightAnkle, isFocus: false },
+  ]
+
+  legPairs.forEach(({ side, upLeg, knee, ankle, isFocus }) => {
     const isLeft = side === 'Left'
-    const xMult = isLeft ? 1 : -1
+    const xDir = isLeft ? 1 : -1
 
-    // Clavicle & Scapula (Attached to Shoulder)
-    const shoulderBone = boneMap[`${side}Shoulder`]
-    if (shoulderBone) {
-      const shGroup = new THREE.Group()
-      // Clavicle (S-curved tube)
-      const clavCurve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(xMult * 0.01, 0, 0),
-        new THREE.Vector3(xMult * 0.06, 0.015, -0.01),
-        new THREE.Vector3(xMult * 0.13, 0.01, -0.02),
-      ])
-      const clavicle = new THREE.Mesh(new THREE.TubeGeometry(clavCurve, 12, 0.006, 8, false), boneMat)
-      shGroup.add(clavicle)
+    const legGroup = new THREE.Group()
+    legGroup.name = `${side}LegSkeleton`
 
-      // Scapula (Shoulder blade plate)
-      const scapulaGeo = new THREE.CylinderGeometry(0.045, 0.015, 0.11, 8)
-      scapulaGeo.scale(1, 1, 0.25)
-      const scapula = new THREE.Mesh(scapulaGeo, boneMat)
-      scapula.position.set(xMult * 0.09, -0.04, -0.04)
-      shGroup.add(scapula)
+    // ── FEMUR ──
+    // Femoral Head (Ball in acetabulum)
+    const fHead = new THREE.Mesh(new THREE.SphereGeometry(0.026, 20, 20), boneMat)
+    fHead.position.copy(upLeg)
+    addMesh(legGroup, fHead)
 
-      shoulderBone.add(shGroup)
-      skeletonGroup.add(shGroup)
+    const fCart = new THREE.Mesh(new THREE.SphereGeometry(0.0265, 18, 18), cartilageMat)
+    fCart.position.copy(upLeg)
+    addMesh(legGroup, fCart)
+
+    // Femoral Neck (Angled from head to greater trochanter)
+    const trochanterPos = new THREE.Vector3(upLeg.x + xDir * 0.038, upLeg.y - 0.025, upLeg.z)
+    addCylinderSegment(legGroup, upLeg, trochanterPos, 0.013, 0.016, boneMat)
+
+    // Greater Trochanter
+    const trochanter = new THREE.Mesh(new THREE.BoxGeometry(0.028, 0.036, 0.030), boneMat)
+    trochanter.position.copy(trochanterPos)
+    addMesh(legGroup, trochanter)
+
+    // Femoral Shaft (Strong cortical tube)
+    addCylinderSegment(legGroup, trochanterPos, knee, 0.018, 0.022, boneMat)
+
+    // Distal Femoral Bicondyles at Knee (Medial & Lateral condyles)
+    ;[-0.020, 0.020].forEach((cSide) => {
+      const condyle = new THREE.Mesh(new THREE.SphereGeometry(0.022, 16, 16), boneMat)
+      condyle.position.set(knee.x + cSide, knee.y, knee.z - 0.008)
+      condyle.scale.set(1, 1.25, 1.4)
+      addMesh(legGroup, condyle)
+
+      const cCart = new THREE.Mesh(new THREE.SphereGeometry(0.0225, 16, 16), cartilageMat)
+      cCart.position.set(knee.x + cSide, knee.y, knee.z - 0.008)
+      cCart.scale.set(1, 1.25, 1.4)
+      addMesh(legGroup, cCart)
+    })
+
+    // Patella (Kneecap)
+    const patella = new THREE.Mesh(new THREE.SphereGeometry(0.019, 16, 16), boneMat)
+    patella.scale.set(1, 1.2, 0.55)
+    patella.position.set(knee.x, knee.y + 0.015, knee.z + 0.038)
+    addMesh(legGroup, patella)
+
+    // ── TIBIA & FIBULA ──
+    // Tibial Plateau (Articular plateau directly beneath femoral condyles)
+    const plateau = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.028, 0.020, 18), boneMat)
+    plateau.position.set(knee.x, knee.y - 0.016, knee.z)
+    addMesh(legGroup, plateau)
+
+    // Meniscus Rings (Fibrocartilage shock absorbers)
+    const meniscus = new THREE.Mesh(new THREE.TorusGeometry(0.026, 0.005, 8, 18), cartilageMat)
+    meniscus.rotation.x = Math.PI / 2
+    meniscus.position.set(knee.x, knee.y - 0.008, knee.z)
+    addMesh(legGroup, meniscus)
+
+    // Tibia Shaft (Main weight-bearing shin bone)
+    addCylinderSegment(legGroup, new THREE.Vector3(knee.x, knee.y - 0.016, knee.z), ankle, 0.018, 0.014, boneMat)
+
+    // Fibula Shaft (Slender lateral stabilizer bone)
+    const fibulaStart = new THREE.Vector3(knee.x + xDir * 0.030, knee.y - 0.025, knee.z - 0.005)
+    const fibulaEnd = new THREE.Vector3(ankle.x + xDir * 0.024, ankle.y, ankle.z)
+    addCylinderSegment(legGroup, fibulaStart, fibulaEnd, 0.007, 0.007, boneMat)
+
+    // Medial & Lateral Malleoli (Ankle mortise)
+    const medMall = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.026, 0.022), boneMat)
+    medMall.position.set(ankle.x - xDir * 0.016, ankle.y, ankle.z)
+    addMesh(legGroup, medMall)
+
+    const latMall = new THREE.Mesh(new THREE.SphereGeometry(0.013, 12, 12), boneMat)
+    latMall.position.set(ankle.x + xDir * 0.024, ankle.y, ankle.z)
+    addMesh(legGroup, latMall)
+
+    // ── FOOT (Talus, Calcaneus heel, Metatarsals) ──
+    const footGroup = new THREE.Group()
+    const talus = new THREE.Mesh(new THREE.SphereGeometry(0.020, 14, 14), boneMat)
+    talus.position.set(ankle.x, ankle.y - 0.018, ankle.z + 0.015)
+    addMesh(footGroup, talus)
+
+    const calcaneus = new THREE.Mesh(new THREE.BoxGeometry(0.026, 0.030, 0.065), boneMat)
+    calcaneus.position.set(ankle.x, ankle.y - 0.028, ankle.z - 0.035)
+    addMesh(footGroup, calcaneus)
+
+    for (let m = -2; m <= 2; m++) {
+      const ray = new THREE.Mesh(new THREE.CylinderGeometry(0.0045, 0.0045, 0.075, 8), boneMat)
+      ray.position.set(ankle.x + m * 0.008, ankle.y - 0.040, ankle.z + 0.065)
+      ray.rotation.x = Math.PI / 2
+      addMesh(footGroup, ray)
     }
+    legGroup.add(footGroup)
 
-    // Humerus (Upper Arm) - length ~0.285 along local Y
-    const armBone = boneMap[`${side}Arm`]
-    if (armBone) {
-      const humerusGroup = new THREE.Group()
-      humerusGroup.name = `${side}Humerus`
+    skeletonGroup.add(legGroup)
 
-      // Proximal Humeral Head (Shoulder ball)
-      const head = new THREE.Mesh(new THREE.SphereGeometry(0.028, 18, 18), boneMat)
-      head.position.set(0, 0.01, 0)
-      humerusGroup.add(head)
+    // Attach joint references for focus
+    if (isLeft) {
+      jointBones['knee'] = legGroup
+      jointBones['hip'] = legGroup
+      jointBones['ankle'] = legGroup
 
-      // Articular Cartilage on head
-      const headCart = new THREE.Mesh(new THREE.SphereGeometry(0.0285, 18, 18, 0, Math.PI), cartilageMat)
-      headCart.position.set(0, 0.01, 0)
-      humerusGroup.add(headCart)
+      // Knee Arthroplasty Surgical Implant (Cobalt-Chrome shield + PE insert + Titanium tray)
+      const kneeImplant = new THREE.Group()
+      kneeImplant.name = 'KneeImplant'
 
-      // Humerus Bone Shaft
-      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.015, 0.24, 16), boneMat)
-      shaft.position.set(0, 0.14, 0)
-      humerusGroup.add(shaft)
+      // Femoral shield
+      const shieldGeo = new THREE.CylinderGeometry(0.038, 0.038, 0.048, 16, 1, false, 0, Math.PI)
+      const shield = new THREE.Mesh(shieldGeo, coCrMat)
+      shield.position.set(knee.x, knee.y, knee.z)
+      shield.rotation.z = Math.PI / 2
+      kneeImplant.add(shield)
 
-      // Distal Epicondyles at Elbow
-      const epicondyle = new THREE.Mesh(new THREE.BoxGeometry(0.038, 0.022, 0.024), boneMat)
-      epicondyle.position.set(0, 0.275, 0)
-      humerusGroup.add(epicondyle)
+      // UHMWPE Polyethylene insert
+      const poly = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.034, 0.008, 16), polyMat)
+      poly.position.set(knee.x, knee.y - 0.014, knee.z)
+      kneeImplant.add(poly)
 
-      armBone.add(humerusGroup)
-      skeletonGroup.add(humerusGroup)
+      // Titanium Tibial Baseplate
+      const tray = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.036, 0.007, 16), titaniumMat)
+      tray.position.set(knee.x, knee.y - 0.022, knee.z)
+      kneeImplant.add(tray)
 
-      if (isLeft) {
-        jointBones['shoulder'] = humerusGroup
+      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.004, 0.045, 12), titaniumMat)
+      stem.position.set(knee.x, knee.y - 0.045, knee.z)
+      kneeImplant.add(stem)
 
-        // Shoulder Surgical Anchor & Rotator Cuff Repair Construct
-        const shoulderImplant = new THREE.Group()
-        shoulderImplant.name = 'ShoulderImplant'
-        const anchor1 = new THREE.Mesh(new THREE.ConeGeometry(0.005, 0.018, 8), titaniumMat)
-        anchor1.position.set(0.025, 0.03, 0.01)
-        anchor1.rotation.z = -0.5
-        shoulderImplant.add(anchor1)
+      kneeImplant.visible = false
+      skeletonGroup.add(kneeImplant)
+      jointImplants['knee'] = kneeImplant
+      jointImplants['knee_femur'] = kneeImplant
 
-        const anchor2 = new THREE.Mesh(new THREE.ConeGeometry(0.005, 0.018, 8), titaniumMat)
-        anchor2.position.set(-0.022, 0.03, 0.01)
-        anchor2.rotation.z = 0.5
-        shoulderImplant.add(anchor2)
+      // Hip Total Arthroplasty Implant (Titanium stem + BIOLOX Ceramic head)
+      const hipImplant = new THREE.Group()
+      hipImplant.name = 'HipImplant'
 
-        shoulderImplant.visible = false
-        armBone.add(shoulderImplant)
-        jointImplants['shoulder'] = shoulderImplant
-      }
-    }
+      const ceramicHead = new THREE.Mesh(new THREE.SphereGeometry(0.028, 20, 20), ceramicMat)
+      ceramicHead.position.copy(upLeg)
+      hipImplant.add(ceramicHead)
 
-    // Forearm (Radius & Ulna) - length ~0.252 along local Y
-    const foreArmBone = boneMap[`${side}ForeArm`]
-    if (foreArmBone) {
-      const foreGroup = new THREE.Group()
-      foreGroup.name = `${side}Forearm`
+      const hipStem = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.008, 0.17, 12), titaniumMat)
+      hipStem.position.set(upLeg.x + 0.020, upLeg.y - 0.09, upLeg.z)
+      hipStem.rotation.z = -0.15
+      hipImplant.add(hipStem)
 
-      // Ulna (Medial / Olecranon beak at elbow)
-      const olecranon = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.028, 0.024), boneMat)
-      olecranon.position.set(-0.008, 0.01, -0.005)
-      foreGroup.add(olecranon)
+      hipImplant.visible = false
+      skeletonGroup.add(hipImplant)
+      jointImplants['hip'] = hipImplant
 
-      const ulnaShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.007, 0.22, 12), boneMat)
-      ulnaShaft.position.set(-0.008, 0.12, 0)
-      foreGroup.add(ulnaShaft)
+      // Ankle Fixation Plate & Locking Screws
+      const ankleImplant = new THREE.Group()
+      ankleImplant.name = 'AnkleImplant'
 
-      // Radius (Lateral bone)
-      const radiusHead = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.012, 14), boneMat)
-      radiusHead.position.set(0.012, 0.01, 0)
-      foreGroup.add(radiusHead)
+      const plate = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.075, 0.004), titaniumMat)
+      plate.position.set(ankle.x + 0.026, ankle.y + 0.04, ankle.z)
+      ankleImplant.add(plate)
 
-      const radiusShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.012, 0.22, 12), boneMat)
-      radiusShaft.position.set(0.012, 0.12, 0)
-      foreGroup.add(radiusShaft)
-
-      foreArmBone.add(foreGroup)
-      skeletonGroup.add(foreGroup)
-
-      if (isLeft) {
-        jointBones['elbow'] = foreGroup
-
-        // Elbow Surgical Titanium Locking Plate
-        const elbowImplant = new THREE.Group()
-        elbowImplant.name = 'ElbowImplant'
-        const plate = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.075, 0.004), titaniumMat)
-        plate.position.set(-0.014, 0.04, -0.012)
-        elbowImplant.add(plate)
-
-        for (let s = 0; s < 3; s++) {
-          const screw = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.018, 8), coCrMat)
-          screw.position.set(-0.014, 0.018 + s * 0.022, -0.005)
-          screw.rotation.x = Math.PI / 2
-          elbowImplant.add(screw)
-        }
-        elbowImplant.visible = false
-        foreArmBone.add(elbowImplant)
-        jointImplants['elbow'] = elbowImplant
-      }
-    }
-
-    // Hand & Wrist Bones (Attached to Hand)
-    const handBone = boneMap[`${side}Hand`]
-    if (handBone) {
-      const handGroup = new THREE.Group()
-      // Carpal cluster
-      const carpal = new THREE.Mesh(new THREE.BoxGeometry(0.034, 0.024, 0.016), boneMat)
-      carpal.position.set(0, 0.015, 0)
-      handGroup.add(carpal)
-
-      // 5 Metacarpals
-      for (let m = -2; m <= 2; m++) {
-        const meta = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.004, 0.05, 8), boneMat)
-        meta.position.set(m * 0.008, 0.048, 0)
-        handGroup.add(meta)
+      for (let s = 0; s < 3; s++) {
+        const screw = new THREE.Mesh(new THREE.CylinderGeometry(0.0025, 0.0025, 0.022, 8), coCrMat)
+        screw.position.set(ankle.x + 0.016, ankle.y + 0.02 + s * 0.022, ankle.z)
+        screw.rotation.z = Math.PI / 2
+        ankleImplant.add(screw)
       }
 
-      handBone.add(handGroup)
-      skeletonGroup.add(handGroup)
+      ankleImplant.visible = false
+      skeletonGroup.add(ankleImplant)
+      jointImplants['ankle'] = ankleImplant
     }
   })
 
-  // ── 7. LEGS & LOWER EXTREMITIES (Left & Right) ─────────────────────────────
-  ;['Left', 'Right'].forEach((side) => {
-    const isRight = side === 'Right'
-    const xMult = isRight ? 1 : -1
+  // ── 6. UPPER EXTREMITIES (CLAVICLES, SCAPULAE, HUMERUS, FOREARM, HANDS) ────
+  const armPairs = [
+    { side: 'Left', shoulder: leftShoulder, arm: leftArm, elbow: leftElbow, wrist: leftWrist },
+    { side: 'Right', shoulder: rightShoulder, arm: rightArm, elbow: rightElbow, wrist: rightWrist },
+  ]
 
-    // Femur (Upper Leg) - length ~0.458 along local Y
-    const upLegBone = boneMap[`${side}UpLeg`]
-    if (upLegBone) {
-      const femurGroup = new THREE.Group()
-      femurGroup.name = `${side}Femur`
+  armPairs.forEach(({ side, shoulder, arm, elbow, wrist }) => {
+    const isLeft = side === 'Left'
+    const xDir = isLeft ? 1 : -1
 
-      // Femoral Head (Spherical ball)
-      const head = new THREE.Mesh(new THREE.SphereGeometry(0.028, 20, 20), boneMat)
-      head.position.set(xMult * 0.028, 0.022, 0.005)
-      femurGroup.add(head)
+    const armGroup = new THREE.Group()
+    armGroup.name = `${side}ArmSkeleton`
 
-      // Articular Cartilage layer
-      const headCart = new THREE.Mesh(new THREE.SphereGeometry(0.0285, 18, 18), cartilageMat)
-      headCart.position.set(xMult * 0.028, 0.022, 0.005)
-      femurGroup.add(headCart)
+    // Clavicle (S-curved collarbone)
+    const clavCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(spine2Pos.x + xDir * 0.015, spine2Pos.y + 0.06, spine2Pos.z + 0.12),
+      new THREE.Vector3(spine2Pos.x + xDir * 0.07, spine2Pos.y + 0.07, spine2Pos.z + 0.08),
+      new THREE.Vector3(shoulder.x, shoulder.y, shoulder.z),
+    ])
+    const clavicle = new THREE.Mesh(new THREE.TubeGeometry(clavCurve, 12, 0.006, 8, false), boneMat)
+    addMesh(armGroup, clavicle)
 
-      // Femoral Neck (Angled at 130 degrees)
-      const neckCurve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(xMult * 0.028, 0.022, 0.005),
-        new THREE.Vector3(xMult * 0.014, 0.012, 0),
-        new THREE.Vector3(0, 0, 0),
-      ])
-      const neck = new THREE.Mesh(new THREE.TubeGeometry(neckCurve, 8, 0.013, 10, false), boneMat)
-      femurGroup.add(neck)
+    // Scapula (Shoulder blade plate behind the ribcage)
+    const scapulaGeo = new THREE.CylinderGeometry(0.045, 0.018, 0.11, 8)
+    scapulaGeo.scale(1, 1, 0.25)
+    const scapula = new THREE.Mesh(scapulaGeo, boneMat)
+    scapula.position.set(shoulder.x - xDir * 0.04, shoulder.y - 0.05, shoulder.z - 0.04)
+    addMesh(armGroup, scapula)
 
-      // Greater Trochanter
-      const trochanter = new THREE.Mesh(new THREE.BoxGeometry(0.028, 0.038, 0.032), boneMat)
-      trochanter.position.set(-xMult * 0.016, 0.015, -0.005)
-      femurGroup.add(trochanter)
+    // Humeral Head (Shoulder ball)
+    const hHead = new THREE.Mesh(new THREE.SphereGeometry(0.027, 18, 18), boneMat)
+    hHead.position.copy(arm)
+    addMesh(armGroup, hHead)
 
-      // Femoral Shaft (Strongest bone in human body)
-      const shaftCurve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(0, 0, 0),
-        new THREE.Vector3(0, 0.22, 0.012),
-        new THREE.Vector3(0, 0.43, 0),
-      ])
-      const shaft = new THREE.Mesh(new THREE.TubeGeometry(shaftCurve, 14, 0.016, 14, false), boneMat)
-      femurGroup.add(shaft)
+    const hCart = new THREE.Mesh(new THREE.SphereGeometry(0.0275, 18, 18), cartilageMat)
+    hCart.position.copy(arm)
+    addMesh(armGroup, hCart)
 
-      // Distal Femoral Bicondyles (Knee Articulation)
-      ;[-0.018, 0.018].forEach((cSide) => {
-        const condyle = new THREE.Mesh(new THREE.SphereGeometry(0.020, 16, 16), boneMat)
-        condyle.position.set(cSide, 0.445, -0.005)
-        condyle.scale.set(1, 1.2, 1.4)
-        femurGroup.add(condyle)
+    // Humerus Shaft
+    addCylinderSegment(armGroup, arm, elbow, 0.015, 0.013, boneMat)
 
-        const cCart = new THREE.Mesh(new THREE.SphereGeometry(0.0205, 16, 16), cartilageMat)
-        cCart.position.set(cSide, 0.445, -0.005)
-        cCart.scale.set(1, 1.2, 1.4)
-        femurGroup.add(cCart)
-      })
+    // Elbow Epicondyles
+    const epicondyle = new THREE.Mesh(new THREE.BoxGeometry(0.034, 0.020, 0.022), boneMat)
+    epicondyle.position.copy(elbow)
+    addMesh(armGroup, epicondyle)
 
-      // Patella (Kneecap)
-      const patella = new THREE.Mesh(new THREE.SphereGeometry(0.018, 14, 14), boneMat)
-      patella.scale.set(1, 1.2, 0.6)
-      patella.position.set(0, 0.435, 0.032)
-      femurGroup.add(patella)
+    // Forearm: Radius & Ulna
+    const olecranon = new THREE.Mesh(new THREE.BoxGeometry(0.020, 0.026, 0.022), boneMat)
+    olecranon.position.set(elbow.x, elbow.y, elbow.z - 0.010)
+    addMesh(armGroup, olecranon)
 
-      upLegBone.add(femurGroup)
-      skeletonGroup.add(femurGroup)
+    // Dual Forearm shafts
+    const ulnaEnd = new THREE.Vector3(wrist.x - xDir * 0.010, wrist.y, wrist.z)
+    const radiusEnd = new THREE.Vector3(wrist.x + xDir * 0.012, wrist.y, wrist.z)
+    addCylinderSegment(armGroup, elbow, ulnaEnd, 0.009, 0.007, boneMat)
+    addCylinderSegment(armGroup, elbow, radiusEnd, 0.008, 0.010, boneMat)
 
-      if (isRight) {
-        jointBones['hip'] = femurGroup
-        jointBones['knee'] = femurGroup
+    // Carpal Wrist Cluster & Hand Bones
+    const handGroup = new THREE.Group()
+    const carpal = new THREE.Mesh(new THREE.BoxGeometry(0.030, 0.022, 0.014), boneMat)
+    carpal.position.copy(wrist)
+    addMesh(handGroup, carpal)
 
-        // Hip Total Arthroplasty Implant (Titanium stem + BIOLOX Ceramic head)
-        const hipImplant = new THREE.Group()
-        hipImplant.name = 'HipImplant'
-
-        const ceramicHead = new THREE.Mesh(
-          new THREE.SphereGeometry(0.029, 20, 20),
-          new THREE.MeshStandardMaterial({ color: 0xff8c42, roughness: 0.08, metalness: 0.1 })
-        )
-        ceramicHead.position.set(xMult * 0.028, 0.022, 0.005)
-        hipImplant.add(ceramicHead)
-
-        const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.008, 0.18, 12), titaniumMat)
-        stem.position.set(0, 0.08, 0)
-        hipImplant.add(stem)
-
-        hipImplant.visible = false
-        upLegBone.add(hipImplant)
-        jointImplants['hip'] = hipImplant
-
-        // Knee Arthroplasty Implant (Cobalt-Chrome Femoral Shield)
-        const kneeFemoralImplant = new THREE.Group()
-        kneeFemoralImplant.name = 'KneeFemoralImplant'
-        const shieldGeo = new THREE.CylinderGeometry(0.036, 0.036, 0.046, 16, 1, false, 0, Math.PI)
-        const shield = new THREE.Mesh(shieldGeo, coCrMat)
-        shield.position.set(0, 0.445, 0.005)
-        shield.rotation.z = Math.PI / 2
-        kneeFemoralImplant.add(shield)
-
-        kneeFemoralImplant.visible = false
-        upLegBone.add(kneeFemoralImplant)
-        jointImplants['knee_femur'] = kneeFemoralImplant
-      }
+    for (let f = -2; f <= 2; f++) {
+      const phalanx = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.003, 0.065, 8), boneMat)
+      phalanx.position.set(wrist.x + f * 0.006, wrist.y - 0.040, wrist.z + 0.01)
+      addMesh(handGroup, phalanx)
     }
+    armGroup.add(handGroup)
 
-    // Tibia & Fibula (Lower Leg) - length ~0.444 along local Y
-    const legBone = boneMap[`${side}Leg`]
-    if (legBone) {
-      const tibiaGroup = new THREE.Group()
-      tibiaGroup.name = `${side}TibiaFibula`
+    skeletonGroup.add(armGroup)
 
-      // Tibial Plateau (Articular Knee surface)
-      const plateau = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.024, 0.024, 16), boneMat)
-      plateau.position.set(0, 0.012, 0)
-      tibiaGroup.add(plateau)
+    if (isLeft) {
+      jointBones['shoulder'] = armGroup
+      jointBones['elbow'] = armGroup
 
-      // Meniscal Cartilage Cushions
-      const meniscus = new THREE.Mesh(new THREE.TorusGeometry(0.024, 0.005, 8, 16), cartilageMat)
-      meniscus.rotation.x = Math.PI / 2
-      meniscus.position.set(0, 0.004, 0)
-      tibiaGroup.add(meniscus)
+      // Shoulder Rotator Cuff Titanium Anchor Screws
+      const shoulderImplant = new THREE.Group()
+      shoulderImplant.name = 'ShoulderImplant'
 
-      // Tibial Shaft (Sharp anterior crest)
-      const tibiaShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.014, 0.38, 14), boneMat)
-      tibiaShaft.position.set(0, 0.20, 0)
-      tibiaGroup.add(tibiaShaft)
+      const anchor1 = new THREE.Mesh(new THREE.ConeGeometry(0.005, 0.018, 8), titaniumMat)
+      anchor1.position.set(arm.x + 0.025, arm.y + 0.015, arm.z + 0.01)
+      anchor1.rotation.z = -0.5
+      shoulderImplant.add(anchor1)
 
-      // Medial Malleolus at Ankle
-      const medMalleolus = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.028, 0.024), boneMat)
-      medMalleolus.position.set(-xMult * 0.014, 0.42, 0)
-      tibiaGroup.add(medMalleolus)
+      const anchor2 = new THREE.Mesh(new THREE.ConeGeometry(0.005, 0.018, 8), titaniumMat)
+      anchor2.position.set(arm.x - 0.022, arm.y + 0.015, arm.z + 0.01)
+      anchor2.rotation.z = 0.5
+      shoulderImplant.add(anchor2)
 
-      // Fibula (Slender lateral bone)
-      const fibulaShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.39, 10), boneMat)
-      fibulaShaft.position.set(xMult * 0.024, 0.21, 0)
-      tibiaGroup.add(fibulaShaft)
+      shoulderImplant.visible = false
+      skeletonGroup.add(shoulderImplant)
+      jointImplants['shoulder'] = shoulderImplant
 
-      // Lateral Malleolus
-      const latMalleolus = new THREE.Mesh(new THREE.SphereGeometry(0.012, 10, 10), boneMat)
-      latMalleolus.position.set(xMult * 0.024, 0.425, 0)
-      tibiaGroup.add(latMalleolus)
+      // Elbow Surgical Locking Compression Plate
+      const elbowImplant = new THREE.Group()
+      elbowImplant.name = 'ElbowImplant'
 
-      legBone.add(tibiaGroup)
-      skeletonGroup.add(tibiaGroup)
+      const ePlate = new THREE.Mesh(new THREE.BoxGeometry(0.014, 0.075, 0.004), titaniumMat)
+      ePlate.position.set(elbow.x, elbow.y + 0.02, elbow.z - 0.014)
+      elbowImplant.add(ePlate)
 
-      if (isRight) {
-        jointBones['ankle'] = tibiaGroup
-
-        // Knee Tibial Tray & Polyethylene Insert
-        const kneeTibialImplant = new THREE.Group()
-        kneeTibialImplant.name = 'KneeTibialImplant'
-
-        const polyInsert = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.009, 16), polyMat)
-        polyInsert.position.set(0, 0.006, 0)
-        kneeTibialImplant.add(polyInsert)
-
-        const tray = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.034, 0.007, 16), titaniumMat)
-        tray.position.set(0, 0.015, 0)
-        kneeTibialImplant.add(tray)
-
-        const keel = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.004, 0.04, 12), titaniumMat)
-        keel.position.set(0, 0.035, 0)
-        kneeTibialImplant.add(keel)
-
-        kneeTibialImplant.visible = false
-        legBone.add(kneeTibialImplant)
-        jointImplants['knee'] = kneeTibialImplant
-
-        // Ankle Surgical Fixation Screws
-        const ankleImplant = new THREE.Group()
-        ankleImplant.name = 'AnkleImplant'
-        const plate = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.065, 0.004), titaniumMat)
-        plate.position.set(0.026, 0.38, 0)
-        ankleImplant.add(plate)
-
-        for (let s = 0; s < 3; s++) {
-          const screw = new THREE.Mesh(new THREE.CylinderGeometry(0.0025, 0.0025, 0.024, 8), coCrMat)
-          screw.position.set(0.018, 0.36 + s * 0.02, 0)
-          screw.rotation.z = Math.PI / 2
-          ankleImplant.add(screw)
-        }
-        ankleImplant.visible = false
-        legBone.add(ankleImplant)
-        jointImplants['ankle'] = ankleImplant
-      }
-    }
-
-    // Foot (Talus, Calcaneus, Metatarsals)
-    const footBone = boneMap[`${side}Foot`]
-    if (footBone) {
-      const footGroup = new THREE.Group()
-      footGroup.name = `${side}Foot`
-
-      // Talus (Ankle dome)
-      const talus = new THREE.Mesh(new THREE.SphereGeometry(0.022, 14, 14), boneMat)
-      talus.position.set(0, 0.015, 0.015)
-      footGroup.add(talus)
-
-      // Calcaneus (Heel bone)
-      const calcaneus = new THREE.Mesh(new THREE.BoxGeometry(0.028, 0.032, 0.065), boneMat)
-      calcaneus.position.set(0, 0.025, -0.035)
-      footGroup.add(calcaneus)
-
-      // 5 Metatarsal Rays
-      for (let m = -2; m <= 2; m++) {
-        const ray = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.005, 0.08, 8), boneMat)
-        ray.position.set(m * 0.008, 0.01, 0.07)
-        ray.rotation.x = Math.PI / 2
-        footGroup.add(ray)
+      for (let s = 0; s < 3; s++) {
+        const screw = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.018, 8), coCrMat)
+        screw.position.set(elbow.x, elbow.y + s * 0.022, elbow.z - 0.006)
+        screw.rotation.x = Math.PI / 2
+        elbowImplant.add(screw)
       }
 
-      footBone.add(footGroup)
-      skeletonGroup.add(footGroup)
+      elbowImplant.visible = false
+      skeletonGroup.add(elbowImplant)
+      jointImplants['elbow'] = elbowImplant
     }
   })
 
-  // Initially full skeleton is hidden until Skeleton/X-Ray mode is activated or a joint is inspected
+  // By default, skeleton is visible in scanner/skeleton modes
   skeletonGroup.visible = false
 
   return {
     skeletonGroup,
     jointImplants,
     jointBones,
+    skeletonMeshes,
   }
 }
