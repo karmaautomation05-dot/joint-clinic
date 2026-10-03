@@ -33,7 +33,7 @@ export const JOINTS_3D_DATA: Joint3DInfo[] = [
     id: 'shoulder',
     label: 'Shoulder',
     boneName: 'LeftArm',
-    surfaceOffset: [0.08, 0.02, 0.08],
+    surfaceOffset: [0.06, 0.03, 0.10],
     camOffset: [0, 0.02, 0.92],
     color: '#059B8F',
   },
@@ -49,7 +49,7 @@ export const JOINTS_3D_DATA: Joint3DInfo[] = [
     id: 'elbow',
     label: 'Elbow',
     boneName: 'LeftForeArm',
-    surfaceOffset: [0.08, 0.02, 0.04],
+    surfaceOffset: [0.05, 0.02, 0.08],
     camOffset: [0, 0.02, 0.88],
     color: '#0A7C97',
   },
@@ -352,14 +352,94 @@ export default function Ortho3DHuman({
           model.position.y = -box.min.y * scale - 0.95
           model.position.z = -center.z * scale
 
-          // Enable shadows and configure high quality rendering
+          // Extract anatomical bones to pose armature into natural relaxed standing posture
+          const boneMap: Record<string, any> = {}
+          model.traverse((child: any) => {
+            if (child.isBone) {
+              boneMap[child.name] = child
+            }
+          })
+
+          // Eliminate stiff dummy A-pose: pose arms to hang naturally at the sides of the thighs
+          if (boneMap['LeftArm']) {
+            boneMap['LeftArm'].rotation.x += 0.44
+            boneMap['LeftArm'].rotation.z += 0.05
+          }
+          if (boneMap['RightArm']) {
+            boneMap['RightArm'].rotation.x += 0.44
+            boneMap['RightArm'].rotation.z -= 0.05
+          }
+
+          // Gentle natural elbow flexion (~10-15 degrees forward)
+          if (boneMap['LeftForeArm']) {
+            boneMap['LeftForeArm'].rotation.z += 0.14
+            boneMap['LeftForeArm'].rotation.y += 0.04
+          }
+          if (boneMap['RightForeArm']) {
+            boneMap['RightForeArm'].rotation.z -= 0.14
+            boneMap['RightForeArm'].rotation.y -= 0.04
+          }
+
+          // Natural inward resting palm orientation toward the body
+          if (boneMap['LeftHand']) {
+            boneMap['LeftHand'].rotation.y += 0.18
+            boneMap['LeftHand'].rotation.x += 0.05
+          }
+          if (boneMap['RightHand']) {
+            boneMap['RightHand'].rotation.y -= 0.18
+            boneMap['RightHand'].rotation.x += 0.05
+          }
+
+          // Relax shoulders down into confident clinical posture
+          if (boneMap['LeftShoulder']) {
+            boneMap['LeftShoulder'].rotation.z += 0.04
+          }
+          if (boneMap['RightShoulder']) {
+            boneMap['RightShoulder'].rotation.z -= 0.04
+          }
+
+          // Upright, distinguished spine
+          if (boneMap['Spine1']) {
+            boneMap['Spine1'].rotation.x -= 0.03
+          }
+
+          // Enable shadows and configure distinguished middle-aged doctor / clinical aesthetic
           model.traverse((child: any) => {
             if (child.isMesh) {
               child.castShadow = true
               child.receiveShadow = true
               if (child.material) {
-                child.material.roughness = Math.max(0.35, child.material.roughness || 0.4)
-                child.material.metalness = Math.min(0.25, child.material.metalness || 0.1)
+                if (child.name === 'Wolf3D_Hair') {
+                  // Mature salt-and-pepper / refined charcoal tone
+                  child.material.color.setHex(0x52525b)
+                  child.material.roughness = 0.85
+                  child.material.metalness = 0.02
+                } else if (child.name === 'Wolf3D_Outfit_Top') {
+                  // Tailored deep navy clinical/orthopedic shirt
+                  child.material.color.setHex(0x1e293b)
+                  child.material.roughness = 0.75
+                  child.material.metalness = 0.05
+                } else if (child.name === 'Wolf3D_Outfit_Bottom') {
+                  // Crisp formal slate trousers
+                  child.material.color.setHex(0x334155)
+                  child.material.roughness = 0.80
+                  child.material.metalness = 0.02
+                } else if (child.name === 'Wolf3D_Outfit_Footwear') {
+                  // Polished black leather dress shoes
+                  child.material.color.setHex(0x111827)
+                  child.material.roughness = 0.35
+                  child.material.metalness = 0.15
+                } else if (child.name === 'Wolf3D_Skin' || child.name === 'Wolf3D_Body') {
+                  // Natural mature skin tone with realistic subsurface roughness
+                  child.material.roughness = 0.58
+                  child.material.metalness = 0.0
+                } else if (child.name === 'Wolf3D_Eye') {
+                  child.material.roughness = 0.12
+                  child.material.metalness = 0.0
+                } else {
+                  child.material.roughness = Math.max(0.35, child.material.roughness || 0.4)
+                  child.material.metalness = Math.min(0.25, child.material.metalness || 0.1)
+                }
                 child.material.needsUpdate = true
               }
             }
@@ -367,14 +447,6 @@ export default function Ortho3DHuman({
 
           characterGroup.add(model)
           model.updateMatrixWorld(true)
-
-          // Extract exact anatomical bone positions
-          const boneMap: Record<string, any> = {}
-          model.traverse((child: any) => {
-            if (child.isBone) {
-              boneMap[child.name] = child
-            }
-          })
 
           // Attach each 3D Pin RIGIDLY directly to the exact bone surface
           JOINTS_3D_DATA.forEach((j) => {
@@ -390,9 +462,9 @@ export default function Ortho3DHuman({
             } else {
               if (j.id === 'knee') pinPos.set(-0.11, -0.34, 0.13)
               if (j.id === 'hip') pinPos.set(-0.14, 0.08, 0.17)
-              if (j.id === 'shoulder') pinPos.set(0.25, 0.44, 0.08)
+              if (j.id === 'shoulder') pinPos.set(0.24, 0.44, 0.10)
               if (j.id === 'spine') pinPos.set(0.0, 0.28, -0.16)
-              if (j.id === 'elbow') pinPos.set(0.42, 0.22, 0.04)
+              if (j.id === 'elbow') pinPos.set(0.25, 0.14, 0.08)
               if (j.id === 'ankle') pinPos.set(-0.12, -0.78, 0.16)
             }
 
