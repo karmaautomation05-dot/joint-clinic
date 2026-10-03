@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { ArrowRight, CheckCircle2, Phone, Calendar } from 'lucide-react'
 import { getAnatomyType } from '@/utils/anatomy'
+import type { ScanMode } from './Ortho3DHuman'
 
 // Dynamically import the WebGL 3D clothed human male with SSR disabled
 const Ortho3DHuman = dynamic(() => import('./Ortho3DHuman'), {
@@ -165,7 +166,7 @@ const JOINTS: JointZone[] = [
 
 export default function BodyMapSelector() {
   const [activeJointId, setActiveJointId] = useState<string | null>(null)
-  const [viewMode, setViewMode] = useState<'normal' | 'skeleton'>('normal')
+  const [viewMode, setViewMode] = useState<ScanMode>('scanner')
   const [rightPanelTab, setRightPanelTab] = useState<'protocol' | 'anatomy'>('protocol')
 
   const activeJoint = activeJointId ? JOINTS.find((j) => j.id === activeJointId) : null
@@ -188,35 +189,50 @@ export default function BodyMapSelector() {
             Explore Your Joint &amp; Treatment
           </h2>
           <p className="text-sm sm:text-base md:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-            View the full 3D human body below. Click any joint pin or select a body part to focus the camera and inspect Dr. Gaurav Bhargava&apos;s specialized surgical procedures in high-definition X-Ray.
+            View the full 3D human body below. Drag the interactive X-Ray scanner beam, or click any joint to focus the camera and inspect Dr. Gaurav Bhargava&apos;s specialized surgical procedures.
           </p>
         </div>
 
         {/* Clean Body Part & View Mode Selection Bar */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-8 sm:mb-10">
-          {/* Normal Clothed vs Full Skeleton View Toggle */}
-          <div className="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200 shadow-xs mr-1">
+          {/* Normal Clothed vs Scanner vs Full Skeleton View Toggle */}
+          <div className="flex items-center bg-slate-900/90 text-white p-1 rounded-2xl border border-slate-700 shadow-md mr-1">
             <button
               type="button"
               onClick={() => setViewMode('normal')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'normal'
                   ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  : 'text-slate-300 hover:text-white'
               }`}
+              title="Normal Clothed Gentleman"
             >
               <span>👤 Clothed</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('scanner')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                viewMode === 'scanner'
+                  ? 'bg-[#00ffea] text-slate-950 shadow-xs shadow-[#00ffea]/30'
+                  : 'text-slate-300 hover:text-[#00ffea]'
+              }`}
+              title="Interactive Dynamic X-Ray Scanner Beam"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00ffea] animate-pulse" />
+              <span>⚡ X-Ray Scanner</span>
             </button>
             <button
               type="button"
               onClick={() => setViewMode('skeleton')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'skeleton'
-                  ? 'bg-brand-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-brand-700'
+                  ? 'bg-brand-500 text-white shadow-xs'
+                  : 'text-slate-300 hover:text-white'
               }`}
+              title="Full Body Anatomical Skeleton"
             >
-              <span>🦴 Skeleton X-Ray</span>
+              <span>🦴 Full Skeleton</span>
             </button>
           </div>
 

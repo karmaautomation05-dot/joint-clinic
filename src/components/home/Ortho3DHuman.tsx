@@ -64,12 +64,14 @@ export const JOINTS_3D_DATA: Joint3DInfo[] = [
   },
 ]
 
+export type ScanMode = 'normal' | 'scanner' | 'skeleton'
+
 interface Ortho3DHumanProps {
   activeJointId: string | null
   onSelectJoint: (id: string | null) => void
   activeColor: string
-  viewMode?: 'normal' | 'skeleton'
-  onToggleViewMode?: (mode: 'normal' | 'skeleton') => void
+  viewMode?: ScanMode
+  onToggleViewMode?: (mode: ScanMode) => void
 }
 
 export default function Ortho3DHuman({
@@ -85,22 +87,31 @@ export default function Ortho3DHuman({
   const [isLoading, setIsLoading] = useState(true)
   const [loadProgress, setLoadProgress] = useState(0)
 
-  // View Mode: 'normal' (middle-aged gentleman) vs 'skeleton' (full-body skeletal X-Ray)
-  const [internalViewMode, setInternalViewMode] = useState<'normal' | 'skeleton'>('normal')
+  // View Mode: 'normal' (No Scanner) | 'scanner' (Interactive Beam) | 'skeleton' (Big Scanner)
+  const [internalViewMode, setInternalViewMode] = useState<ScanMode>('scanner')
   const viewMode = propViewMode ?? internalViewMode
   const setViewMode = useCallback(
-    (mode: 'normal' | 'skeleton') => {
+    (mode: ScanMode) => {
       setInternalViewMode(mode)
       onToggleViewMode?.(mode)
     },
     [onToggleViewMode]
   )
 
-  // In joint X-Ray view: toggle native joint anatomy vs surgical replacement implant
+  // Scanner vertical center: range from -0.80 (feet) to +0.75 (head)
+  const [scannerY, setScannerY] = useState(0.12)
   const [showImplant, setShowImplant] = useState(false)
 
   useEffect(() => {
     setShowImplant(false)
+    if (activeJointId) {
+      if (activeJointId === 'knee') setScannerY(-0.34)
+      if (activeJointId === 'hip') setScannerY(0.08)
+      if (activeJointId === 'shoulder') setScannerY(0.44)
+      if (activeJointId === 'spine') setScannerY(0.28)
+      if (activeJointId === 'elbow') setScannerY(0.18)
+      if (activeJointId === 'ankle') setScannerY(-0.75)
+    }
   }, [activeJointId])
 
   // Full body camera initial view: z = 3.10 perfectly fits 1.85m human male head-to-toe
@@ -118,7 +129,8 @@ export default function Ortho3DHuman({
   const stateRef = useRef<{
     selectJoint?: (id: string | null) => void
     resetView?: () => void
-    applyVisualMode?: (mode: 'normal' | 'skeleton', activeJoint: string | null, implant: boolean) => void
+    applyVisualMode?: (mode: ScanMode, activeJoint: string | null, implant: boolean, yCenter: number) => void
+    setTargetScannerY?: (y: number) => void
   }>({})
 
   useEffect(() => {
@@ -350,6 +362,11 @@ export default function Ortho3DHuman({
         jointCoordinates[j.id] = pos.clone()
       }
 
+      // Scanner animation state in init3D scope
+      let currentScannerY = scannerY
+      let targetScannerY = scannerY
+      let updateScannerPlanesFn: ((y: number) => void) | null = null
+
       // ── LOAD REAL 3D CLOTHED HUMAN MALE GLB ──────────────────────────────
       const loader = new GLTFLoader()
 
@@ -469,9 +486,26 @@ export default function Ortho3DHuman({
             }
           })
 
+          renderer.localClippingEnabled = true
+
           // Build smooth, realistic anatomical skeleton and surgical implants directly on armature bones
           const skeletonResult = buildFullBodySkeleton(THREE as any, boneMap)
           characterGroup.add(skeletonResult.skeletonGroup)
+
+          // Clipping planes for dynamic scanner beam window
+          const scanHeight = 0.38
+          const planeSkelTop = new THREE.Plane(new THREE.Vector3(0, -1, 0), 0.19)
+          const planeSkelBottom = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.19)
+          const planeClothesTop = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.19)
+          const planeClothesBottom = new THREE.Plane(new THREE.Vector3(0, -1, 0), -0.19)
+
+          // Collect all skeleton meshes for clipping
+          const skeletonGroupMeshes: any[] = []
+          skeletonResult.skeletonGroup.traverse((child: any) => {
+            if (child.isMesh && child.material) {
+              skeletonGroupMeshes.push(child)
+            }
+          })
 
           // Store mesh material information for switching between Normal and Skeleton/X-Ray
           const avatarMeshes: Array<{
@@ -492,30 +526,82 @@ export default function Ortho3DHuman({
             }
           })
 
-          function applyVisualMode(
-            mode: 'normal' | 'skeleton',
-            jointId: string | null,
-            implant: boolean
-          ) {
-            const isXray = mode === 'skeleton' || jointId !== null
+          function updateScannerPlanes(yCenter: number) {
+            const yMin = yCenter - scanHeight / 2
+            const yMax = yCenter + scanHeight / 2
+            planeSkelTop.constant = yMax
+            planeSkelBottom.constant = -yMin
+            planeClothesTop.constant = -yMax
+            planeClothesBottom.constant = yMin
+          }
+          updateScannerPlanesFn = updateScannerPlanes
 
-            if (isXray) {
-              skeletonResult.skeletonGroup.visible = true
-              avatarMeshes.forEach((item) => {
-                const mat = item.mesh.material
-                if (mat) {
-                  mat.transparent = true
-                  mat.opacity = mode === 'skeleton' ? 0.16 : 0.22
-                  mat.depthWrite = false
-                  mat.color.setHex(0x38bdf8) // Medical cyan radiograph tone
-                  mat.needsUpdate = true
-                }
-              })
-            } else {
+          stateRef.current.setTargetScannerY = (y: number) => {
+            targetScannerY = y
+          }
+
+          function applyVisualMode(
+            mode: ScanMode,
+            jointId: string | null,
+            implant: boolean,
+            yCenter: number
+          ) {
+            let activeY = yCenter
+            if (jointId && jointCoordinates[jointId]) {
+              activeY = jointCoordinates[jointId].y
+              targetScannerY = activeY
+            }
+
+            if (mode === 'normal' && !jointId) {
+              // 1. NO SCANNER (Normal Clothed Gentleman)
               skeletonResult.skeletonGroup.visible = false
               avatarMeshes.forEach((item) => {
                 const mat = item.mesh.material
                 if (mat) {
+                  mat.clippingPlanes = null
+                  mat.transparent = false
+                  mat.opacity = 1.0
+                  mat.depthWrite = true
+                  mat.color.copy(item.originalColor)
+                  mat.roughness = item.originalRoughness
+                  mat.metalness = item.originalMetalness
+                  mat.needsUpdate = true
+                }
+              })
+            } else if (mode === 'skeleton' && !jointId) {
+              // 2. BIG SCANNER (Full Body Skeleton)
+              skeletonResult.skeletonGroup.visible = true
+              skeletonGroupMeshes.forEach((m) => {
+                m.material.clippingPlanes = null
+                m.material.needsUpdate = true
+              })
+              avatarMeshes.forEach((item) => {
+                const mat = item.mesh.material
+                if (mat) {
+                  mat.clippingPlanes = null
+                  mat.transparent = true
+                  mat.opacity = 0.16
+                  mat.depthWrite = false
+                  mat.color.setHex(0x38bdf8) // Cyan radiograph silhouette
+                  mat.needsUpdate = true
+                }
+              })
+            } else {
+              // 3. DYNAMIC X-RAY SCANNER (or Focused Joint): Clipping beam active!
+              updateScannerPlanes(activeY)
+              skeletonResult.skeletonGroup.visible = true
+
+              skeletonGroupMeshes.forEach((m) => {
+                m.material.clippingPlanes = [planeSkelTop, planeSkelBottom]
+                m.material.clipIntersection = false
+                m.material.needsUpdate = true
+              })
+
+              avatarMeshes.forEach((item) => {
+                const mat = item.mesh.material
+                if (mat) {
+                  mat.clippingPlanes = [planeClothesTop, planeClothesBottom]
+                  mat.clipIntersection = true
                   mat.transparent = false
                   mat.opacity = 1.0
                   mat.depthWrite = true
@@ -541,7 +627,7 @@ export default function Ortho3DHuman({
           }
 
           stateRef.current.applyVisualMode = applyVisualMode
-          applyVisualMode(viewMode, activeJointId, showImplant)
+          applyVisualMode(viewMode, activeJointId, showImplant, scannerY)
 
           characterGroup.add(model)
           model.updateMatrixWorld(true)
@@ -759,6 +845,12 @@ export default function Ortho3DHuman({
         characterGroup.rotation.y += (targetRotY - characterGroup.rotation.y) * 0.08
         characterGroup.rotation.x += (targetRotX - characterGroup.rotation.x) * 0.08
 
+        // Smooth dynamic scanner motion interpolation
+        if (Math.abs(targetScannerY - currentScannerY) > 0.001) {
+          currentScannerY += (targetScannerY - currentScannerY) * 0.15
+          updateScannerPlanesFn?.(currentScannerY)
+        }
+
         // Buttery-smooth camera glide transition (exponential ease-out)
         const trans = transitionRef.current
         if (trans.isTransitioning) {
@@ -849,12 +941,15 @@ export default function Ortho3DHuman({
     }
   }, [activeJointId])
 
-  // React to viewMode, activeJointId, or showImplant changes
+  // React to viewMode, activeJointId, showImplant, or scannerY changes
   useEffect(() => {
-    if (stateRef.current.applyVisualMode) {
-      stateRef.current.applyVisualMode(viewMode, activeJointId, showImplant)
+    if (stateRef.current.setTargetScannerY) {
+      stateRef.current.setTargetScannerY(scannerY)
     }
-  }, [viewMode, activeJointId, showImplant])
+    if (stateRef.current.applyVisualMode) {
+      stateRef.current.applyVisualMode(viewMode, activeJointId, showImplant, scannerY)
+    }
+  }, [viewMode, activeJointId, showImplant, scannerY])
 
   const handleResetCamera = useCallback(() => {
     onSelectJoint(null)
@@ -864,6 +959,12 @@ export default function Ortho3DHuman({
   }, [onSelectJoint])
 
   const activeJointInfo = activeJointId ? JOINTS_3D_DATA.find((j) => j.id === activeJointId) : null
+
+  // Calculate vertical percentage for the floating scanner frame
+  // scannerY ranges from -0.80 (feet) to +0.75 (head) -> screenTopPercent from 84% to 14%
+  const clampedY = Math.max(-0.80, Math.min(0.75, scannerY))
+  const t = (clampedY - -0.80) / 1.55
+  const screenTopPercent = 84 - t * 70
 
   return (
     <div
@@ -892,31 +993,78 @@ export default function Ortho3DHuman({
         className="w-full h-full cursor-grab active:cursor-grabbing block"
       />
 
-      {/* View Mode Toggle: Normal View vs Full Body Skeleton X-Ray (Top Left) */}
-      <div className="absolute top-4 left-4 z-20 flex items-center bg-white/95 backdrop-blur-md p-1 rounded-full border border-slate-200 shadow-md">
+      {/* Floating Medical X-Ray Scanner Frame (Josetxu Style with Neon Cyan Glow) */}
+      {(viewMode === 'scanner' || activeJointId) && (
+        <div
+          className="absolute inset-x-6 sm:inset-x-12 md:inset-x-20 pointer-events-none transition-all duration-150 ease-out z-10"
+          style={{
+            top: `${screenTopPercent}%`,
+            transform: 'translateY(-50%)',
+            height: activeJointId ? '32%' : '26%',
+          }}
+        >
+          <div className="w-full h-full rounded-2xl border-2 sm:border-[3px] border-[#00ffea] shadow-[0_0_24px_rgba(0,255,234,0.45),_inset_0_0_16px_rgba(0,255,234,0.2)] bg-gradient-to-b from-[#00ffea]/10 via-transparent to-[#00ffea]/10 relative overflow-hidden backdrop-brightness-105">
+            {/* Center animated laser scanning beam */}
+            <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-[#00ffea] to-transparent shadow-[0_0_12px_#00ffea] animate-pulse top-1/2 -translate-y-1/2" />
+
+            {/* Corner Bracket Reticles */}
+            <div className="absolute top-1 left-1 w-3 h-3 border-t-2 border-l-2 border-[#00ffea]" />
+            <div className="absolute top-1 right-1 w-3 h-3 border-t-2 border-r-2 border-[#00ffea]" />
+            <div className="absolute bottom-1 left-1 w-3 h-3 border-b-2 border-l-2 border-[#00ffea]" />
+            <div className="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2 border-[#00ffea]" />
+
+            {/* Technical HUD Readout */}
+            <div className="absolute top-2 left-3 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00ffea] animate-ping" />
+              <span className="text-[10px] font-mono font-bold text-[#00ffea] tracking-wider uppercase">
+                {activeJointId ? `${activeJointId.toUpperCase()} PROJECTION` : 'X-RAY SCANNER BEAM'}
+              </span>
+            </div>
+            <div className="absolute bottom-2 right-3 text-[10px] font-mono text-[#00ffea]/90 hidden sm:block">
+              78 kVp • 12 mAs • DIGITAL RADIOGRAPHY
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3-Mode Switcher: Clothed (No Scanner) | X-Ray Scanner | Full Skeleton (Big Scanner) */}
+      <div className="absolute top-4 left-4 z-20 flex items-center bg-slate-900/90 backdrop-blur-md p-1 rounded-2xl border border-slate-700/80 shadow-xl">
         <button
           type="button"
           onClick={() => setViewMode('normal')}
-          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
             viewMode === 'normal'
-              ? 'bg-slate-900 text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              ? 'bg-white text-slate-900 shadow-sm'
+              : 'text-slate-300 hover:text-white hover:bg-slate-800'
           }`}
-          title="Switch to Normal Clothed Male View"
+          title="No Scanner: Normal Clothed Gentleman"
         >
-          <span>👤 Normal</span>
+          <span>👤 Clothed</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setViewMode('scanner')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+            viewMode === 'scanner'
+              ? 'bg-[#00ffea] text-slate-950 shadow-sm shadow-[#00ffea]/30'
+              : 'text-slate-300 hover:text-[#00ffea] hover:bg-slate-800'
+          }`}
+          title="Dynamic Scanner: Interactive Sliding Beam"
+        >
+          <span className="w-2 h-2 rounded-full bg-[#00ffea] animate-pulse" />
+          <span>⚡ X-Ray Scanner</span>
         </button>
         <button
           type="button"
           onClick={() => setViewMode('skeleton')}
-          className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
             viewMode === 'skeleton'
-              ? 'bg-brand-600 text-white shadow-xs shadow-brand-500/20'
-              : 'text-slate-600 hover:text-brand-700 hover:bg-slate-100'
+              ? 'bg-brand-500 text-white shadow-sm'
+              : 'text-slate-300 hover:text-white hover:bg-slate-800'
           }`}
-          title="Switch to Full Body Anatomical Skeleton X-Ray"
+          title="Big Scanner: Full Body Skeleton X-Ray"
         >
-          <span>🦴 Skeleton X-Ray</span>
+          <span>🦴 Full Skeleton</span>
         </button>
       </div>
 
@@ -945,6 +1093,68 @@ export default function Ortho3DHuman({
           <span>↺ Full Body</span>
         </button>
       </div>
+
+      {/* 20-Zone Vertical Anatomical Scan Rail (Josetxu .x-ray Hover/Drag Zones) */}
+      {viewMode === 'scanner' && !activeJointId && (
+        <div className="absolute right-3.5 top-20 bottom-20 z-20 flex flex-col items-center justify-between pointer-events-auto select-none">
+          <span className="text-[9px] font-mono font-bold text-slate-400 uppercase -rotate-90 origin-center mb-4">
+            HEAD
+          </span>
+          <div className="flex-1 w-6 relative flex flex-col justify-between py-2 bg-slate-900/60 backdrop-blur-md rounded-full border border-slate-700/80 p-1 shadow-lg">
+            {Array.from({ length: 20 }).map((_, idx) => {
+              const targetY = 0.75 - (idx / 19) * 1.50
+              const isClose = Math.abs(scannerY - targetY) < 0.08
+              return (
+                <div
+                  key={idx}
+                  onMouseEnter={() => {
+                    setScannerY(targetY)
+                    stateRef.current.setTargetScannerY?.(targetY)
+                  }}
+                  onClick={() => {
+                    setScannerY(targetY)
+                    stateRef.current.setTargetScannerY?.(targetY)
+                  }}
+                  className={`w-full h-1.5 rounded-full cursor-pointer transition-all ${
+                    isClose
+                      ? 'bg-[#00ffea] shadow-[0_0_8px_#00ffea] scale-x-125'
+                      : 'bg-slate-400/40 hover:bg-[#00ffea]/80'
+                  }`}
+                  title={`Scan Height Level ${20 - idx}`}
+                />
+              )
+            })}
+          </div>
+          <span className="text-[9px] font-mono font-bold text-slate-400 uppercase -rotate-90 origin-center mt-4">
+            FEET
+          </span>
+        </div>
+      )}
+
+      {/* Interactive Drag Scanner Bar & Level Readout (Bottom Center) */}
+      {viewMode === 'scanner' && !activeJointId && (
+        <div className="absolute bottom-3 inset-x-0 z-20 flex flex-col items-center justify-center gap-1.5 pointer-events-auto">
+          <div className="flex items-center gap-3 bg-slate-900/90 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-700/80 shadow-xl">
+            <span className="text-[11px] font-mono font-bold text-[#00ffea]">↕ SCAN:</span>
+            <input
+              type="range"
+              min="-0.75"
+              max="0.75"
+              step="0.01"
+              value={scannerY}
+              onChange={(e) => {
+                const val = parseFloat(e.target.value)
+                setScannerY(val)
+                stateRef.current.setTargetScannerY?.(val)
+              }}
+              className="w-36 sm:w-56 accent-[#00ffea] cursor-pointer"
+            />
+            <span className="text-[10px] font-mono text-slate-300">
+              {scannerY > 0.4 ? 'Head/Neck' : scannerY > 0.15 ? 'Chest/Ribs' : scannerY > -0.15 ? 'Pelvis/Hips' : scannerY > -0.5 ? 'Knee' : 'Ankles'}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Joint Anatomy vs Surgical Implant Toggle (Bottom Center when Joint is Active) */}
       {activeJointId && (
@@ -975,7 +1185,7 @@ export default function Ortho3DHuman({
       )}
 
       {/* Subtle Drag Hint (Bottom Center when in Full Body Overview) */}
-      {!activeJointId && (
+      {!activeJointId && viewMode !== 'scanner' && (
         <div className="absolute bottom-3 inset-x-0 pointer-events-none text-center hidden sm:block z-10">
           <span className="text-[11px] font-medium text-slate-500 bg-white/90 px-3.5 py-1 rounded-full border border-slate-200/80 shadow-xs">
             Drag to rotate 360° • Click any joint to inspect X-Ray &amp; Implants
