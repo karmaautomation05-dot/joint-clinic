@@ -44,7 +44,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation - Clean, Balanced Spacing Matching Medfemme */}
-        <nav className="hidden xl:flex items-center gap-4 xl:gap-5 2xl:gap-6">
+        <nav className="hidden xl:flex items-center gap-5 xl:gap-6">
           <Link
             href="/"
             className={`text-sm font-semibold transition-colors whitespace-nowrap ${
@@ -87,7 +87,6 @@ export default function Navbar() {
             Treatments &amp; Recovery
           </Link>
 
-          {/* Interchanged: Health Blog before Reviews */}
           <Link
             href="/blog"
             className={`text-sm font-semibold transition-colors whitespace-nowrap ${
@@ -97,17 +96,6 @@ export default function Navbar() {
             }`}
           >
             Health Blog
-          </Link>
-
-          <Link
-            href="/testimonials"
-            className={`text-sm font-semibold transition-colors whitespace-nowrap ${
-              isActive('/testimonials')
-                ? 'text-brand-600 font-bold'
-                : 'text-slate-600 hover:text-brand-600'
-            }`}
-          >
-            Reviews
           </Link>
 
           <Link
@@ -193,15 +181,6 @@ export default function Navbar() {
               onClick={() => setIsMenuOpen(false)}
             >
               Health Blog
-            </Link>
-            <Link
-              href="/testimonials"
-              className={`px-2 py-1.5 transition-colors ${
-                isActive('/testimonials') ? 'text-brand-600 font-bold' : 'hover:text-brand-600 font-semibold'
-              }`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Verified Patient Reviews
             </Link>
             <Link
               href="/contact"
