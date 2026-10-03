@@ -1,15 +1,22 @@
 'use client'
 
 import React from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, ArrowRight } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/common/WhatsAppIcon'
 import DoctorAnimatedCard from '@/components/common/DoctorAnimatedCard'
 
+const Hero3DScene = dynamic(() => import('./Hero3DScene'), { ssr: false })
+
 export default function Hero() {
   return (
     <section className="relative overflow-hidden bg-white">
+      {/* === Three.js Ambient Joint Sphere (right-side) === */}
+      <div className="absolute inset-y-0 right-0 w-full lg:w-[55%] pointer-events-none" style={{ zIndex: 0 }}>
+        <Hero3DScene />
+      </div>
       {/* Background ambient glowing orbs */}
       <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/3 w-[350px] sm:w-[500px] lg:w-[650px] h-[350px] sm:h-[500px] lg:h-[650px] bg-brand-100/50 rounded-full blur-3xl opacity-60 pointer-events-none" />
       <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-[300px] sm:w-[450px] h-[300px] sm:h-[450px] bg-accent-100/40 rounded-full blur-3xl opacity-50 pointer-events-none" />

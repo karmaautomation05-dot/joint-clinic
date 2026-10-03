@@ -3,6 +3,7 @@ import AboutDr from "@/components/home/AboutDr";
 import ServicesOverview from "@/components/home/ServicesOverview";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
 import Statistics from "@/components/home/Statistics";
+import BodyMapSelector from "@/components/home/BodyMapSelector";
 import VideoTestimonials from "@/components/home/VideoTestimonials";
 import FAQ from "@/components/home/FAQ";
 import AppointmentForm from "@/components/home/AppointmentForm";
@@ -16,6 +17,7 @@ export default function HomePage() {
       <ServicesOverview />
       <WhyChooseUs />
       <Statistics />
+      <BodyMapSelector />
       <VideoTestimonials />
       <FAQ />
       <AppointmentForm />
