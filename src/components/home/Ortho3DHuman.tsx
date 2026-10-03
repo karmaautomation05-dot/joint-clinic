@@ -17,48 +17,48 @@ export const JOINTS_3D_DATA: Joint3DInfo[] = [
     id: 'knee',
     label: 'Knee',
     boneName: 'RightLeg',
-    surfaceOffset: [0, 0.02, 0.11], // Front patellar surface of right knee
-    camOffset: [0, 0.02, 0.85],
+    surfaceOffset: [0, 0.02, 0.13], // Front patellar surface of right knee
+    camOffset: [0, 0.02, 0.88],
     color: '#02BAB9',
   },
   {
     id: 'hip',
     label: 'Hip',
     boneName: 'RightUpLeg',
-    surfaceOffset: [-0.08, 0.02, 0.08], // Lateral/front right hip joint
-    camOffset: [0, 0.02, 0.95],
+    surfaceOffset: [-0.07, 0.04, 0.17], // In front and lateral on anterior hip (no body clipping)
+    camOffset: [0, 0.03, 1.05],
     color: '#F18712',
   },
   {
     id: 'shoulder',
     label: 'Shoulder',
     boneName: 'LeftArm',
-    surfaceOffset: [0.08, 0.02, 0.06], // Left shoulder deltoid surface
-    camOffset: [0, 0.02, 0.90],
+    surfaceOffset: [0.08, 0.02, 0.08], // In front of left shoulder deltoid
+    camOffset: [0, 0.02, 0.92],
     color: '#059B8F',
   },
   {
     id: 'spine',
     label: 'Spine',
     boneName: 'Spine1',
-    surfaceOffset: [0, 0.0, -0.14], // Posterior surface of spine (back)
-    camOffset: [0.10, 0.02, -0.95],
+    surfaceOffset: [0, 0.0, -0.16], // Posterior surface of spine (back)
+    camOffset: [0.10, 0.02, -0.98],
     color: '#01B3BF',
   },
   {
     id: 'elbow',
     label: 'Elbow',
     boneName: 'LeftForeArm',
-    surfaceOffset: [0.07, 0.02, 0.02], // Lateral left elbow joint
-    camOffset: [0, 0.02, 0.85],
+    surfaceOffset: [0.08, 0.02, 0.04], // Lateral left elbow joint
+    camOffset: [0, 0.02, 0.88],
     color: '#0A7C97',
   },
   {
     id: 'ankle',
     label: 'Ankle',
     boneName: 'RightFoot',
-    surfaceOffset: [-0.04, 0.04, 0.06], // Lateral right ankle malleolus
-    camOffset: [0, 0.05, 0.80],
+    surfaceOffset: [-0.04, 0.06, 0.16], // In front of right ankle/footwear (no body clipping)
+    camOffset: [0, 0.06, 0.82],
     color: '#059B8F',
   },
 ]
@@ -244,11 +244,12 @@ export default function Ortho3DHuman({
         tex.minFilter = THREE.LinearFilter
         const mat = new THREE.SpriteMaterial({
           map: tex,
-          depthTest: true,
+          depthTest: false, // Ensures badge is NEVER cut through or hidden behind clothes
           depthWrite: false,
           transparent: true,
         })
         const sprite = new THREE.Sprite(mat)
+        sprite.renderOrder = 1000 // Always renders on top
         sprite.scale.set(0.22, 0.07, 1)
         return sprite
       }
@@ -258,41 +259,52 @@ export default function Ortho3DHuman({
         const pinGroup = new THREE.Group()
         pinGroup.position.copy(pos)
         pinGroup.name = j.id
+        pinGroup.renderOrder = 998
 
         const jColor = new THREE.Color(j.color)
 
         // 1. Center Spherical Jewel Pin
-        const orbGeo = new THREE.SphereGeometry(0.026, 16, 16)
+        const orbGeo = new THREE.SphereGeometry(0.028, 16, 16)
         const orbMat = new THREE.MeshStandardMaterial({
           color: jColor,
           emissive: jColor,
-          emissiveIntensity: 0.8,
+          emissiveIntensity: 0.9,
           roughness: 0.2,
           metalness: 0.3,
+          polygonOffset: true,
+          polygonOffsetFactor: -4,
+          polygonOffsetUnits: -4,
         })
         const orb = new THREE.Mesh(orbGeo, orbMat)
+        orb.renderOrder = 998
         orb.userData = { jointId: j.id }
         pinGroup.add(orb)
 
         // 2. Pulse Radar Ring
-        const ringGeo = new THREE.RingGeometry(0.038, 0.048, 32)
+        const ringGeo = new THREE.RingGeometry(0.040, 0.052, 32)
         const ringMat = new THREE.MeshBasicMaterial({
           color: jColor,
           transparent: true,
           opacity: 0.85,
           side: THREE.DoubleSide,
+          polygonOffset: true,
+          polygonOffsetFactor: -5,
+          polygonOffsetUnits: -5,
         })
         const ring = new THREE.Mesh(ringGeo, ringMat)
+        ring.renderOrder = 999
         pinGroup.add(ring)
 
         // 3. Glow Halo Sphere
-        const glowGeo = new THREE.SphereGeometry(0.046, 14, 14)
+        const glowGeo = new THREE.SphereGeometry(0.048, 14, 14)
         const glowMat = new THREE.MeshBasicMaterial({
           color: jColor,
           transparent: true,
-          opacity: 0.28,
+          opacity: 0.30,
+          depthTest: false,
         })
         const glow = new THREE.Mesh(glowGeo, glowMat)
+        glow.renderOrder = 997
         pinGroup.add(glow)
 
         // 4. Stuck 3D Sprite Label (Anchored rigidly beside the pin)
@@ -379,12 +391,12 @@ export default function Ortho3DHuman({
               pinPos.z += j.surfaceOffset[2]
             } else {
               // Safe default position if bone not resolved
-              if (j.id === 'knee') pinPos.set(-0.11, -0.34, 0.11)
-              if (j.id === 'hip') pinPos.set(-0.14, 0.08, 0.09)
-              if (j.id === 'shoulder') pinPos.set(0.25, 0.44, 0.06)
-              if (j.id === 'spine') pinPos.set(0.0, 0.28, -0.14)
-              if (j.id === 'elbow') pinPos.set(0.42, 0.22, 0.02)
-              if (j.id === 'ankle') pinPos.set(-0.12, -0.78, 0.06)
+              if (j.id === 'knee') pinPos.set(-0.11, -0.34, 0.13)
+              if (j.id === 'hip') pinPos.set(-0.14, 0.08, 0.17)
+              if (j.id === 'shoulder') pinPos.set(0.25, 0.44, 0.08)
+              if (j.id === 'spine') pinPos.set(0.0, 0.28, -0.16)
+              if (j.id === 'elbow') pinPos.set(0.42, 0.22, 0.04)
+              if (j.id === 'ankle') pinPos.set(-0.12, -0.78, 0.16)
             }
 
             create3DPin(j, pinPos)
