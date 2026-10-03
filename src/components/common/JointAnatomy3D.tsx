@@ -18,9 +18,9 @@ export interface CalloutPoint {
 const CALLOUTS_DATA: Record<AnatomyType, { surgical: CalloutPoint[]; recovery: CalloutPoint[] }> = {
   knee: {
     surgical: [
-      { id: 'femoral', title: 'Femoral Component', desc: 'Anatomically contoured cobalt-chrome femoral shield replicating natural condylar curvature.', pos: [0, 0.42, 0.46], color: '#02BAB9' },
+      { id: 'femoral', title: 'Femoral Component', desc: 'Anatomically contoured cobalt-chrome femoral shield replicating natural condylar curvature and trochlear groove.', pos: [0, 0.42, 0.46], color: '#02BAB9' },
       { id: 'poly', title: 'UHMWPE Bearing Insert', desc: 'Highly cross-linked polyethylene shock-absorbing insert for frictionless gliding and 25+ year durability.', pos: [0, 0.08, 0.50], color: '#F18712' },
-      { id: 'tibial', title: 'Tibial Baseplate', desc: 'Titanium alloy tibial tray providing sub-millimeter fixation to the proximal tibial bone bed.', pos: [0, -0.20, 0.45], color: '#059B8F' },
+      { id: 'tibial', title: 'Tibial Baseplate', desc: 'Titanium alloy tibial tray providing sub-millimeter fixation to the proximal tibial bone bed with central keel.', pos: [0, -0.20, 0.45], color: '#059B8F' },
       { id: 'patella', title: 'Patellar Tracking', desc: 'Preserved native kneecap with optimized trochlear groove tracking for natural, pain-free stair climbing.', pos: [0, 0.28, 0.62], color: '#0A7C97' },
     ],
     recovery: [
@@ -33,8 +33,8 @@ const CALLOUTS_DATA: Record<AnatomyType, { surgical: CalloutPoint[]; recovery: C
   hip: {
     surgical: [
       { id: 'acetabulum', title: 'Acetabular Cup', desc: 'Titanium shell with trabecular porous coating for rapid biological bone ingrowth.', pos: [0.18, 0.42, 0.26], color: '#02BAB9' },
-      { id: 'head', title: 'Ceramic Femoral Ball', desc: 'High-hardness BIOLOX ceramic head providing micro-smooth articulation and low friction.', pos: [0.12, 0.32, 0.20], color: '#F18712' },
-      { id: 'neck', title: 'Anatomical Offset Neck', desc: 'Restores exact limb length and abductor muscle biomechanics to prevent limping.', pos: [-0.06, 0.18, 0.16], color: '#0A7C97' },
+      { id: 'head', title: 'Ceramic Femoral Ball', desc: 'High-hardness BIOLOX Delta ceramic head providing micro-smooth articulation and low friction.', pos: [0.12, 0.32, 0.20], color: '#F18712' },
+      { id: 'neck', title: 'Anatomical Offset Neck', desc: '128° angle of inclination restores exact limb length and abductor muscle biomechanics.', pos: [-0.06, 0.18, 0.16], color: '#0A7C97' },
       { id: 'stem', title: 'Titanium Femoral Stem', desc: 'Triple-tapered femoral stem achieving rigid proximal press-fit fixation inside femoral canal.', pos: [-0.20, -0.25, 0.12], color: '#059B8F' },
     ],
     recovery: [
@@ -63,7 +63,7 @@ const CALLOUTS_DATA: Record<AnatomyType, { surgical: CalloutPoint[]; recovery: C
       { id: 'disc', title: 'Intervertebral Disc Space', desc: 'Cushioning fibrocartilage space maintaining neural foramen height between vertebrae.', pos: [0, 0.05, 0.26], color: '#02BAB9' },
       { id: 'herniation', title: 'Targeted Discectomy Site', desc: 'Microscopic removal of protruding disc fragment relieving mechanical nerve compression.', pos: [0.18, 0.04, 0.16], color: '#F18712' },
       { id: 'nerve', title: 'Decompressed Nerve Root', desc: 'Spinal root fully freed from stenosis, ending radiating leg sciatica and numbness.', pos: [0.26, -0.06, 0.08], color: '#059B8F' },
-      { id: 'vertebra', title: 'Lumbar Motion Segment', desc: 'Preserved vertebral bodies and facet joints providing natural rotational and flexion stability.', pos: [0, 0.40, 0.22], color: '#0A7C97' },
+      { id: 'vertebra', title: 'Lumbar Motion Segment', desc: 'Preserved L4-L5 vertebral bodies and facet joints providing natural rotational and flexion stability.', pos: [0, 0.40, 0.22], color: '#0A7C97' },
     ],
     recovery: [
       { id: 'rec-decomp', title: 'Sciatic Nerve Relief', desc: 'Immediate relief of burning leg pain as root swelling resolves with anti-inflammatory therapy.', pos: [0.26, -0.06, 0.08], color: '#059B8F' },
@@ -155,6 +155,7 @@ export default function JointAnatomy3D({
 
   const [activeType, setActiveType] = useState<AnatomyType>(initialType)
   const [viewMode, setViewMode] = useState<'surgical' | 'biological'>(isRecovery ? 'biological' : 'surgical')
+  const [visualTheme, setVisualTheme] = useState<'studio' | 'radiograph'>('studio')
   const [autoRotate, setAutoRotate] = useState<boolean>(true)
   const [projectedPins, setProjectedPins] = useState<ProjectedPin[]>([])
 
@@ -175,6 +176,7 @@ export default function JointAnatomy3D({
 
   const stateRef = useRef<{
     setMode?: (mode: 'surgical' | 'biological') => void
+    setTheme?: (theme: 'studio' | 'radiograph') => void
     rebuild?: (type: AnatomyType) => void
     resetCam?: () => void
     zoom?: (delta: number) => void
@@ -196,7 +198,7 @@ export default function JointAnatomy3D({
       const width = container.clientWidth
       const height = container.clientHeight
 
-      // ── High Performance Renderer ─────────────────────────────────────────
+      // ── High Performance WebGL Renderer ────────────────────────────────────
       const renderer = new THREE.WebGLRenderer({
         canvas,
         alpha: false,
@@ -205,22 +207,22 @@ export default function JointAnatomy3D({
       })
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
       renderer.setSize(width, height, false)
-      renderer.setClearColor(0xffffff, 1)
+      renderer.setClearColor(visualTheme === 'radiograph' ? 0x050a14 : 0xffffff, 1)
       renderer.shadowMap.enabled = true
       renderer.shadowMap.type = THREE.PCFSoftShadowMap
       renderer.toneMapping = THREE.ACESFilmicToneMapping
-      renderer.toneMappingExposure = 1.15
+      renderer.toneMappingExposure = visualTheme === 'radiograph' ? 1.35 : 1.18
 
-      // ── Scene & Camera ──────────────────────────────────────────────────
+      // ── Scene & Camera ─────────────────────────────────────────────────────
       const scene = new THREE.Scene()
-      scene.background = new THREE.Color(0xffffff)
+      scene.background = new THREE.Color(visualTheme === 'radiograph' ? 0x050a14 : 0xffffff)
 
       const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100)
       camera.position.set(0, 0.15, 3.2)
       const cameraTarget = new THREE.Vector3(0, 0.05, 0)
       camera.lookAt(cameraTarget)
 
-      // ── OrbitControls with Physics Damping ──────────────────────────────
+      // ── OrbitControls with Physics Damping ─────────────────────────────────
       const controls = new OrbitControls(camera, canvas)
       controls.enableDamping = true
       controls.dampingFactor = 0.06
@@ -231,17 +233,23 @@ export default function JointAnatomy3D({
       controls.maxPolarAngle = Math.PI * 0.82
       controls.target.copy(cameraTarget)
       controls.autoRotate = autoRotate
-      controls.autoRotateSpeed = 0.9
+      controls.autoRotateSpeed = 0.85
 
       let isInteracting = false
       controls.addEventListener('start', () => { isInteracting = true })
       controls.addEventListener('end', () => { isInteracting = false })
 
-      // ── Studio High-Key Lighting & Environment Reflections ──────────────
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1.45)
+      // ── Studio High-Key & Radiograph Dual Lighting Setup ───────────────────
+      const ambientLight = new THREE.AmbientLight(
+        visualTheme === 'radiograph' ? 0x0c4a6e : 0xffffff,
+        visualTheme === 'radiograph' ? 1.8 : 1.45
+      )
       scene.add(ambientLight)
 
-      const keyLight = new THREE.DirectionalLight(0xfff8ee, 2.2)
+      const keyLight = new THREE.DirectionalLight(
+        visualTheme === 'radiograph' ? 0x38bdf8 : 0xfff8ee,
+        visualTheme === 'radiograph' ? 2.5 : 2.2
+      )
       keyLight.position.set(3, 4, 3.5)
       keyLight.castShadow = true
       keyLight.shadow.mapSize.width = 1024
@@ -249,15 +257,21 @@ export default function JointAnatomy3D({
       keyLight.shadow.bias = -0.0005
       scene.add(keyLight)
 
-      const fillLight = new THREE.DirectionalLight(0xe0f2fe, 1.3)
+      const fillLight = new THREE.DirectionalLight(
+        visualTheme === 'radiograph' ? 0x0284c7 : 0xe0f2fe,
+        1.3
+      )
       fillLight.position.set(-3.5, 2, 2.5)
       scene.add(fillLight)
 
-      const rimLight = new THREE.DirectionalLight(0xccfbf1, 1.1)
+      const rimLight = new THREE.DirectionalLight(
+        visualTheme === 'radiograph' ? 0x7dd3fc : 0xccfbf1,
+        visualTheme === 'radiograph' ? 1.6 : 1.1
+      )
       rimLight.position.set(0, -3, -3)
       scene.add(rimLight)
 
-      // Generate a sleek studio gradient environment map for metallic reflections
+      // Gradient studio reflection environment
       const pmrem = new THREE.PMREMGenerator(renderer)
       pmrem.compileEquirectangularShader()
       const envCanvas = document.createElement('canvas')
@@ -266,15 +280,22 @@ export default function JointAnatomy3D({
       const envCtx = envCanvas.getContext('2d')
       if (envCtx) {
         const grad = envCtx.createLinearGradient(0, 0, 0, 256)
-        grad.addColorStop(0, '#ffffff')
-        grad.addColorStop(0.35, '#f8fafc')
-        grad.addColorStop(0.65, '#e2e8f0')
-        grad.addColorStop(1, '#cbd5e1')
+        if (visualTheme === 'radiograph') {
+          grad.addColorStop(0, '#020617')
+          grad.addColorStop(0.4, '#0c4a6e')
+          grad.addColorStop(0.7, '#075985')
+          grad.addColorStop(1, '#020617')
+        } else {
+          grad.addColorStop(0, '#ffffff')
+          grad.addColorStop(0.35, '#f8fafc')
+          grad.addColorStop(0.65, '#e2e8f0')
+          grad.addColorStop(1, '#cbd5e1')
+        }
         envCtx.fillStyle = grad
         envCtx.fillRect(0, 0, 512, 256)
 
-        // Specular studio softbox highlight
-        envCtx.fillStyle = '#ffffff'
+        // Softbox specular highlight
+        envCtx.fillStyle = visualTheme === 'radiograph' ? '#38bdf8' : '#ffffff'
         envCtx.beginPath()
         envCtx.ellipse(256, 70, 180, 50, 0, 0, Math.PI * 2)
         envCtx.fill()
@@ -284,106 +305,132 @@ export default function JointAnatomy3D({
       const envRT = pmrem.fromEquirectangular(envTex)
       scene.environment = envRT.texture
 
-      // Soft Ground Contact Shadow Disk
+      // Soft Ground Contact Shadow Disk (visible in studio mode only)
       const shadowGeo = new THREE.CircleGeometry(1.35, 48)
       const shadowMat = new THREE.MeshBasicMaterial({
         color: 0x94a3b8,
         transparent: true,
-        opacity: 0.16,
+        opacity: visualTheme === 'radiograph' ? 0.0 : 0.16,
       })
       const shadowPlane = new THREE.Mesh(shadowGeo, shadowMat)
       shadowPlane.rotation.x = -Math.PI / 2
       shadowPlane.position.y = -1.25
+      shadowPlane.visible = visualTheme === 'studio'
       scene.add(shadowPlane)
 
       // Master Root Group
       const jointGroup = new THREE.Group()
       scene.add(jointGroup)
 
-      // ── Physical PBR Clinical Materials ──────────────────────────────────
+      // ── Physical Materials (Studio vs Radiograph) ───────────────────────────
+      const isRad = visualTheme === 'radiograph'
+
+      // Cortical bone material
       const boneMat = new THREE.MeshStandardMaterial({
-        color: 0xf8f5ee, // Warm clinical ivory
-        roughness: 0.40,
-        metalness: 0.02,
+        color: isRad ? 0x67e8f9 : 0xfaf6ec,
+        roughness: isRad ? 0.28 : 0.38,
+        metalness: isRad ? 0.08 : 0.02,
+        emissive: isRad ? new THREE.Color(0x0369a1) : new THREE.Color(0x000000),
+        emissiveIntensity: isRad ? 0.42 : 0.0,
+        transparent: isRad,
+        opacity: isRad ? 0.90 : 1.0,
       })
 
+      // Surgical metal (radio-dense bright white in radiograph)
       const metalMat = new THREE.MeshStandardMaterial({
-        color: 0xdce5ec, // Polished Surgical Cobalt-Chrome / Titanium
-        roughness: 0.12,
-        metalness: 0.94,
+        color: isRad ? 0xffffff : 0xdce5ec,
+        roughness: isRad ? 0.08 : 0.12,
+        metalness: isRad ? 0.96 : 0.94,
+        emissive: isRad ? new THREE.Color(0xe0f2fe) : new THREE.Color(0x000000),
+        emissiveIntensity: isRad ? 0.72 : 0.0,
       })
 
+      // BIOLOX Delta ceramic
       const ceramicMat = new THREE.MeshPhysicalMaterial({
-        color: 0xffffff, // BIOLOX Delta ceramic
+        color: 0xffffff,
         roughness: 0.05,
         metalness: 0.08,
         clearcoat: 1.0,
         clearcoatRoughness: 0.05,
+        emissive: isRad ? new THREE.Color(0xffffff) : new THREE.Color(0x000000),
+        emissiveIntensity: isRad ? 0.85 : 0.0,
       })
 
+      // UHMWPE polymer bearing
       const polyMat = new THREE.MeshPhysicalMaterial({
-        color: 0xecfeff, // Medical-grade UHMWPE polymer
+        color: isRad ? 0x38bdf8 : 0xecfeff,
         roughness: 0.18,
         metalness: 0.08,
-        transmission: 0.70,
+        transmission: isRad ? 0.50 : 0.70,
         transparent: true,
-        opacity: 0.90,
+        opacity: isRad ? 0.75 : 0.90,
         ior: 1.46,
       })
 
+      // Muscle and tendon bands
       const tendonMat = new THREE.MeshPhysicalMaterial({
-        color: 0xb92b27, // Anatomical tendon / muscle band
+        color: isRad ? 0x0284c7 : 0xb92b27,
         roughness: 0.35,
         metalness: 0.05,
         clearcoat: 0.6,
         clearcoatRoughness: 0.2,
+        emissive: isRad ? new THREE.Color(0x075985) : new THREE.Color(0x000000),
+        emissiveIntensity: isRad ? 0.35 : 0.0,
       })
 
+      // Articular & meniscal cartilage
       const cartilageMat = new THREE.MeshPhysicalMaterial({
-        color: 0x02bab9, // Articular cartilage / meniscus
+        color: isRad ? 0x06b6d4 : 0x02bab9,
         roughness: 0.22,
         metalness: 0.12,
-        transmission: 0.4,
+        transmission: 0.45,
         transparent: true,
         opacity: 0.92,
-        emissive: 0x016b6a,
-        emissiveIntensity: 0.22,
+        emissive: isRad ? new THREE.Color(0x0891b2) : new THREE.Color(0x016b6a),
+        emissiveIntensity: isRad ? 0.45 : 0.22,
       })
 
+      // Lumbar spinal nerve root
       const nerveMat = new THREE.MeshStandardMaterial({
-        color: 0xf5cd09, // Lumbar spinal root & cord
+        color: 0xf5cd09,
         roughness: 0.28,
         metalness: 0.05,
-        emissive: 0xd97706,
-        emissiveIntensity: 0.38,
+        emissive: new THREE.Color(0xd97706),
+        emissiveIntensity: isRad ? 0.65 : 0.38,
       })
 
+      // Titanium locking compression plate
       const plateMat = new THREE.MeshStandardMaterial({
-        color: 0x64748b, // Titanium Locking Plate
-        roughness: 0.20,
-        metalness: 0.88,
+        color: isRad ? 0xffffff : 0x64748b,
+        roughness: 0.18,
+        metalness: 0.90,
+        emissive: isRad ? new THREE.Color(0xe0f2fe) : new THREE.Color(0x000000),
+        emissiveIntensity: isRad ? 0.65 : 0.0,
       })
 
+      // Locking hex screws
       const screwMat = new THREE.MeshStandardMaterial({
-        color: 0x334155, // Locking hex screws
-        roughness: 0.16,
-        metalness: 0.92,
+        color: isRad ? 0x94a3b8 : 0x334155,
+        roughness: 0.15,
+        metalness: 0.94,
+        emissive: isRad ? new THREE.Color(0x38bdf8) : new THREE.Color(0x000000),
+        emissiveIntensity: isRad ? 0.45 : 0.0,
       })
 
+      // PRP bioactive growth factors
       const goldBioMat = new THREE.MeshStandardMaterial({
-        color: 0xf59e0b, // Platelet growth factors
+        color: 0xf59e0b,
         roughness: 0.22,
         metalness: 0.35,
-        emissive: 0xb45309,
-        emissiveIntensity: 0.45,
+        emissive: new THREE.Color(0xb45309),
+        emissiveIntensity: isRad ? 0.75 : 0.45,
       })
 
-      // Containers for dynamic visibility toggling
       let surgicalObjects: THREE.Object3D[] = []
       let biologicalObjects: THREE.Object3D[] = []
       let pinAnchors: { id: string; mesh: THREE.Mesh; worldPos: THREE.Vector3; color: string; title: string }[] = []
 
-      // ── Anatomical Model Builders ─────────────────────────────────────────
+      // ── Anatomical Model Sculptor (Artec HD / Sketchfab Reference Standard) ──
       function buildModel(currentType: AnatomyType) {
         while (jointGroup.children.length > 0) {
           jointGroup.remove(jointGroup.children[0])
@@ -393,207 +440,309 @@ export default function JointAnatomy3D({
         pinAnchors = []
 
         if (currentType === 'knee') {
-          // ── KNEE MODEL: Smooth Anatomical Alignment ──────────────────────
-          // 1. Distal Femur (Upper Thigh Bone)
-          const femurShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.21, 1.15, 32), boneMat)
-          femurShaft.position.set(0, 0.92, -0.04)
+          // ── KNEE: Distal Femur, Tibial Plateau, Patella & Implants ──────────
+          // 1. Distal Femur Diaphysis & Metaphysis
+          const femurShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 1.15, 32), boneMat)
+          femurShaft.position.set(0, 0.94, -0.04)
           femurShaft.castShadow = true
           jointGroup.add(femurShaft)
 
-          // Femoral flare leading into condyles
-          const flare = new THREE.Mesh(new THREE.ConeGeometry(0.36, 0.42, 32), boneMat)
+          // Epicondylar Metaphyseal Flare
+          const flare = new THREE.Mesh(new THREE.ConeGeometry(0.38, 0.46, 32), boneMat)
           flare.position.set(0, 0.46, -0.02)
           flare.rotation.x = Math.PI
           jointGroup.add(flare)
 
-          // Medial & Lateral Femoral Condyles (Smooth anatomical curves)
-          const condyleM = new THREE.Mesh(new THREE.SphereGeometry(0.24, 28, 28), boneMat)
-          condyleM.scale.set(0.85, 1.25, 1.35)
-          condyleM.position.set(-0.20, 0.30, 0.02)
+          // Medial & Lateral Epicondyle Prominences
+          const medEpicondyle = new THREE.Mesh(new THREE.SphereGeometry(0.12, 20, 20), boneMat)
+          medEpicondyle.position.set(-0.31, 0.36, -0.02)
+          jointGroup.add(medEpicondyle)
+
+          const latEpicondyle = new THREE.Mesh(new THREE.SphereGeometry(0.11, 20, 20), boneMat)
+          latEpicondyle.position.set(0.31, 0.36, -0.02)
+          jointGroup.add(latEpicondyle)
+
+          // Medial Condyle (Larger radius, posterior extension)
+          const condyleM = new THREE.Mesh(new THREE.SphereGeometry(0.25, 32, 32), boneMat)
+          condyleM.scale.set(0.85, 1.30, 1.40)
+          condyleM.position.set(-0.21, 0.30, 0.02)
           condyleM.castShadow = true
           jointGroup.add(condyleM)
 
-          const condyleL = new THREE.Mesh(new THREE.SphereGeometry(0.23, 28, 28), boneMat)
-          condyleL.scale.set(0.85, 1.25, 1.35)
-          condyleL.position.set(0.20, 0.30, 0.02)
+          // Lateral Condyle
+          const condyleL = new THREE.Mesh(new THREE.SphereGeometry(0.24, 32, 32), boneMat)
+          condyleL.scale.set(0.85, 1.30, 1.40)
+          condyleL.position.set(0.21, 0.30, 0.02)
           condyleL.castShadow = true
           jointGroup.add(condyleL)
 
+          // Anterior Patellar Surface (Trochlear Groove Bridge)
+          const trochlea = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.25, 0.28, 24, 1, false, 0, Math.PI), boneMat)
+          trochlea.rotation.x = Math.PI / 2
+          trochlea.position.set(0, 0.34, 0.16)
+          jointGroup.add(trochlea)
+
           // 2. Proximal Tibia (Lower Leg Shin Bone)
-          const plateau = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.36, 0.22, 32), boneMat)
-          plateau.scale.set(1.08, 1.0, 0.90)
+          // Tibial Plateau (Medial & Lateral Articular Condyles)
+          const plateau = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.38, 0.24, 36), boneMat)
+          plateau.scale.set(1.10, 1.0, 0.92)
           plateau.position.set(0, -0.22, 0)
           plateau.castShadow = true
           jointGroup.add(plateau)
 
-          const tibiaShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.20, 0.16, 1.05, 32), boneMat)
-          tibiaShaft.position.set(0, -0.75, 0)
+          // Intercondylar Eminence (Dual Tibial Spines)
+          const spineM = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.16, 16), boneMat)
+          spineM.position.set(-0.06, -0.04, 0.02)
+          jointGroup.add(spineM)
+
+          const spineL = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.16, 16), boneMat)
+          spineL.position.set(0.06, -0.04, 0.02)
+          jointGroup.add(spineL)
+
+          // Anterior Tibial Tuberosity Prominence
+          const tuberosity = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.28, 20), boneMat)
+          tuberosity.position.set(0, -0.32, 0.26)
+          tuberosity.rotation.x = -Math.PI / 3
+          jointGroup.add(tuberosity)
+
+          // Tibial Diaphysis Shaft with Anterior Crest
+          const tibiaShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.16, 1.05, 32), boneMat)
+          tibiaShaft.position.set(0, -0.76, 0)
           tibiaShaft.castShadow = true
           jointGroup.add(tibiaShaft)
 
-          const fibula = new THREE.Mesh(new THREE.SphereGeometry(0.11, 20, 20), boneMat)
-          fibula.position.set(0.40, -0.32, -0.08)
-          jointGroup.add(fibula)
+          // Proximal Fibular Head with Styloid Process
+          const fibulaHead = new THREE.Mesh(new THREE.SphereGeometry(0.12, 20, 20), boneMat)
+          fibulaHead.position.set(0.42, -0.30, -0.08)
+          jointGroup.add(fibulaHead)
 
-          // 3. Patella (Kneecap) & Quadriceps/Patellar Tendon
-          const patella = new THREE.Mesh(new THREE.SphereGeometry(0.15, 24, 24), boneMat)
-          patella.scale.set(1.0, 1.25, 0.65)
-          patella.position.set(0, 0.28, 0.42)
+          const fibulaShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.065, 0.95, 20), boneMat)
+          fibulaShaft.position.set(0.42, -0.74, -0.08)
+          jointGroup.add(fibulaShaft)
+
+          // 3. Patella (Sesamoid Kneecap) & Quadriceps/Patellar Tendon
+          const patella = new THREE.Mesh(new THREE.SphereGeometry(0.16, 28, 28), boneMat)
+          patella.scale.set(1.0, 1.30, 0.65)
+          patella.position.set(0, 0.28, 0.44)
           jointGroup.add(patella)
 
-          const quadTendon = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.13, 0.60, 20), tendonMat)
-          quadTendon.position.set(0, 0.66, 0.34)
+          const quadTendon = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 0.62, 20), tendonMat)
+          quadTendon.position.set(0, 0.68, 0.36)
           jointGroup.add(quadTendon)
 
-          const patellarTendon = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.10, 0.44, 20), tendonMat)
+          const patellarTendon = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.11, 0.46, 20), tendonMat)
           patellarTendon.position.set(0, -0.04, 0.38)
           jointGroup.add(patellarTendon)
 
-          // 4. SURGICAL MODE: Cobalt-Chrome Implant + UHMWPE Poly Insert
+          // 4. SURGICAL MODE: CoCr Femoral Component, UHMWPE Insert & Tibial Tray
           const sGroup = new THREE.Group()
           const femoralShield = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.38, 0.40, 0.38, 32, 1, false, -Math.PI / 2, Math.PI),
+            new THREE.CylinderGeometry(0.40, 0.42, 0.42, 32, 1, false, -Math.PI / 2, Math.PI),
             metalMat
           )
           femoralShield.rotation.z = Math.PI / 2
           femoralShield.position.set(0, 0.30, 0.08)
           sGroup.add(femoralShield)
 
-          const polyBearing = new THREE.Mesh(new THREE.CylinderGeometry(0.41, 0.41, 0.12, 32), polyMat)
+          // Anterior Patellar Flange on Femoral Shield
+          const patellarFlange = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.34, 0.06), metalMat)
+          patellarFlange.position.set(0, 0.45, 0.28)
+          patellarFlange.rotation.x = -0.25
+          sGroup.add(patellarFlange)
+
+          // UHMWPE Articular Bearing Insert with dual dishes
+          const polyBearing = new THREE.Mesh(new THREE.CylinderGeometry(0.43, 0.43, 0.12, 32), polyMat)
           polyBearing.position.set(0, 0.08, 0.02)
           sGroup.add(polyBearing)
 
-          const tibialPlate = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.08, 32), metalMat)
+          // Titanium Tibial Baseplate Tray & Keel
+          const tibialPlate = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.44, 0.08, 32), metalMat)
           tibialPlate.position.set(0, -0.02, 0.02)
           sGroup.add(tibialPlate)
 
-          const tibialStem = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.42, 20), metalMat)
+          const tibialStem = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.45, 20), metalMat)
           tibialStem.rotation.x = Math.PI
-          tibialStem.position.set(0, -0.24, 0)
+          tibialStem.position.set(0, -0.26, 0)
           sGroup.add(tibialStem)
 
           jointGroup.add(sGroup)
           surgicalObjects.push(sGroup)
 
-          // 5. BIOLOGICAL MODE: Meniscus Fibrocartilage & Cruciate Ligaments
+          // 5. BIOLOGICAL MODE: Menisci & Cruciate Ligaments
           const bGroup = new THREE.Group()
-          const menM = new THREE.Mesh(new THREE.TorusGeometry(0.20, 0.055, 16, 32, Math.PI * 0.9), cartilageMat)
+          const menM = new THREE.Mesh(new THREE.TorusGeometry(0.21, 0.06, 16, 32, Math.PI * 0.92), cartilageMat)
           menM.rotation.x = Math.PI / 2
-          menM.position.set(-0.16, 0.02, 0.02)
+          menM.position.set(-0.17, 0.02, 0.02)
           bGroup.add(menM)
 
-          const menL = new THREE.Mesh(new THREE.TorusGeometry(0.20, 0.055, 16, 32, Math.PI * 0.9), cartilageMat)
+          const menL = new THREE.Mesh(new THREE.TorusGeometry(0.20, 0.06, 16, 32, Math.PI * 0.95), cartilageMat)
           menL.rotation.x = Math.PI / 2
           menL.rotation.z = Math.PI
-          menL.position.set(0.16, 0.02, 0.02)
+          menL.position.set(0.17, 0.02, 0.02)
           bGroup.add(menL)
 
-          const acl = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.40, 16), tendonMat)
+          const acl = new THREE.Mesh(new THREE.CylinderGeometry(0.040, 0.040, 0.42, 16), tendonMat)
           acl.rotation.z = 0.52
           acl.rotation.y = 0.32
-          acl.position.set(0.02, 0.13, 0.04)
+          acl.position.set(0.02, 0.14, 0.04)
           bGroup.add(acl)
+
+          const pcl = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.42, 16), tendonMat)
+          pcl.rotation.z = -0.48
+          pcl.rotation.y = -0.30
+          pcl.position.set(-0.02, 0.14, -0.04)
+          bGroup.add(pcl)
 
           jointGroup.add(bGroup)
           biologicalObjects.push(bGroup)
-        } else if (currentType === 'hip') {
-          // ── HIP MODEL: Mathematical 130° Anatomical Femoral Neck & Acetabulum
-          // 1. Pelvic Acetabulum Wing
-          const pelvis = new THREE.Mesh(new THREE.TorusGeometry(0.38, 0.16, 20, 36, Math.PI * 1.1), boneMat)
-          pelvis.position.set(0.16, 0.46, 0.0)
-          pelvis.rotation.z = -0.32
-          jointGroup.add(pelvis)
 
-          // 2. Femoral Shaft & Greater Trochanter
-          const femurShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.19, 1.25, 32), boneMat)
-          femurShaft.position.set(-0.20, -0.45, 0)
+        } else if (currentType === 'hip') {
+          // ── HIP: Hemi-Pelvis, Acetabular Socket & 128° Femoral Neck ─────────
+          // 1. Pelvic Iliac Wing Blade with ASIS & Crest
+          const iliacWing = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.18, 20, 36, Math.PI * 1.15), boneMat)
+          iliacWing.position.set(0.18, 0.50, 0.0)
+          iliacWing.rotation.z = -0.30
+          jointGroup.add(iliacWing)
+
+          const asis = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 20), boneMat)
+          asis.position.set(0.44, 0.72, 0.08)
+          jointGroup.add(asis)
+
+          // Ischial Body & Tuberosity (Weight bearing base)
+          const ischium = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.20, 0.55, 20), boneMat)
+          ischium.position.set(0.32, 0.12, -0.12)
+          ischium.rotation.z = 0.25
+          jointGroup.add(ischium)
+
+          // 2. Femoral Diaphysis Shaft
+          const femurShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.20, 1.25, 32), boneMat)
+          femurShaft.position.set(-0.20, -0.46, 0)
           jointGroup.add(femurShaft)
 
-          const trochanter = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 24), boneMat)
-          trochanter.scale.set(0.85, 1.35, 0.85)
-          trochanter.position.set(-0.25, 0.08, 0)
+          // Greater Trochanter with Trochanteric Fossa
+          const trochanter = new THREE.Mesh(new THREE.SphereGeometry(0.24, 24, 24), boneMat)
+          trochanter.scale.set(0.85, 1.40, 0.88)
+          trochanter.position.set(-0.26, 0.09, 0)
           jointGroup.add(trochanter)
 
-          // 3. Anatomical Femoral Neck (Connecting shaft to acetabulum at 130°)
-          const neckBone = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.13, 0.42, 24), boneMat)
+          // Lesser Trochanter (Conical posteromedial projection)
+          const lesserTroch = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.18, 16), boneMat)
+          lesserTroch.rotation.z = -Math.PI / 3
+          lesserTroch.position.set(-0.13, -0.10, -0.06)
+          jointGroup.add(lesserTroch)
+
+          // Anatomical 128° Inclined Femoral Neck
+          const neckBone = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.14, 0.44, 24), boneMat)
           neckBone.rotation.z = -0.78
           neckBone.position.set(-0.06, 0.20, 0.02)
           jointGroup.add(neckBone)
 
-          // 4. SURGICAL: Titanium Cup, Ceramic Ball & Modular Stem
+          // 3. SURGICAL: Titanium Porous Cup, BIOLOX Ceramic Ball & Stem
           const sGroup = new THREE.Group()
           const acetabularCup = new THREE.Mesh(
-            new THREE.SphereGeometry(0.30, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.55),
+            new THREE.SphereGeometry(0.31, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.55),
             metalMat
           )
-          acetabularCup.position.set(0.14, 0.40, 0.04)
+          acetabularCup.position.set(0.15, 0.41, 0.04)
           acetabularCup.rotation.z = 2.38
           sGroup.add(acetabularCup)
 
-          const ceramicBall = new THREE.Mesh(new THREE.SphereGeometry(0.22, 32, 32), ceramicMat)
-          ceramicBall.position.set(0.10, 0.33, 0.04)
+          const ceramicBall = new THREE.Mesh(new THREE.SphereGeometry(0.23, 32, 32), ceramicMat)
+          ceramicBall.position.set(0.11, 0.34, 0.04)
           sGroup.add(ceramicBall)
 
-          const metalNeck = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.10, 0.38, 20), metalMat)
+          const metalNeck = new THREE.Mesh(new THREE.CylinderGeometry(0.088, 0.105, 0.40, 20), metalMat)
           metalNeck.rotation.z = -0.78
           metalNeck.position.set(-0.06, 0.20, 0.02)
           sGroup.add(metalNeck)
 
-          const metalStem = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.95, 20), metalMat)
-          metalStem.position.set(-0.20, -0.22, 0.01)
+          const metalStem = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.98, 20), metalMat)
+          metalStem.position.set(-0.20, -0.24, 0.01)
           sGroup.add(metalStem)
 
           jointGroup.add(sGroup)
           surgicalObjects.push(sGroup)
 
-          // 5. BIOLOGICAL: Natural Femoral Head & Acetabular Labrum
+          // 4. BIOLOGICAL: Natural Femoral Head with Fovea Capitis & Labrum
           const bGroup = new THREE.Group()
-          const naturalHead = new THREE.Mesh(new THREE.SphereGeometry(0.24, 32, 32), boneMat)
-          naturalHead.position.set(0.10, 0.33, 0.04)
+          const naturalHead = new THREE.Mesh(new THREE.SphereGeometry(0.25, 32, 32), boneMat)
+          naturalHead.position.set(0.11, 0.34, 0.04)
           bGroup.add(naturalHead)
 
-          const labrum = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.05, 16, 32), cartilageMat)
-          labrum.position.set(0.14, 0.40, 0.04)
+          // Fovea Capitis Depression
+          const fovea = new THREE.Mesh(new THREE.SphereGeometry(0.045, 12, 12), tendonMat)
+          fovea.position.set(0.16, 0.42, 0.04)
+          bGroup.add(fovea)
+
+          const labrum = new THREE.Mesh(new THREE.TorusGeometry(0.29, 0.052, 16, 32), cartilageMat)
+          labrum.position.set(0.15, 0.41, 0.04)
           labrum.rotation.z = 2.38
           bGroup.add(labrum)
 
           jointGroup.add(bGroup)
           biologicalObjects.push(bGroup)
+
         } else if (currentType === 'shoulder') {
-          // ── SHOULDER: Glenoid Cavity, Clavicle Arch & Humeral Head ────────
-          // 1. Scapula & Glenoid Neck
-          const scapulaBlade = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.45, 0.75, 24, 1, false, 0, Math.PI * 0.8), boneMat)
+          // ── SHOULDER: Scapula Blade, Acromion, Clavicle Arch & Humerus ──────
+          // 1. Scapula Body Blade with Spine & Acromion
+          const scapulaBlade = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.36, 0.48, 0.78, 24, 1, false, 0, Math.PI * 0.8),
+            boneMat
+          )
           scapulaBlade.rotation.y = Math.PI / 2
-          scapulaBlade.position.set(-0.35, -0.10, -0.10)
+          scapulaBlade.position.set(-0.36, -0.10, -0.10)
           jointGroup.add(scapulaBlade)
 
-          // Clavicle Arch
-          const clavicle = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.085, 0.90, 20), boneMat)
+          // Spine of Scapula Crest
+          const scapularSpine = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.08, 0.14), boneMat)
+          scapularSpine.position.set(-0.22, 0.28, -0.06)
+          scapularSpine.rotation.z = 0.20
+          jointGroup.add(scapularSpine)
+
+          // Broad Acromion Process Shelf
+          const acromion = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.07, 0.32), boneMat)
+          acromion.position.set(0.06, 0.50, 0.10)
+          acromion.rotation.y = 0.25
+          jointGroup.add(acromion)
+
+          // Coracoid Process Hook
+          const coracoid = new THREE.Mesh(new THREE.TorusGeometry(0.10, 0.045, 12, 20, Math.PI * 0.7), boneMat)
+          coracoid.rotation.x = Math.PI / 2
+          coracoid.position.set(-0.08, 0.38, 0.20)
+          jointGroup.add(coracoid)
+
+          // Clavicular S-Curve
+          const clavicle = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.085, 0.92, 20), boneMat)
           clavicle.rotation.z = Math.PI / 2.3
           clavicle.position.set(0.04, 0.58, 0.04)
           jointGroup.add(clavicle)
 
-          // Humerus Shaft & Head
-          const humerusShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.18, 1.15, 32), boneMat)
-          humerusShaft.position.set(0.12, -0.42, 0)
+          // Proximal Humerus Shaft & Spherical Head
+          const humerusShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.19, 1.15, 32), boneMat)
+          humerusShaft.position.set(0.13, -0.42, 0)
           jointGroup.add(humerusShaft)
 
-          const humeralHead = new THREE.Mesh(new THREE.SphereGeometry(0.29, 32, 32), boneMat)
-          humeralHead.position.set(0.04, 0.18, 0.02)
+          const humeralHead = new THREE.Mesh(new THREE.SphereGeometry(0.30, 32, 32), boneMat)
+          humeralHead.position.set(0.05, 0.18, 0.02)
           jointGroup.add(humeralHead)
 
-          const glenoidRim = new THREE.Mesh(new THREE.TorusGeometry(0.22, 0.045, 16, 28), cartilageMat)
+          // Greater Tubercle & Bicipital Groove
+          const greaterTubercle = new THREE.Mesh(new THREE.SphereGeometry(0.14, 20, 20), boneMat)
+          greaterTubercle.position.set(0.19, 0.26, 0.14)
+          jointGroup.add(greaterTubercle)
+
+          const glenoidRim = new THREE.Mesh(new THREE.TorusGeometry(0.23, 0.048, 16, 28), cartilageMat)
           glenoidRim.position.set(-0.16, 0.18, 0)
           glenoidRim.rotation.y = Math.PI / 2.2
           jointGroup.add(glenoidRim)
 
-          // SURGICAL: Suture Anchors & Rotator Cuff Fixation
+          // SURGICAL: Titanium Suture Anchors & Rotator Repair
           const sGroup = new THREE.Group()
-          const anchor1 = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.14, 10), screwMat)
+          const anchor1 = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.15, 10), screwMat)
           anchor1.position.set(0.16, 0.32, 0.16)
           sGroup.add(anchor1)
 
-          const anchor2 = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.14, 10), screwMat)
+          const anchor2 = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.15, 10), screwMat)
           anchor2.position.set(0.22, 0.22, 0.14)
           sGroup.add(anchor2)
 
@@ -602,18 +751,19 @@ export default function JointAnatomy3D({
 
           // BIOLOGICAL: Supraspinatus Tendon Band
           const bGroup = new THREE.Group()
-          const supraspinatus = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.17, 0.56, 20), tendonMat)
+          const supraspinatus = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.18, 0.58, 20), tendonMat)
           supraspinatus.rotation.z = 0.95
           supraspinatus.position.set(-0.04, 0.38, 0.12)
           bGroup.add(supraspinatus)
 
           jointGroup.add(bGroup)
           biologicalObjects.push(bGroup)
+
         } else if (currentType === 'spine') {
-          // ── SPINE: L4-L5 Lumbar Vertebrae, Discs & Nerve Roots ───────────
-          // Superior L4 Vertebral Body
+          // ── SPINE: L4-L5 Lumbar Vertebrae, Facet Joints, Discs & Nerves ─────
+          // Superior L4 Vertebral Body (Reniform kidney shape)
           const l4 = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.44, 0.36, 32), boneMat)
-          l4.scale.set(1.15, 1.0, 0.88)
+          l4.scale.set(1.16, 1.0, 0.88)
           l4.position.set(0, 0.40, 0)
           jointGroup.add(l4)
 
@@ -623,44 +773,66 @@ export default function JointAnatomy3D({
           l5.position.set(0, -0.40, 0)
           jointGroup.add(l5)
 
+          // Pedicles & Laminae Arch
+          const l4PedicleR = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.28, 16), boneMat)
+          l4PedicleR.rotation.x = Math.PI / 2
+          l4PedicleR.position.set(0.24, 0.40, -0.22)
+          jointGroup.add(l4PedicleR)
+
+          const l4PedicleL = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.28, 16), boneMat)
+          l4PedicleL.rotation.x = Math.PI / 2
+          l4PedicleL.position.set(-0.24, 0.40, -0.22)
+          jointGroup.add(l4PedicleL)
+
           // Spinous Processes extending posterior
-          const l4Spinous = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.44, 16), boneMat)
-          l4Spinous.rotation.x = -Math.PI / 2.2
-          l4Spinous.position.set(0, 0.40, -0.42)
+          const l4Spinous = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.22, 0.48), boneMat)
+          l4Spinous.position.set(0, 0.40, -0.44)
           jointGroup.add(l4Spinous)
 
-          const l5Spinous = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.44, 16), boneMat)
-          l5Spinous.rotation.x = -Math.PI / 2.2
-          l5Spinous.position.set(0, -0.40, -0.42)
+          const l5Spinous = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.22, 0.48), boneMat)
+          l5Spinous.position.set(0, -0.40, -0.44)
           jointGroup.add(l5Spinous)
 
-          // Intervertebral Disc
+          // Transverse Processes
+          const l4TransR = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 0.42, 14), boneMat)
+          l4TransR.rotation.z = Math.PI / 2
+          l4TransR.position.set(0.44, 0.42, -0.16)
+          jointGroup.add(l4TransR)
+
+          const l4TransL = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 0.42, 14), boneMat)
+          l4TransL.rotation.z = Math.PI / 2
+          l4TransL.position.set(-0.44, 0.42, -0.16)
+          jointGroup.add(l4TransL)
+
+          // Intervertebral Disc (Annulus Fibrosus & Nucleus)
           const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.43, 0.43, 0.18, 32), cartilageMat)
           disc.scale.set(1.15, 1.0, 0.88)
           disc.position.set(0, 0.0, 0)
           jointGroup.add(disc)
 
-          // Spinal Cord & Nerve Roots
+          // Thecal Sac Spinal Cord
           const cord = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 1.25, 20), nerveMat)
           cord.position.set(0, 0.0, -0.16)
           jointGroup.add(cord)
 
-          const nerveR = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.030, 0.46, 14), nerveMat)
+          // Exiting Spinal Nerve Roots
+          const nerveR = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.030, 0.48, 14), nerveMat)
           nerveR.rotation.z = Math.PI / 3
-          nerveR.position.set(0.24, -0.05, -0.08)
+          nerveR.position.set(0.25, -0.05, -0.08)
           jointGroup.add(nerveR)
 
-          const nerveL = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.030, 0.46, 14), nerveMat)
+          const nerveL = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.030, 0.48, 14), nerveMat)
           nerveL.rotation.z = -Math.PI / 3
-          nerveL.position.set(-0.24, -0.05, -0.08)
+          nerveL.position.set(-0.25, -0.05, -0.08)
           jointGroup.add(nerveL)
 
-          // SURGICAL: Microdiscectomy Retractor
+          // SURGICAL: Microdiscectomy Retractor & PEEK Spacer
           const sGroup = new THREE.Group()
-          const retractor = new THREE.Mesh(new THREE.TorusGeometry(0.11, 0.025, 10, 20, Math.PI), metalMat)
+          const retractor = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.026, 10, 20, Math.PI), metalMat)
           retractor.rotation.y = Math.PI / 2
           retractor.position.set(0.18, 0.04, 0.14)
           sGroup.add(retractor)
+
           jointGroup.add(sGroup)
           surgicalObjects.push(sGroup)
 
@@ -670,20 +842,22 @@ export default function JointAnatomy3D({
           herniation.scale.set(1.25, 0.85, 1.0)
           herniation.position.set(0.18, 0.02, 0.14)
           bGroup.add(herniation)
+
           jointGroup.add(bGroup)
           biologicalObjects.push(bGroup)
+
         } else if (currentType === 'sports') {
-          // ── SPORTS: ACL Reconstruction Graft & Meniscal Cartilage ────────
+          // ── SPORTS: Flexed Knee, Cruciate Tunnels & Menisci ─────────────────
           const femurShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.22, 0.85, 28), boneMat)
           femurShaft.position.set(0, 0.85, 0)
           jointGroup.add(femurShaft)
 
-          const condyles = new THREE.Mesh(new THREE.SphereGeometry(0.35, 28, 28), boneMat)
-          condyles.scale.set(1.2, 0.72, 1.0)
+          const condyles = new THREE.Mesh(new THREE.SphereGeometry(0.36, 28, 28), boneMat)
+          condyles.scale.set(1.2, 0.74, 1.0)
           condyles.position.set(0, 0.38, 0)
           jointGroup.add(condyles)
 
-          const tibiaPlateau = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.36, 0.22, 28), boneMat)
+          const tibiaPlateau = new THREE.Mesh(new THREE.CylinderGeometry(0.43, 0.37, 0.22, 28), boneMat)
           tibiaPlateau.position.set(0, -0.24, 0)
           jointGroup.add(tibiaPlateau)
 
@@ -692,19 +866,19 @@ export default function JointAnatomy3D({
           jointGroup.add(tibiaShaft)
 
           // Meniscus shock absorbers
-          const menM = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.05, 14, 28, Math.PI * 0.9), cartilageMat)
+          const menM = new THREE.Mesh(new THREE.TorusGeometry(0.19, 0.052, 14, 28, Math.PI * 0.92), cartilageMat)
           menM.rotation.x = Math.PI / 2
           menM.position.set(-0.16, -0.06, 0.02)
           jointGroup.add(menM)
 
-          const menL = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.05, 14, 28, Math.PI * 0.9), cartilageMat)
+          const menL = new THREE.Mesh(new THREE.TorusGeometry(0.19, 0.052, 14, 28, Math.PI * 0.92), cartilageMat)
           menL.rotation.x = Math.PI / 2
           menL.rotation.z = Math.PI
           menL.position.set(0.16, -0.06, 0.02)
           jointGroup.add(menL)
 
           // ACL Graft Bundle
-          const aclGraft = new THREE.Mesh(new THREE.CylinderGeometry(0.062, 0.062, 0.50, 20), tendonMat)
+          const aclGraft = new THREE.Mesh(new THREE.CylinderGeometry(0.062, 0.062, 0.52, 20), tendonMat)
           aclGraft.rotation.z = 0.52
           aclGraft.rotation.y = 0.32
           aclGraft.position.set(0.04, 0.08, 0.08)
@@ -712,11 +886,11 @@ export default function JointAnatomy3D({
 
           // SURGICAL: Titanium Interference Screws
           const sGroup = new THREE.Group()
-          const screwF = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.038, 0.24, 14), screwMat)
+          const screwF = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.038, 0.25, 14), screwMat)
           screwF.position.set(0.16, 0.36, 0.14)
           sGroup.add(screwF)
 
-          const screwT = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.038, 0.24, 14), screwMat)
+          const screwT = new THREE.Mesh(new THREE.CylinderGeometry(0.042, 0.038, 0.25, 14), screwMat)
           screwT.position.set(-0.08, -0.24, 0.12)
           sGroup.add(screwT)
 
@@ -725,18 +899,19 @@ export default function JointAnatomy3D({
 
           // BIOLOGICAL: Collateral Ligaments
           const bGroup = new THREE.Group()
-          const mcl = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.72, 12), tendonMat)
-          mcl.position.set(-0.34, 0.05, 0.02)
+          const mcl = new THREE.Mesh(new THREE.CylinderGeometry(0.030, 0.030, 0.74, 12), tendonMat)
+          mcl.position.set(-0.35, 0.05, 0.02)
           bGroup.add(mcl)
 
-          const lcl = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.72, 12), tendonMat)
-          lcl.position.set(0.34, 0.05, 0.02)
+          const lcl = new THREE.Mesh(new THREE.CylinderGeometry(0.030, 0.030, 0.74, 12), tendonMat)
+          lcl.position.set(0.35, 0.05, 0.02)
           bGroup.add(lcl)
 
           jointGroup.add(bGroup)
           biologicalObjects.push(bGroup)
+
         } else if (currentType === 'prp') {
-          // ── PRP: Cartilage Matrix & Hydrodynamic Bio-Fluid ───────────────
+          // ── PRP: Hyaline Cartilage Matrix & Synovial Bio-Fluid ──────────────
           const femurShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.23, 0.85, 28), boneMat)
           femurShaft.position.set(0, 0.85, 0)
           jointGroup.add(femurShaft)
@@ -746,15 +921,15 @@ export default function JointAnatomy3D({
           condyles.position.set(0, 0.38, 0)
           jointGroup.add(condyles)
 
-          const femCartilage = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.39, 0.08, 32), cartilageMat)
+          const femCartilage = new THREE.Mesh(new THREE.CylinderGeometry(0.39, 0.40, 0.08, 32), cartilageMat)
           femCartilage.position.set(0, 0.18, 0)
           jointGroup.add(femCartilage)
 
-          const tibCartilage = new THREE.Mesh(new THREE.CylinderGeometry(0.40, 0.40, 0.08, 32), cartilageMat)
+          const tibCartilage = new THREE.Mesh(new THREE.CylinderGeometry(0.41, 0.41, 0.08, 32), cartilageMat)
           tibCartilage.position.set(0, -0.06, 0)
           jointGroup.add(tibCartilage)
 
-          const tibiaPlateau = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.36, 0.22, 28), boneMat)
+          const tibiaPlateau = new THREE.Mesh(new THREE.CylinderGeometry(0.43, 0.37, 0.22, 28), boneMat)
           tibiaPlateau.position.set(0, -0.22, 0)
           jointGroup.add(tibiaPlateau)
 
@@ -768,53 +943,56 @@ export default function JointAnatomy3D({
 
           // SURGICAL: Targeted Micro-Delivery Needle
           const sGroup = new THREE.Group()
-          const needle = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.65, 14), metalMat)
+          const needle = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.68, 14), metalMat)
           needle.rotation.z = -1.22
-          needle.position.set(0.35, 0.18, 0.20)
+          needle.position.set(0.36, 0.18, 0.20)
           sGroup.add(needle)
+
           jointGroup.add(sGroup)
           surgicalObjects.push(sGroup)
 
           // BIOLOGICAL: Platelet-Rich Plasma Bioactive Growth Factors
           const bGroup = new THREE.Group()
-          for (let i = 0; i < 10; i++) {
-            const p = new THREE.Mesh(new THREE.SphereGeometry(0.034, 14, 14), goldBioMat)
-            const angle = (i / 10) * Math.PI * 2
+          for (let i = 0; i < 12; i++) {
+            const p = new THREE.Mesh(new THREE.SphereGeometry(0.035, 14, 14), goldBioMat)
+            const angle = (i / 12) * Math.PI * 2
             const r = 0.12 + (i % 3) * 0.05
             p.position.set(Math.cos(angle) * r, 0.06 + (i % 2 === 0 ? 0.02 : -0.02), Math.sin(angle) * r + 0.12)
             bGroup.add(p)
           }
+
           jointGroup.add(bGroup)
           biologicalObjects.push(bGroup)
+
         } else if (currentType === 'trauma') {
-          // ── TRAUMA: Precision Cortical Bone Reduction & LCP Locking Plate
-          const boneUpper = new THREE.Mesh(new THREE.CylinderGeometry(0.20, 0.21, 0.72, 32), boneMat)
-          boneUpper.position.set(0, 0.54, 0)
+          // ── TRAUMA: Cortical Bone Diaphysis & LC-DCP Locking Plate ─────────
+          const boneUpper = new THREE.Mesh(new THREE.CylinderGeometry(0.20, 0.21, 0.74, 32), boneMat)
+          boneUpper.position.set(0, 0.55, 0)
           jointGroup.add(boneUpper)
 
-          const boneLower = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.20, 0.72, 32), boneMat)
-          boneLower.position.set(0, -0.54, 0)
+          const boneLower = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.20, 0.74, 32), boneMat)
+          boneLower.position.set(0, -0.55, 0)
           jointGroup.add(boneLower)
 
-          const fractureDisc = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.21, 0.03, 32), cartilageMat)
+          const fractureDisc = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.21, 0.035, 32), cartilageMat)
           fractureDisc.rotation.z = 0.28
           fractureDisc.position.set(0, 0.0, 0)
           jointGroup.add(fractureDisc)
 
-          // SURGICAL: Titanium Locking Compression Plate & 6 Screws
+          // SURGICAL: Titanium LC-DCP Locking Compression Plate & 6 Screws
           const sGroup = new THREE.Group()
-          const plate = new THREE.Mesh(new THREE.BoxGeometry(0.11, 1.25, 0.038), plateMat)
+          const plate = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.28, 0.040), plateMat)
           plate.position.set(0.18, 0.0, 0.16)
           sGroup.add(plate)
 
           const screwY = [0.46, 0.28, 0.10, -0.10, -0.28, -0.46]
           screwY.forEach((sy) => {
-            const sc = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.38, 12), screwMat)
+            const sc = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.40, 12), screwMat)
             sc.rotation.x = Math.PI / 2
             sc.position.set(0.18, sy, 0.06)
             sGroup.add(sc)
 
-            const head = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.02, 12), plateMat)
+            const head = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.022, 12), plateMat)
             head.rotation.x = Math.PI / 2
             head.position.set(0.18, sy, 0.18)
             sGroup.add(head)
@@ -825,15 +1003,16 @@ export default function JointAnatomy3D({
 
           // BIOLOGICAL: Primary Callus Formation Collar
           const bGroup = new THREE.Group()
-          const callus = new THREE.Mesh(new THREE.SphereGeometry(0.26, 24, 24), boneMat)
-          callus.scale.set(1.12, 0.55, 1.12)
+          const callus = new THREE.Mesh(new THREE.SphereGeometry(0.27, 24, 24), boneMat)
+          callus.scale.set(1.14, 0.58, 1.14)
           callus.position.set(0, 0.0, 0)
           bGroup.add(callus)
+
           jointGroup.add(bGroup)
           biologicalObjects.push(bGroup)
         }
 
-        // ── 3D Visual Glowing Beacon Anchors ────────────────────────────────
+        // ── 3D Visual Glowing Beacon Anchors ──────────────────────────────────
         const currentCallouts = isRecovery
           ? CALLOUTS_DATA[currentType].recovery
           : CALLOUTS_DATA[currentType].surgical
@@ -848,7 +1027,7 @@ export default function JointAnatomy3D({
             new THREE.MeshStandardMaterial({
               color: new THREE.Color(c.color),
               emissive: new THREE.Color(c.color),
-              emissiveIntensity: 0.8,
+              emissiveIntensity: visualTheme === 'radiograph' ? 1.2 : 0.8,
               roughness: 0.1,
             })
           )
@@ -903,7 +1082,7 @@ export default function JointAnatomy3D({
 
       buildModel(activeType)
 
-      // ── Main Render & Projection Loop ───────────────────────────────────
+      // ── Main Render & Projection Loop ─────────────────────────────────────
       const clock = new THREE.Clock()
       const tempVec = new THREE.Vector3()
 
@@ -914,7 +1093,7 @@ export default function JointAnatomy3D({
         const elapsedTime = clock.getElapsedTime()
         controls.update()
 
-        // Soft floating when user is not actively interacting
+        // Subtle floating when user is not actively interacting
         if (!isInteracting) {
           jointGroup.position.y = Math.sin(elapsedTime * 1.5) * 0.02
         }
@@ -981,7 +1160,7 @@ export default function JointAnatomy3D({
       disposed = true
       cleanupPromise.then((cleanup) => cleanup && cleanup())
     }
-  }, [activeType, isRecovery, viewMode])
+  }, [activeType, isRecovery, viewMode, visualTheme])
 
   function handleTypeChange(newType: AnatomyType) {
     setActiveType(newType)
@@ -997,6 +1176,10 @@ export default function JointAnatomy3D({
     }
   }
 
+  function handleThemeChange(newTheme: 'studio' | 'radiograph') {
+    setVisualTheme(newTheme)
+  }
+
   function toggleAutoRotate() {
     const next = !autoRotate
     setAutoRotate(next)
@@ -1006,11 +1189,20 @@ export default function JointAnatomy3D({
   }
 
   const currentConfig = TYPE_CONFIG[activeType] || TYPE_CONFIG.knee
+  const isDark = visualTheme === 'radiograph'
 
   return (
-    <div className="w-full bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden my-8 sm:my-12">
+    <div
+      className={`w-full rounded-3xl border shadow-xl overflow-hidden my-8 sm:my-12 transition-colors duration-500 ${
+        isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'
+      }`}
+    >
       {/* Top Clinical Header Bar */}
-      <div className="p-5 sm:p-7 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50">
+      <div
+        className={`p-5 sm:p-7 border-b flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors duration-500 ${
+          isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-slate-50 border-slate-100'
+        }`}
+      >
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#059B8F] animate-pulse" />
@@ -1018,46 +1210,97 @@ export default function JointAnatomy3D({
               {isRecovery ? 'Clinical Rehabilitation & Bone Healing 3D' : 'Precision 3D Surgical Reconstruction'}
             </span>
           </div>
-          <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
+          <h3
+            className={`text-xl sm:text-2xl font-serif font-bold transition-colors ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}
+          >
             {title || (isRecovery ? `${currentConfig.label} Recovery Model` : `${currentConfig.label} 3D Anatomy`)}
           </h3>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
+          <p
+            className={`text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed transition-colors ${
+              isDark ? 'text-slate-300' : 'text-slate-600'
+            }`}
+          >
             {subtitle || (isRecovery
               ? 'Inspect structural joint stability, Day-1 walking alignment, and progressive tissue remodeling in interactive 3D.'
               : 'Rotate the 3D model 360° to view bone landmarks, precision surgical implants, and tissue-sparing techniques.')}
           </p>
         </div>
 
-        {/* View Mode Toggle Button */}
-        <div className="flex items-center gap-1.5 p-1 bg-white rounded-2xl border border-slate-200 shrink-0 self-start md:self-auto shadow-2xs">
-          <button
-            type="button"
-            onClick={() => handleModeChange('surgical')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              viewMode === 'surgical'
-                ? 'bg-[#059B8F] text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+        {/* View Mode & Contrast Theme Selectors */}
+        <div className="flex flex-wrap items-center gap-2 shrink-0 self-start md:self-auto">
+          {/* Studio vs Digital Radiograph Theme */}
+          <div
+            className={`flex items-center gap-1 p-1 rounded-2xl border shadow-2xs transition-colors ${
+              isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
             }`}
           >
-            {isRecovery ? 'Load Stabilization' : 'Surgical Reconstruction'}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleModeChange('biological')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-              viewMode === 'biological'
-                ? 'bg-[#059B8F] text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+            <button
+              type="button"
+              onClick={() => handleThemeChange('studio')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                !isDark
+                  ? 'bg-[#059B8F] text-white shadow-xs'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>☀️</span>
+              <span>Clinical Studio</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleThemeChange('radiograph')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                isDark
+                  ? 'bg-cyan-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>🔬</span>
+              <span>Digital X-Ray</span>
+            </button>
+          </div>
+
+          {/* Surgical vs Biological Toggle */}
+          <div
+            className={`flex items-center gap-1 p-1 rounded-2xl border shadow-2xs transition-colors ${
+              isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
             }`}
           >
-            {isRecovery ? 'Biological Tissue Healing' : 'Native Bone Anatomy'}
-          </button>
+            <button
+              type="button"
+              onClick={() => handleModeChange('surgical')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                viewMode === 'surgical'
+                  ? 'bg-[#059B8F] text-white shadow-xs'
+                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {isRecovery ? 'Load Stabilization' : 'Surgical Reconstruction'}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleModeChange('biological')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                viewMode === 'biological'
+                  ? 'bg-[#059B8F] text-white shadow-xs'
+                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {isRecovery ? 'Biological Tissue Healing' : 'Native Bone Anatomy'}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Optional Joint Type Selector for Recovery Hub */}
       {allowTypeSwitch && (
-        <div className="px-5 sm:px-7 py-3 border-b border-slate-100 bg-white flex items-center gap-2 overflow-x-auto scrollbar-none">
+        <div
+          className={`px-5 sm:px-7 py-3 border-b flex items-center gap-2 overflow-x-auto scrollbar-none transition-colors ${
+            isDark ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-100'
+          }`}
+        >
           <span className="text-xs font-bold uppercase tracking-wider text-slate-400 shrink-0 mr-1">
             Switch Joint:
           </span>
@@ -1070,7 +1313,9 @@ export default function JointAnatomy3D({
                 onClick={() => handleTypeChange(tKey)}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border ${
                   isCur
-                    ? 'bg-brand-50 text-[#059B8F] border-[#059B8F] shadow-xs'
+                    ? 'bg-teal-500/20 text-[#02BAB9] border-[#02BAB9] shadow-xs'
+                    : isDark
+                    ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
                     : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                 }`}
               >
@@ -1086,7 +1331,9 @@ export default function JointAnatomy3D({
         {/* WebGL Canvas Container */}
         <div
           ref={containerRef}
-          className="lg:col-span-8 relative min-h-[440px] sm:min-h-[520px] lg:min-h-[560px] bg-white cursor-grab active:cursor-grabbing flex items-center justify-center select-none overflow-hidden"
+          className={`lg:col-span-8 relative min-h-[440px] sm:min-h-[520px] lg:min-h-[560px] cursor-grab active:cursor-grabbing flex items-center justify-center select-none overflow-hidden transition-colors duration-500 ${
+            isDark ? 'bg-[#050a14]' : 'bg-white'
+          }`}
         >
           <canvas ref={canvasRef} className="w-full h-full block" />
 
@@ -1112,7 +1359,11 @@ export default function JointAnatomy3D({
                     onClick={() => matchingCallout && setActiveCallout(matchingCallout)}
                     className={`group flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-md backdrop-blur-xs border transition-all ${
                       isSelected
-                        ? 'bg-white border-[#059B8F] ring-2 ring-[#059B8F]/30 scale-105'
+                        ? isDark
+                          ? 'bg-slate-900 border-cyan-400 ring-2 ring-cyan-400/40 scale-105'
+                          : 'bg-white border-[#059B8F] ring-2 ring-[#059B8F]/30 scale-105'
+                        : isDark
+                        ? 'bg-slate-900/90 border-slate-700 hover:border-cyan-400 hover:bg-slate-800'
                         : 'bg-white/95 border-slate-200 hover:border-[#059B8F] hover:bg-white'
                     }`}
                   >
@@ -1120,7 +1371,11 @@ export default function JointAnatomy3D({
                       className="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs"
                       style={{ backgroundColor: pin.color }}
                     />
-                    <span className="text-[11px] font-bold text-slate-800 whitespace-nowrap leading-none">
+                    <span
+                      className={`text-[11px] font-bold whitespace-nowrap leading-none ${
+                        isDark ? 'text-slate-100' : 'text-slate-800'
+                      }`}
+                    >
                       {pin.title}
                     </span>
                   </button>
@@ -1130,11 +1385,17 @@ export default function JointAnatomy3D({
           </div>
 
           {/* On-Canvas Camera Floating Control Bar */}
-          <div className="absolute top-4 right-4 z-10 flex items-center gap-2 bg-white/95 p-1.5 rounded-2xl border border-slate-200 shadow-sm">
+          <div
+            className={`absolute top-4 right-4 z-10 flex items-center gap-2 p-1.5 rounded-2xl border shadow-sm backdrop-blur-md transition-colors ${
+              isDark ? 'bg-slate-900/90 border-slate-700' : 'bg-white/95 border-slate-200'
+            }`}
+          >
             <button
               type="button"
               onClick={() => stateRef.current.zoom && stateRef.current.zoom(-0.4)}
-              className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-700 font-bold text-base transition-colors"
+              className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-base transition-colors ${
+                isDark ? 'bg-slate-800 hover:bg-slate-700 text-slate-100' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'
+              }`}
               title="Zoom In"
             >
               +
@@ -1142,7 +1403,9 @@ export default function JointAnatomy3D({
             <button
               type="button"
               onClick={() => stateRef.current.zoom && stateRef.current.zoom(0.4)}
-              className="w-8 h-8 rounded-xl bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-700 font-bold text-base transition-colors"
+              className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-base transition-colors ${
+                isDark ? 'bg-slate-800 hover:bg-slate-700 text-slate-100' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'
+              }`}
               title="Zoom Out"
             >
               -
@@ -1150,7 +1413,9 @@ export default function JointAnatomy3D({
             <button
               type="button"
               onClick={() => stateRef.current.resetCam && stateRef.current.resetCam()}
-              className="px-2.5 h-8 rounded-xl bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors flex items-center gap-1"
+              className={`px-2.5 h-8 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1 ${
+                isDark ? 'bg-slate-800 hover:bg-slate-700 text-slate-100' : 'bg-slate-50 hover:bg-slate-100 text-slate-700'
+              }`}
               title="Reset Camera View"
             >
               Reset
@@ -1159,7 +1424,9 @@ export default function JointAnatomy3D({
               type="button"
               onClick={toggleAutoRotate}
               className={`px-2.5 h-8 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1 ${
-                autoRotate ? 'bg-teal-50 text-[#059B8F]' : 'bg-slate-50 text-slate-600'
+                autoRotate
+                  ? isDark ? 'bg-cyan-950 text-cyan-300' : 'bg-teal-50 text-[#059B8F]'
+                  : isDark ? 'bg-slate-800 text-slate-400' : 'bg-slate-50 text-slate-600'
               }`}
               title="Toggle Slow Turntable Rotation"
             >
@@ -1169,20 +1436,36 @@ export default function JointAnatomy3D({
 
           {/* Interactive Drag Hint */}
           <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 pointer-events-none">
-            <span className="text-[11px] font-medium text-slate-500 bg-white/95 px-3.5 py-1 rounded-full border border-slate-200 shadow-xs">
+            <span
+              className={`text-[11px] font-medium px-3.5 py-1 rounded-full border shadow-xs backdrop-blur-md ${
+                isDark
+                  ? 'bg-slate-900/90 text-slate-300 border-slate-700'
+                  : 'bg-white/95 text-slate-500 border-slate-200'
+              }`}
+            >
               🖱️ Drag 360° to orbit &bull; Pinch/Scroll to zoom &bull; Click pins to inspect
             </span>
           </div>
         </div>
 
         {/* Anatomical & Clinical Information Sidebar */}
-        <div className="lg:col-span-4 p-5 sm:p-7 border-t lg:border-t-0 lg:border-l border-slate-200 bg-slate-50 flex flex-col justify-between space-y-6">
+        <div
+          className={`lg:col-span-4 p-5 sm:p-7 border-t lg:border-t-0 lg:border-l flex flex-col justify-between space-y-6 transition-colors duration-500 ${
+            isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'
+          }`}
+        >
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              <span className={`text-[11px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-400'}`}>
                 {isRecovery ? 'Rehabilitation Anchors' : 'Key Anatomical Structures'}
               </span>
-              <span className="text-xs font-semibold text-[#059B8F] bg-white px-2.5 py-0.5 rounded-md border border-slate-200">
+              <span
+                className={`text-xs font-semibold px-2.5 py-0.5 rounded-md border ${
+                  isDark
+                    ? 'text-cyan-300 bg-slate-800 border-slate-700'
+                    : 'text-[#059B8F] bg-white border-slate-200'
+                }`}
+              >
                 {callouts.length} Checkpoints
               </span>
             </div>
@@ -1198,7 +1481,11 @@ export default function JointAnatomy3D({
                     onClick={() => setActiveCallout(point)}
                     className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-start gap-3 ${
                       isSelected
-                        ? 'bg-white border-[#059B8F] shadow-md ring-1 ring-[#059B8F]/20'
+                        ? isDark
+                          ? 'bg-slate-800/90 border-cyan-400 shadow-md ring-1 ring-cyan-400/30'
+                          : 'bg-white border-[#059B8F] shadow-md ring-1 ring-[#059B8F]/20'
+                        : isDark
+                        ? 'bg-slate-850/60 border-slate-800 hover:bg-slate-800 hover:border-slate-700'
                         : 'bg-white/80 border-slate-200 hover:bg-white hover:border-slate-300'
                     }`}
                   >
@@ -1208,16 +1495,24 @@ export default function JointAnatomy3D({
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h4 className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                        <h4
+                          className={`text-xs sm:text-sm font-bold truncate ${
+                            isDark ? 'text-white' : 'text-slate-900'
+                          }`}
+                        >
                           {point.title}
                         </h4>
                         {isSelected && (
-                          <span className="text-[10px] font-bold text-[#059B8F] uppercase tracking-wider">
+                          <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-cyan-300' : 'text-[#059B8F]'}`}>
                             Active
                           </span>
                         )}
                       </div>
-                      <p className="text-[11px] sm:text-xs text-slate-600 line-clamp-2 mt-0.5 leading-relaxed">
+                      <p
+                        className={`text-[11px] sm:text-xs line-clamp-2 mt-0.5 leading-relaxed ${
+                          isDark ? 'text-slate-300' : 'text-slate-600'
+                        }`}
+                      >
                         {point.desc}
                       </p>
                     </div>
@@ -1228,7 +1523,11 @@ export default function JointAnatomy3D({
           </div>
 
           {/* Focused Callout Detailed Card */}
-          <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-2">
+          <div
+            className={`p-4 rounded-2xl border shadow-sm space-y-2 transition-colors ${
+              isDark ? 'bg-slate-850 border-slate-700' : 'bg-white border-slate-200'
+            }`}
+          >
             <div className="flex items-center gap-2">
               <span
                 className="w-2.5 h-2.5 rounded-full"
@@ -1238,10 +1537,18 @@ export default function JointAnatomy3D({
                 Clinical Detail
               </span>
             </div>
-            <h4 className="text-sm font-serif font-bold text-slate-900">
+            <h4
+              className={`text-sm font-serif font-bold ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}
+            >
               {activeCallout.title}
             </h4>
-            <p className="text-xs text-slate-600 leading-relaxed font-sans">
+            <p
+              className={`text-xs leading-relaxed font-sans ${
+                isDark ? 'text-slate-300' : 'text-slate-600'
+              }`}
+            >
               {activeCallout.desc}
             </p>
           </div>
