@@ -7,8 +7,8 @@ export interface Joint3DInfo {
   id: string
   label: string
   boneName: string
-  fallbackPos: [number, number, number]
-  camOffset: [number, number, number]
+  surfaceOffset: [number, number, number] // Offset from bone to sit on skin/clothing surface
+  camOffset: [number, number, number]    // Camera focus offset
   color: string
 }
 
@@ -17,48 +17,48 @@ export const JOINTS_3D_DATA: Joint3DInfo[] = [
     id: 'knee',
     label: 'Knee',
     boneName: 'RightLeg',
-    fallbackPos: [-0.12, -0.34, 0.04],
-    camOffset: [0, 0.05, 0.95],
+    surfaceOffset: [0, 0.02, 0.11], // Front patellar surface of right knee
+    camOffset: [0, 0.02, 0.85],
     color: '#02BAB9',
   },
   {
     id: 'hip',
     label: 'Hip',
     boneName: 'RightUpLeg',
-    fallbackPos: [-0.12, 0.08, 0.02],
-    camOffset: [0, 0.05, 1.05],
+    surfaceOffset: [-0.08, 0.02, 0.08], // Lateral/front right hip joint
+    camOffset: [0, 0.02, 0.95],
     color: '#F18712',
   },
   {
     id: 'shoulder',
     label: 'Shoulder',
     boneName: 'LeftArm',
-    fallbackPos: [0.24, 0.44, 0.0],
-    camOffset: [0, 0.05, 1.0],
+    surfaceOffset: [0.08, 0.02, 0.06], // Left shoulder deltoid surface
+    camOffset: [0, 0.02, 0.90],
     color: '#059B8F',
   },
   {
     id: 'spine',
     label: 'Spine',
     boneName: 'Spine1',
-    fallbackPos: [0.0, 0.28, -0.06],
-    camOffset: [0.15, 0.05, -1.05],
+    surfaceOffset: [0, 0.0, -0.14], // Posterior surface of spine (back)
+    camOffset: [0.10, 0.02, -0.95],
     color: '#01B3BF',
   },
   {
     id: 'elbow',
     label: 'Elbow',
     boneName: 'LeftForeArm',
-    fallbackPos: [0.42, 0.24, 0.0],
-    camOffset: [0, 0.05, 0.95],
+    surfaceOffset: [0.07, 0.02, 0.02], // Lateral left elbow joint
+    camOffset: [0, 0.02, 0.85],
     color: '#0A7C97',
   },
   {
     id: 'ankle',
     label: 'Ankle',
     boneName: 'RightFoot',
-    fallbackPos: [-0.12, -0.78, 0.02],
-    camOffset: [0, 0.08, 0.9],
+    surfaceOffset: [-0.04, 0.04, 0.06], // Lateral right ankle malleolus
+    camOffset: [0, 0.05, 0.80],
     color: '#059B8F',
   },
 ]
@@ -79,7 +79,6 @@ export default function Ortho3DHuman({
 
   const [isLoading, setIsLoading] = useState(true)
   const [loadProgress, setLoadProgress] = useState(0)
-  const [screenPins, setScreenPins] = useState<{ id: string; x: number; y: number; visible: boolean }[]>([])
 
   // Store transition targets
   const transitionRef = useRef({
@@ -110,7 +109,7 @@ export default function Ortho3DHuman({
       const width = container.clientWidth
       const height = container.clientHeight
 
-      // ── Renderer (Pure White Clean Background) ───────────────────────────
+      // ── Renderer (Pure White Studio Background) ───────────────────────────
       const renderer = new THREE.WebGLRenderer({
         canvas,
         alpha: false,
@@ -136,11 +135,11 @@ export default function Ortho3DHuman({
       camera.lookAt(cameraTarget)
 
       // ── Studio High-Key Lighting ─────────────────────────────────────────
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1.4)
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.45)
       scene.add(ambientLight)
 
       // Soft Key Light from front-right
-      const keyLight = new THREE.DirectionalLight(0xfff7ed, 2.0)
+      const keyLight = new THREE.DirectionalLight(0xfff7ed, 1.9)
       keyLight.position.set(2.5, 3.5, 3.0)
       keyLight.castShadow = true
       keyLight.shadow.mapSize.width = 1024
@@ -153,7 +152,7 @@ export default function Ortho3DHuman({
       fillLight.position.set(-2.5, 2.5, 2.5)
       scene.add(fillLight)
 
-      // Backlight for realistic silhouette separation
+      // Backlight for clean silhouette separation
       const backLight = new THREE.DirectionalLight(0xe0f2fe, 1.0)
       backLight.position.set(0, 2.0, -3.0)
       scene.add(backLight)
@@ -189,67 +188,132 @@ export default function Ortho3DHuman({
       scene.add(shadowMesh)
 
       // ── Model & Pins Groups ──────────────────────────────────────────────
+      // `characterGroup` holds the model and all attached joint pins rigidly
       const characterGroup = new THREE.Group()
       scene.add(characterGroup)
 
-      const pinsGroup = new THREE.Group()
-      characterGroup.add(pinsGroup)
+      // Raycasting hit testing list
+      const clickableObjects: THREE.Object3D[] = []
+      const jointAnchorMap: Record<string, { group: THREE.Group; orb: THREE.Mesh; ring: THREE.Mesh; glow: THREE.Mesh; sprite: THREE.Sprite }> = {}
+      const jointCoordinates: Record<string, THREE.Vector3> = {}
 
-      const jointWorldPositions: Record<string, THREE.Vector3> = {}
-      const pinMeshes: Record<string, { orb: any; ring: any; glow: any }> = {}
+      // Helper to generate a crisp 3D Canvas Sprite Badge stuck to the joint
+      function createLabelSprite(text: string, color: string) {
+        const c = document.createElement('canvas')
+        c.width = 256
+        c.height = 80
+        const ctx = c.getContext('2d')!
 
-      // Initialize default fallback positions
-      JOINTS_3D_DATA.forEach((j) => {
-        jointWorldPositions[j.id] = new THREE.Vector3(...j.fallbackPos)
-      })
+        // Rounded pill badge with shadow
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.96)'
+        ctx.strokeStyle = color
+        ctx.lineWidth = 4
 
-      // Setup 3D Hotspot Pins
-      function setupPins() {
-        JOINTS_3D_DATA.forEach((j) => {
-          const jColor = new THREE.Color(j.color)
-          const pos = jointWorldPositions[j.id] || new THREE.Vector3(...j.fallbackPos)
+        const r = 24
+        const x = 8
+        const y = 8
+        const w = 240
+        const h = 64
 
-          // Center jewel sphere
-          const orbGeo = new THREE.SphereGeometry(0.032, 16, 16)
-          const orbMat = new THREE.MeshStandardMaterial({
-            color: jColor,
-            emissive: jColor,
-            emissiveIntensity: 0.7,
-            roughness: 0.2,
-            metalness: 0.2,
-          })
-          const orb = new THREE.Mesh(orbGeo, orbMat)
-          orb.position.copy(pos)
-          pinsGroup.add(orb)
+        ctx.beginPath()
+        ctx.moveTo(x + r, y)
+        ctx.lineTo(x + w - r, y)
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+        ctx.lineTo(x + w, y + h - r)
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+        ctx.lineTo(x + r, y + h)
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+        ctx.lineTo(x, y + r)
+        ctx.quadraticCurveTo(x, y, x + r, y)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
 
-          // Pulsing radar ring
-          const ringGeo = new THREE.RingGeometry(0.045, 0.058, 32)
-          const ringMat = new THREE.MeshBasicMaterial({
-            color: jColor,
-            transparent: true,
-            opacity: 0.8,
-            side: THREE.DoubleSide,
-          })
-          const ring = new THREE.Mesh(ringGeo, ringMat)
-          ring.position.copy(pos)
-          pinsGroup.add(ring)
+        // Colored dot
+        ctx.fillStyle = color
+        ctx.beginPath()
+        ctx.arc(38, 40, 10, 0, Math.PI * 2)
+        ctx.fill()
 
-          // Glow halo
-          const glowGeo = new THREE.SphereGeometry(0.065, 14, 14)
-          const glowMat = new THREE.MeshBasicMaterial({
-            color: jColor,
-            transparent: true,
-            opacity: 0.25,
-          })
-          const glow = new THREE.Mesh(glowGeo, glowMat)
-          glow.position.copy(pos)
-          pinsGroup.add(glow)
+        // Bold Typography
+        ctx.fillStyle = '#0f172a'
+        ctx.font = 'bold 30px system-ui, -apple-system, sans-serif'
+        ctx.fillText(text, 60, 50)
 
-          pinMeshes[j.id] = { orb, ring, glow }
+        const tex = new THREE.CanvasTexture(c)
+        tex.minFilter = THREE.LinearFilter
+        const mat = new THREE.SpriteMaterial({
+          map: tex,
+          depthTest: true,
+          depthWrite: false,
+          transparent: true,
         })
+        const sprite = new THREE.Sprite(mat)
+        sprite.scale.set(0.22, 0.07, 1)
+        return sprite
       }
 
-      setupPins()
+      // Attach real 3D marker pins rigidly to the character
+      function create3DPin(j: Joint3DInfo, pos: THREE.Vector3) {
+        const pinGroup = new THREE.Group()
+        pinGroup.position.copy(pos)
+        pinGroup.name = j.id
+
+        const jColor = new THREE.Color(j.color)
+
+        // 1. Center Spherical Jewel Pin
+        const orbGeo = new THREE.SphereGeometry(0.026, 16, 16)
+        const orbMat = new THREE.MeshStandardMaterial({
+          color: jColor,
+          emissive: jColor,
+          emissiveIntensity: 0.8,
+          roughness: 0.2,
+          metalness: 0.3,
+        })
+        const orb = new THREE.Mesh(orbGeo, orbMat)
+        orb.userData = { jointId: j.id }
+        pinGroup.add(orb)
+
+        // 2. Pulse Radar Ring
+        const ringGeo = new THREE.RingGeometry(0.038, 0.048, 32)
+        const ringMat = new THREE.MeshBasicMaterial({
+          color: jColor,
+          transparent: true,
+          opacity: 0.85,
+          side: THREE.DoubleSide,
+        })
+        const ring = new THREE.Mesh(ringGeo, ringMat)
+        pinGroup.add(ring)
+
+        // 3. Glow Halo Sphere
+        const glowGeo = new THREE.SphereGeometry(0.046, 14, 14)
+        const glowMat = new THREE.MeshBasicMaterial({
+          color: jColor,
+          transparent: true,
+          opacity: 0.28,
+        })
+        const glow = new THREE.Mesh(glowGeo, glowMat)
+        pinGroup.add(glow)
+
+        // 4. Stuck 3D Sprite Label (Anchored rigidly beside the pin)
+        const sprite = createLabelSprite(j.label, j.color)
+        sprite.position.set(0.12, 0.04, 0)
+        sprite.userData = { jointId: j.id }
+        pinGroup.add(sprite)
+
+        // Invisible larger hit box for easy clicking directly on the body part
+        const hitGeo = new THREE.SphereGeometry(0.08, 8, 8)
+        const hitMat = new THREE.MeshBasicMaterial({ visible: false })
+        const hitMesh = new THREE.Mesh(hitGeo, hitMat)
+        hitMesh.userData = { jointId: j.id }
+        pinGroup.add(hitMesh)
+
+        clickableObjects.push(hitMesh, orb, sprite)
+        characterGroup.add(pinGroup)
+
+        jointAnchorMap[j.id] = { group: pinGroup, orb, ring, glow, sprite }
+        jointCoordinates[j.id] = pos.clone()
+      }
 
       // ── LOAD REAL 3D CLOTHED HUMAN MALE GLB ──────────────────────────────
       const loader = new GLTFLoader()
@@ -301,32 +365,29 @@ export default function Ortho3DHuman({
             }
           })
 
-          // Update joint pin positions from real model bones
+          // Attach each 3D Pin RIGIDLY directly to the exact bone surface
           JOINTS_3D_DATA.forEach((j) => {
             const bone = boneMap[j.boneName]
+            const pinPos = new THREE.Vector3()
+
             if (bone) {
-              const worldPos = new THREE.Vector3()
-              bone.getWorldPosition(worldPos)
-              // Convert to local position in characterGroup
-              characterGroup.worldToLocal(worldPos)
-
-              // Subtle natural surface offsets so pins sit on skin/clothing surface
-              if (j.id === 'knee') worldPos.z += 0.08
-              if (j.id === 'hip') worldPos.z += 0.08
-              if (j.id === 'shoulder') worldPos.z += 0.06
-              if (j.id === 'elbow') worldPos.z += 0.05
-              if (j.id === 'ankle') worldPos.z += 0.06
-              if (j.id === 'spine') worldPos.z -= 0.08
-
-              jointWorldPositions[j.id].copy(worldPos)
-
-              const pin = pinMeshes[j.id]
-              if (pin) {
-                pin.orb.position.copy(worldPos)
-                pin.ring.position.copy(worldPos)
-                pin.glow.position.copy(worldPos)
-              }
+              bone.getWorldPosition(pinPos)
+              characterGroup.worldToLocal(pinPos)
+              // Apply surface offset so the pin sits right on the skin/clothing
+              pinPos.x += j.surfaceOffset[0]
+              pinPos.y += j.surfaceOffset[1]
+              pinPos.z += j.surfaceOffset[2]
+            } else {
+              // Safe default position if bone not resolved
+              if (j.id === 'knee') pinPos.set(-0.11, -0.34, 0.11)
+              if (j.id === 'hip') pinPos.set(-0.14, 0.08, 0.09)
+              if (j.id === 'shoulder') pinPos.set(0.25, 0.44, 0.06)
+              if (j.id === 'spine') pinPos.set(0.0, 0.28, -0.14)
+              if (j.id === 'elbow') pinPos.set(0.42, 0.22, 0.02)
+              if (j.id === 'ankle') pinPos.set(-0.12, -0.78, 0.06)
             }
+
+            create3DPin(j, pinPos)
           })
 
           setIsLoading(false)
@@ -350,9 +411,10 @@ export default function Ortho3DHuman({
         const joint = JOINTS_3D_DATA.find((j) => j.id === jointId)
         if (!joint) return
 
-        const jointPos = jointWorldPositions[jointId] || new THREE.Vector3(...joint.fallbackPos)
+        const jointPos = jointCoordinates[jointId]
+        if (!jointPos) return
 
-        // Target camera position offset from the joint
+        // Compute camera destination relative to the joint
         transitionRef.current.targetCamPos = [
           jointPos.x + joint.camOffset[0],
           jointPos.y + joint.camOffset[1],
@@ -371,6 +433,44 @@ export default function Ortho3DHuman({
       stateRef.current.selectJoint = flyToJoint
       stateRef.current.resetView = resetView
 
+      // ── RAYCASTER FOR DIRECT CLICK & HOVER ON PINS ─────────────────────────
+      const raycaster = new THREE.Raycaster()
+      const mouseVec = new THREE.Vector2()
+
+      function getPointerPos(e: MouseEvent) {
+        const rect = canvas.getBoundingClientRect()
+        mouseVec.x = ((e.clientX - rect.left) / rect.width) * 2 - 1
+        mouseVec.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
+      }
+
+      function onClick(e: MouseEvent) {
+        getPointerPos(e)
+        raycaster.setFromCamera(mouseVec, camera)
+        const intersects = raycaster.intersectObjects(clickableObjects, true)
+
+        if (intersects.length > 0) {
+          let hitObj: any = intersects[0].object
+          while (hitObj && !hitObj.userData?.jointId && hitObj.parent) {
+            hitObj = hitObj.parent
+          }
+          const jointId = hitObj?.userData?.jointId
+          if (jointId) {
+            onSelectJoint(jointId)
+          }
+        }
+      }
+
+      function onPointerMove(e: MouseEvent) {
+        getPointerPos(e)
+        raycaster.setFromCamera(mouseVec, camera)
+        const intersects = raycaster.intersectObjects(clickableObjects, true)
+        if (intersects.length > 0) {
+          canvas.style.cursor = 'pointer'
+        } else {
+          canvas.style.cursor = isDragging ? 'grabbing' : 'grab'
+        }
+      }
+
       // ── 360° MOUSE & TOUCH ORBIT CONTROLS ─────────────────────────────────
       let isDragging = false
       let prevMouseX = 0
@@ -387,6 +487,7 @@ export default function Ortho3DHuman({
       }
 
       function onMouseMove(e: MouseEvent) {
+        onPointerMove(e)
         if (!isDragging) return
         const deltaX = e.clientX - prevMouseX
         const deltaY = e.clientY - prevMouseY
@@ -399,6 +500,7 @@ export default function Ortho3DHuman({
 
       function onMouseUp() {
         isDragging = false
+        canvas.style.cursor = 'grab'
       }
 
       function onWheel(e: WheelEvent) {
@@ -437,6 +539,7 @@ export default function Ortho3DHuman({
       }
 
       const canvasEl = canvasRef.current
+      canvasEl.addEventListener('click', onClick)
       canvasEl.addEventListener('mousedown', onMouseDown)
       window.addEventListener('mousemove', onMouseMove)
       window.addEventListener('mouseup', onMouseUp)
@@ -444,25 +547,6 @@ export default function Ortho3DHuman({
       canvasEl.addEventListener('touchstart', onTouchStart, { passive: true })
       window.addEventListener('touchmove', onTouchMove, { passive: true })
       window.addEventListener('touchend', onTouchEnd)
-
-      // ── SCREEN PROJECTION FOR 2D JOINT HOTSPOT TAGS ───────────────────────
-      const tempVec = new THREE.Vector3()
-
-      function updateScreenPins() {
-        const pins = JOINTS_3D_DATA.map((j) => {
-          const pos = jointWorldPositions[j.id] || new THREE.Vector3(...j.fallbackPos)
-          tempVec.copy(pos)
-          tempVec.applyMatrix4(characterGroup.matrixWorld)
-          tempVec.project(camera)
-
-          const isVisible = tempVec.z < 1.0 && Math.abs(tempVec.x) < 1.1 && Math.abs(tempVec.y) < 1.1
-          const x = (tempVec.x * 0.5 + 0.5) * width
-          const y = (-(tempVec.y * 0.5) + 0.5) * height
-
-          return { id: j.id, x, y, visible: isVisible }
-        })
-        setScreenPins(pins)
-      }
 
       // ── RESIZE HANDLER ────────────────────────────────────────────────────
       function onResize() {
@@ -516,34 +600,34 @@ export default function Ortho3DHuman({
           }
         }
 
-        // Animate Hotspot Pins
+        // Animate 3D Hotspot Pins (Locked to character)
         JOINTS_3D_DATA.forEach((j, idx) => {
-          const pin = pinMeshes[j.id]
+          const pin = jointAnchorMap[j.id]
           if (pin) {
+            // Billboard the radar ring so it faces camera
             pin.ring.lookAt(camera.position)
 
             const wave = (elapsedTime * 1.5 + idx * 0.35) % 1
             pin.ring.scale.setScalar(1 + wave * 1.5)
-            pin.ring.material.opacity = (1 - wave) * 0.75
+            ;(pin.ring.material as THREE.MeshBasicMaterial).opacity = (1 - wave) * 0.8
 
             const isSelected = j.id === activeJointId
-            const pulse = 1 + Math.sin(elapsedTime * 3 + idx) * (isSelected ? 0.2 : 0.1)
+            const pulse = 1 + Math.sin(elapsedTime * 3 + idx) * (isSelected ? 0.25 : 0.1)
             pin.orb.scale.setScalar(pulse)
 
             if (isSelected) {
-              pin.glow.scale.setScalar(1.5 + Math.sin(elapsedTime * 4) * 0.2)
-              pin.glow.material.opacity = 0.4
-              pin.orb.material.emissiveIntensity = 1.1
+              pin.glow.scale.setScalar(1.6 + Math.sin(elapsedTime * 4) * 0.2)
+              ;(pin.glow.material as THREE.MeshBasicMaterial).opacity = 0.45
+              ;(pin.orb.material as THREE.MeshStandardMaterial).emissiveIntensity = 1.3
+              pin.sprite.scale.set(0.26, 0.082, 1)
             } else {
               pin.glow.scale.setScalar(1.0)
-              pin.glow.material.opacity = 0.2
-              pin.orb.material.emissiveIntensity = 0.4
+              ;(pin.glow.material as THREE.MeshBasicMaterial).opacity = 0.2
+              ;(pin.orb.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.6
+              pin.sprite.scale.set(0.22, 0.07, 1)
             }
           }
         })
-
-        // Update 2D Screen Hotspot Tags
-        updateScreenPins()
 
         renderer.render(scene, camera)
       }
@@ -553,6 +637,7 @@ export default function Ortho3DHuman({
       return () => {
         disposed = true
         cancelAnimationFrame(animId)
+        canvasEl.removeEventListener('click', onClick)
         canvasEl.removeEventListener('mousedown', onMouseDown)
         window.removeEventListener('mousemove', onMouseMove)
         window.removeEventListener('mouseup', onMouseUp)
@@ -570,7 +655,7 @@ export default function Ortho3DHuman({
       disposed = true
       cleanupPromise.then((fn) => fn?.())
     }
-  }, [activeJointId])
+  }, [activeJointId, onSelectJoint])
 
   // React to external active joint change
   useEffect(() => {
@@ -625,51 +710,9 @@ export default function Ortho3DHuman({
       {/* Subtle Drag Hint (Bottom Center) */}
       <div className="absolute bottom-3 inset-x-0 pointer-events-none text-center hidden sm:block z-10">
         <span className="text-[11px] font-medium text-slate-500 bg-white/90 px-3.5 py-1 rounded-full border border-slate-200/80 shadow-xs">
-          Drag to rotate 360° • Click any joint to inspect
+          Drag to rotate 360° • Click any joint pin on the body to inspect
         </span>
       </div>
-
-      {/* ── 2D SCREEN-PROJECTED HOTSPOT BADGES (Clean White/Teal Style) ── */}
-      {screenPins.map((pin) => {
-        if (!pin.visible) return null
-        const isSelected = pin.id === activeJointId
-        const jointData = JOINTS_3D_DATA.find((j) => j.id === pin.id)
-        if (!jointData) return null
-
-        return (
-          <button
-            key={pin.id}
-            onClick={() => onSelectJoint(pin.id)}
-            className={`absolute z-20 flex items-center gap-1.5 px-3 py-1 rounded-full backdrop-blur-md transition-all duration-300 cursor-pointer ${
-              isSelected
-                ? 'scale-110 shadow-md ring-2 ring-brand-500'
-                : 'hover:scale-105 opacity-90 hover:opacity-100 shadow-xs'
-            }`}
-            style={{
-              left: `${pin.x}px`,
-              top: `${pin.y}px`,
-              transform: 'translate(-50%, -50%)',
-              backgroundColor: isSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.95)',
-              border: `1.5px solid ${isSelected ? jointData.color : '#e2e8f0'}`,
-              boxShadow: isSelected ? `0 4px 14px ${jointData.color}40` : '0 2px 6px rgba(0,0,0,0.06)',
-            }}
-          >
-            <span
-              className="w-2.5 h-2.5 rounded-full shrink-0"
-              style={{
-                backgroundColor: jointData.color,
-                boxShadow: isSelected ? `0 0 8px ${jointData.color}` : 'none',
-              }}
-            />
-            <span
-              className="text-xs font-bold whitespace-nowrap"
-              style={{ color: isSelected ? '#0f172a' : '#334155' }}
-            >
-              {jointData.label}
-            </span>
-          </button>
-        )
-      })}
     </div>
   )
 }
