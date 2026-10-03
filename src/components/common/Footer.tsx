@@ -5,7 +5,7 @@ import { WhatsAppIcon } from '@/components/common/WhatsAppIcon'
 
 export default function Footer() {
   return (
-    <footer className="bg-white text-black pt-16 pb-10 border-t border-brand-200/80">
+    <footer className="bg-white text-black pt-16 pb-16 sm:pb-20 border-t border-brand-200/80">
       <div className="container">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           {/* Column 1: Brand & Mission */}
