@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { ArrowRight, CheckCircle2 } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Phone, Calendar } from 'lucide-react'
 
 // Dynamically import the WebGL 3D clothed human male with SSR disabled
 const Ortho3DHuman = dynamic(() => import('./Ortho3DHuman'), {
@@ -152,9 +152,10 @@ const JOINTS: JointZone[] = [
 ]
 
 export default function BodyMapSelector() {
-  const [activeJointId, setActiveJointId] = useState<string>('knee')
+  const [activeJointId, setActiveJointId] = useState<string | null>(null)
 
-  const activeJoint = JOINTS.find((j) => j.id === activeJointId) || JOINTS[0]
+  const activeJoint = activeJointId ? JOINTS.find((j) => j.id === activeJointId) : null
+  const currentColor = activeJoint?.color || '#059B8F'
 
   return (
     <section id="interactive-body-map" className="py-14 sm:py-18 md:py-22 bg-white border-y border-slate-100">
@@ -164,7 +165,7 @@ export default function BodyMapSelector() {
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-50 border border-brand-200/80 text-brand-700 text-xs font-bold mb-4">
             <span
               className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: activeJoint.color }}
+              style={{ backgroundColor: currentColor }}
             />
             <span>3D Interactive Anatomy Explorer</span>
           </div>
@@ -173,12 +174,29 @@ export default function BodyMapSelector() {
             Explore Your Joint &amp; Treatment
           </h2>
           <p className="text-sm sm:text-base md:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-            Rotate the 3D model in 360° and click any joint below to inspect Dr. Gaurav Bhargava&apos;s surgical procedures, implant specifications, and recovery timelines.
+            View the full 3D human body below. Click any joint pin or select a body part to focus the camera and inspect Dr. Gaurav Bhargava&apos;s specialized surgical procedures.
           </p>
         </div>
 
-        {/* Clean Joint Selection Buttons (Only Joints & Body Parts) */}
+        {/* Clean Body Part Selection Buttons */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-8 sm:mb-10">
+          {/* Full Body Overview Button */}
+          <button
+            onClick={() => setActiveJointId(null)}
+            className={`flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
+              activeJointId === null
+                ? 'bg-slate-900 text-white shadow-md'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
+            }`}
+          >
+            <span
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: activeJointId === null ? '#02BAB9' : '#94a3b8' }}
+            />
+            <span>Full Body</span>
+          </button>
+
+          {/* Individual Joint Buttons */}
           {JOINTS.map((j) => {
             const isSelected = j.id === activeJointId
             return (
@@ -213,12 +231,12 @@ export default function BodyMapSelector() {
 
         {/* Main 3D Model & Procedure Showcase Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 items-stretch">
-          {/* Left: 3D Clothed Human Male on White Canvas (7 cols) */}
+          {/* Left: 3D Clothed Human Male on Pure White Canvas (7 cols) */}
           <div className="lg:col-span-7 flex flex-col justify-center">
             <Ortho3DHuman
               activeJointId={activeJointId}
               onSelectJoint={(id) => setActiveJointId(id)}
-              activeColor={activeJoint.color}
+              activeColor={currentColor}
             />
           </div>
 
@@ -227,104 +245,178 @@ export default function BodyMapSelector() {
             <div
               className="flex-1 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-md flex flex-col justify-between transition-all duration-300"
               style={{
-                borderTopColor: activeJoint.color,
+                borderTopColor: currentColor,
                 borderTopWidth: '4px',
               }}
             >
-              <div>
-                {/* Category Pill */}
-                <div className="flex items-center justify-between mb-4">
-                  <span
-                    className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full"
-                    style={{
-                      backgroundColor: `${activeJoint.color}15`,
-                      color: activeJoint.color,
-                    }}
-                  >
-                    {activeJoint.category}
-                  </span>
-                  <span className="text-xs font-semibold text-slate-400">
-                    {activeJoint.label} Specialty
-                  </span>
-                </div>
-
-                {/* Procedure Title */}
-                <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mb-3 leading-snug">
-                  {activeJoint.treatmentName}
-                </h3>
-
-                {/* Description */}
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
-                  {activeJoint.desc}
-                </p>
-
-                {/* Quick Clinical Metrics */}
-                <div className="grid grid-cols-3 gap-2 sm:gap-2.5 mb-6">
-                  {activeJoint.stats.map((stat, i) => (
-                    <div
-                      key={i}
-                      className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-center"
+              {activeJoint ? (
+                // SPECIFIC JOINT PROCEDURE VIEW
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span
+                      className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full"
+                      style={{
+                        backgroundColor: `${activeJoint.color}15`,
+                        color: activeJoint.color,
+                      }}
                     >
+                      {activeJoint.category}
+                    </span>
+                    <span className="text-xs font-semibold text-slate-400">
+                      {activeJoint.label} Specialty
+                    </span>
+                  </div>
+
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mb-3 leading-snug">
+                    {activeJoint.treatmentName}
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+                    {activeJoint.desc}
+                  </p>
+
+                  <div className="grid grid-cols-3 gap-2 sm:gap-2.5 mb-6">
+                    {activeJoint.stats.map((stat, i) => (
                       <div
-                        className="text-xs sm:text-sm font-bold leading-tight"
-                        style={{ color: activeJoint.color }}
+                        key={i}
+                        className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-center"
                       >
-                        {stat}
+                        <div
+                          className="text-xs sm:text-sm font-bold leading-tight"
+                          style={{ color: activeJoint.color }}
+                        >
+                          {stat}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Surgical Rigor Points */}
-                <div className="mb-6 space-y-2.5">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    Surgical Protocol &amp; Rigor:
+                    ))}
                   </div>
-                  {activeJoint.surgicalFeatures.map((feat, i) => (
-                    <div key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700">
-                      <CheckCircle2
-                        size={16}
-                        className="shrink-0 mt-0.5"
-                        style={{ color: activeJoint.color }}
-                      />
-                      <span>{feat}</span>
-                    </div>
-                  ))}
-                </div>
 
-                {/* Implant & Recovery Summary */}
-                <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs mb-6">
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-slate-500 font-medium shrink-0">Implant / Protocol:</span>
-                    <span className="text-right font-semibold text-slate-900">
-                      {activeJoint.implantType}
+                  <div className="mb-6 space-y-2.5">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                      Surgical Protocol &amp; Rigor:
+                    </div>
+                    {activeJoint.surgicalFeatures.map((feat, i) => (
+                      <div key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700">
+                        <CheckCircle2
+                          size={16}
+                          className="shrink-0 mt-0.5"
+                          style={{ color: activeJoint.color }}
+                        />
+                        <span>{feat}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2 text-xs mb-6">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-slate-500 font-medium shrink-0">Implant / Protocol:</span>
+                      <span className="text-right font-semibold text-slate-900">
+                        {activeJoint.implantType}
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between gap-2 pt-2 border-t border-slate-200">
+                      <span className="text-slate-500 font-medium shrink-0">Mobilization:</span>
+                      <span className="text-right font-bold text-emerald-700">
+                        {activeJoint.recoveryTime}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // FULL BODY OVERVIEW (SHOWN ON INITIAL LOAD & FULL BODY SELECTION)
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-brand-50 text-brand-700">
+                      Comprehensive Joint Care
+                    </span>
+                    <span className="text-xs font-semibold text-slate-400">
+                      Ex-SR MAMC New Delhi
                     </span>
                   </div>
-                  <div className="flex items-start justify-between gap-2 pt-2 border-t border-slate-200">
-                    <span className="text-slate-500 font-medium shrink-0">Mobilization:</span>
-                    <span className="text-right font-bold text-emerald-700">
-                      {activeJoint.recoveryTime}
-                    </span>
+
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900 mb-3 leading-snug">
+                    Full-Body Orthopaedic &amp; Joint Replacement Portfolio
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+                    Select any joint on the 3D model or choose from the body parts above to explore Dr. Gaurav Bhargava&apos;s specialized surgical procedures, implant technologies, and fast-track recovery protocols.
+                  </p>
+
+                  <div className="grid grid-cols-3 gap-2 sm:gap-2.5 mb-6">
+                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
+                      <div className="text-xs sm:text-sm font-bold text-brand-600 leading-tight">
+                        5,000+
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-medium mt-0.5">Surgeries</div>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
+                      <div className="text-xs sm:text-sm font-bold text-brand-700 leading-tight">
+                        20+ Years
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-medium mt-0.5">Excellence</div>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
+                      <div className="text-xs sm:text-sm font-bold text-[#F18712] leading-tight">
+                        24-Hr
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-medium mt-0.5">Walking</div>
+                    </div>
+                  </div>
+
+                  <div className="mb-6 space-y-2.5">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                      Key Clinical Focus Areas:
+                    </div>
+                    {[
+                      'Computer-balanced Total Knee & Hip Arthroplasty',
+                      'High-definition 4K Keyhole Shoulder Arthroscopy',
+                      'Non-operative fluoroscopy-guided spinal preservation',
+                      'Class-100 laminar airflow infection-free operating theaters',
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700">
+                        <CheckCircle2 size={16} className="shrink-0 mt-0.5 text-brand-600" />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-brand-50/70 border border-brand-200/80 text-xs text-brand-900 leading-relaxed mb-6">
+                    💡 <strong>Tip:</strong> Tap on the <strong>Knee</strong>, <strong>Hip</strong>, <strong>Shoulder</strong>, <strong>Spine</strong>, <strong>Elbow</strong>, or <strong>Ankle</strong> pins to zoom the 3D camera into that joint.
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Action Buttons */}
               <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-3">
-                <Link
-                  href={`/treatments/${activeJoint.slug}`}
-                  className="btn-primary flex-1 flex items-center justify-center gap-2 py-3 px-5 text-xs sm:text-sm font-bold shadow-md shadow-brand-600/20"
-                >
-                  <span>View Treatment Details</span>
-                  <ArrowRight size={15} />
-                </Link>
+                {activeJoint ? (
+                  <Link
+                    href={`/treatments/${activeJoint.slug}`}
+                    className="btn-primary flex-1 flex items-center justify-center gap-2 py-3 px-5 text-xs sm:text-sm font-bold shadow-md shadow-brand-600/20"
+                    style={{
+                      backgroundColor: activeJoint.color,
+                      borderColor: activeJoint.color,
+                    }}
+                  >
+                    <span>View Treatment Details</span>
+                    <ArrowRight size={15} />
+                  </Link>
+                ) : (
+                  <Link
+                    href="/appointment"
+                    className="btn-primary flex-1 flex items-center justify-center gap-2 py-3 px-5 text-xs sm:text-sm font-bold shadow-md shadow-brand-600/20"
+                  >
+                    <Calendar size={15} />
+                    <span>Book Clinic Appointment</span>
+                  </Link>
+                )}
 
-                <Link
-                  href="/appointment"
-                  className="btn-secondary py-3 px-5 text-xs sm:text-sm font-bold text-center"
+                <a
+                  href="tel:+917309038872"
+                  className="btn-secondary py-3 px-5 text-xs sm:text-sm font-bold text-center flex items-center justify-center gap-2"
                 >
-                  Book Consult
-                </Link>
+                  <Phone size={14} />
+                  <span>Call OPD</span>
+                </a>
               </div>
             </div>
           </div>

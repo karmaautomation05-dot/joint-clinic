@@ -7,8 +7,8 @@ export interface Joint3DInfo {
   id: string
   label: string
   boneName: string
-  surfaceOffset: [number, number, number] // Offset from bone to sit on skin/clothing surface
-  camOffset: [number, number, number]    // Camera focus offset
+  surfaceOffset: [number, number, number]
+  camOffset: [number, number, number]
   color: string
 }
 
@@ -17,7 +17,7 @@ export const JOINTS_3D_DATA: Joint3DInfo[] = [
     id: 'knee',
     label: 'Knee',
     boneName: 'RightLeg',
-    surfaceOffset: [0, 0.02, 0.13], // Front patellar surface of right knee
+    surfaceOffset: [0, 0.02, 0.13],
     camOffset: [0, 0.02, 0.88],
     color: '#02BAB9',
   },
@@ -25,7 +25,7 @@ export const JOINTS_3D_DATA: Joint3DInfo[] = [
     id: 'hip',
     label: 'Hip',
     boneName: 'RightUpLeg',
-    surfaceOffset: [-0.07, 0.04, 0.17], // In front and lateral on anterior hip (no body clipping)
+    surfaceOffset: [-0.07, 0.04, 0.17],
     camOffset: [0, 0.03, 1.05],
     color: '#F18712',
   },
@@ -33,7 +33,7 @@ export const JOINTS_3D_DATA: Joint3DInfo[] = [
     id: 'shoulder',
     label: 'Shoulder',
     boneName: 'LeftArm',
-    surfaceOffset: [0.08, 0.02, 0.08], // In front of left shoulder deltoid
+    surfaceOffset: [0.08, 0.02, 0.08],
     camOffset: [0, 0.02, 0.92],
     color: '#059B8F',
   },
@@ -41,7 +41,7 @@ export const JOINTS_3D_DATA: Joint3DInfo[] = [
     id: 'spine',
     label: 'Spine',
     boneName: 'Spine1',
-    surfaceOffset: [0, 0.0, -0.16], // Posterior surface of spine (back)
+    surfaceOffset: [0, 0.0, -0.16],
     camOffset: [0.10, 0.02, -0.98],
     color: '#01B3BF',
   },
@@ -49,7 +49,7 @@ export const JOINTS_3D_DATA: Joint3DInfo[] = [
     id: 'elbow',
     label: 'Elbow',
     boneName: 'LeftForeArm',
-    surfaceOffset: [0.08, 0.02, 0.04], // Lateral left elbow joint
+    surfaceOffset: [0.08, 0.02, 0.04],
     camOffset: [0, 0.02, 0.88],
     color: '#0A7C97',
   },
@@ -57,15 +57,15 @@ export const JOINTS_3D_DATA: Joint3DInfo[] = [
     id: 'ankle',
     label: 'Ankle',
     boneName: 'RightFoot',
-    surfaceOffset: [-0.04, 0.06, 0.16], // In front of right ankle/footwear (no body clipping)
+    surfaceOffset: [-0.04, 0.06, 0.16],
     camOffset: [0, 0.06, 0.82],
     color: '#059B8F',
   },
 ]
 
 interface Ortho3DHumanProps {
-  activeJointId: string
-  onSelectJoint: (id: string) => void
+  activeJointId: string | null
+  onSelectJoint: (id: string | null) => void
   activeColor: string
 }
 
@@ -80,17 +80,20 @@ export default function Ortho3DHuman({
   const [isLoading, setIsLoading] = useState(true)
   const [loadProgress, setLoadProgress] = useState(0)
 
-  // Store transition targets
+  // Full body camera initial view: z = 3.10 perfectly fits 1.85m human male head-to-toe
+  const FULL_BODY_CAM: [number, number, number] = [0, 0.0, 3.10]
+  const FULL_BODY_TARGET: [number, number, number] = [0, 0.0, 0]
+
   const transitionRef = useRef({
-    currentCamPos: [0, 0.0, 2.5] as [number, number, number],
-    targetCamPos: [0, 0.0, 2.5] as [number, number, number],
-    currentLookAt: [0, 0.0, 0] as [number, number, number],
-    targetLookAt: [0, 0.0, 0] as [number, number, number],
+    currentCamPos: [...FULL_BODY_CAM] as [number, number, number],
+    targetCamPos: [...FULL_BODY_CAM] as [number, number, number],
+    currentLookAt: [...FULL_BODY_TARGET] as [number, number, number],
+    targetLookAt: [...FULL_BODY_TARGET] as [number, number, number],
     isTransitioning: false,
   })
 
   const stateRef = useRef<{
-    selectJoint?: (id: string) => void
+    selectJoint?: (id: string | null) => void
     resetView?: () => void
   }>({})
 
@@ -124,14 +127,14 @@ export default function Ortho3DHuman({
       renderer.toneMapping = THREE.ACESFilmicToneMapping
       renderer.toneMappingExposure = 1.05
 
-      // ── Scene & Camera ──────────────────────────────────────────────────
+      // ── Scene & Camera (Starts in Full Body Overview) ─────────────────────
       const scene = new THREE.Scene()
       scene.background = new THREE.Color(0xffffff)
 
       const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100)
-      camera.position.set(0, 0.0, 2.5)
+      camera.position.set(...FULL_BODY_CAM)
 
-      const cameraTarget = new THREE.Vector3(0, 0.0, 0)
+      const cameraTarget = new THREE.Vector3(...FULL_BODY_TARGET)
       camera.lookAt(cameraTarget)
 
       // ── Studio High-Key Lighting ─────────────────────────────────────────
@@ -176,7 +179,7 @@ export default function Ortho3DHuman({
       sCtx.fillRect(0, 0, 256, 256)
 
       const shadowTex = new THREE.CanvasTexture(shadowCanvas)
-      const shadowPlaneGeo = new THREE.PlaneGeometry(2.2, 2.2)
+      const shadowPlaneGeo = new THREE.PlaneGeometry(2.4, 2.4)
       const shadowPlaneMat = new THREE.MeshBasicMaterial({
         map: shadowTex,
         transparent: true,
@@ -188,11 +191,9 @@ export default function Ortho3DHuman({
       scene.add(shadowMesh)
 
       // ── Model & Pins Groups ──────────────────────────────────────────────
-      // `characterGroup` holds the model and all attached joint pins rigidly
       const characterGroup = new THREE.Group()
       scene.add(characterGroup)
 
-      // Raycasting hit testing list
       const clickableObjects: THREE.Object3D[] = []
       const jointAnchorMap: Record<string, { group: THREE.Group; orb: THREE.Mesh; ring: THREE.Mesh; glow: THREE.Mesh; sprite: THREE.Sprite }> = {}
       const jointCoordinates: Record<string, THREE.Vector3> = {}
@@ -204,7 +205,6 @@ export default function Ortho3DHuman({
         c.height = 80
         const ctx = c.getContext('2d')!
 
-        // Rounded pill badge with shadow
         ctx.fillStyle = 'rgba(255, 255, 255, 0.96)'
         ctx.strokeStyle = color
         ctx.lineWidth = 4
@@ -244,17 +244,16 @@ export default function Ortho3DHuman({
         tex.minFilter = THREE.LinearFilter
         const mat = new THREE.SpriteMaterial({
           map: tex,
-          depthTest: false, // Ensures badge is NEVER cut through or hidden behind clothes
+          depthTest: false,
           depthWrite: false,
           transparent: true,
         })
         const sprite = new THREE.Sprite(mat)
-        sprite.renderOrder = 1000 // Always renders on top
+        sprite.renderOrder = 1000
         sprite.scale.set(0.22, 0.07, 1)
         return sprite
       }
 
-      // Attach real 3D marker pins rigidly to the character
       function create3DPin(j: Joint3DInfo, pos: THREE.Vector3) {
         const pinGroup = new THREE.Group()
         pinGroup.position.copy(pos)
@@ -307,13 +306,13 @@ export default function Ortho3DHuman({
         glow.renderOrder = 997
         pinGroup.add(glow)
 
-        // 4. Stuck 3D Sprite Label (Anchored rigidly beside the pin)
+        // 4. Stuck 3D Sprite Label
         const sprite = createLabelSprite(j.label, j.color)
         sprite.position.set(0.12, 0.04, 0)
         sprite.userData = { jointId: j.id }
         pinGroup.add(sprite)
 
-        // Invisible larger hit box for easy clicking directly on the body part
+        // Invisible larger hit sphere for direct click
         const hitGeo = new THREE.SphereGeometry(0.08, 8, 8)
         const hitMat = new THREE.MeshBasicMaterial({ visible: false })
         const hitMesh = new THREE.Mesh(hitGeo, hitMat)
@@ -385,12 +384,10 @@ export default function Ortho3DHuman({
             if (bone) {
               bone.getWorldPosition(pinPos)
               characterGroup.worldToLocal(pinPos)
-              // Apply surface offset so the pin sits right on the skin/clothing
               pinPos.x += j.surfaceOffset[0]
               pinPos.y += j.surfaceOffset[1]
               pinPos.z += j.surfaceOffset[2]
             } else {
-              // Safe default position if bone not resolved
               if (j.id === 'knee') pinPos.set(-0.11, -0.34, 0.13)
               if (j.id === 'hip') pinPos.set(-0.14, 0.08, 0.17)
               if (j.id === 'shoulder') pinPos.set(0.25, 0.44, 0.08)
@@ -404,8 +401,12 @@ export default function Ortho3DHuman({
 
           setIsLoading(false)
 
-          // Fly to active joint on initial load
-          flyToJoint(activeJointId)
+          // Initial load: ONLY zoom to joint if activeJointId was explicitly set, otherwise stay in FULL BODY view!
+          if (activeJointId) {
+            flyToJoint(activeJointId)
+          } else {
+            resetView()
+          }
         },
         (xhr) => {
           if (xhr.lengthComputable && xhr.total > 0) {
@@ -419,14 +420,18 @@ export default function Ortho3DHuman({
       )
 
       // ── CAMERA FLIGHT / ZOOM TO JOINT ─────────────────────────────────────
-      function flyToJoint(jointId: string) {
+      function flyToJoint(jointId: string | null) {
+        if (!jointId) {
+          resetView()
+          return
+        }
+
         const joint = JOINTS_3D_DATA.find((j) => j.id === jointId)
         if (!joint) return
 
         const jointPos = jointCoordinates[jointId]
         if (!jointPos) return
 
-        // Compute camera destination relative to the joint
         transitionRef.current.targetCamPos = [
           jointPos.x + joint.camOffset[0],
           jointPos.y + joint.camOffset[1],
@@ -437,8 +442,8 @@ export default function Ortho3DHuman({
       }
 
       function resetView() {
-        transitionRef.current.targetCamPos = [0, 0.0, 2.5]
-        transitionRef.current.targetLookAt = [0, 0.0, 0]
+        transitionRef.current.targetCamPos = [...FULL_BODY_CAM]
+        transitionRef.current.targetLookAt = [...FULL_BODY_TARGET]
         transitionRef.current.isTransitioning = true
       }
 
@@ -483,7 +488,7 @@ export default function Ortho3DHuman({
         }
       }
 
-      // ── 360° MOUSE & TOUCH ORBIT CONTROLS ─────────────────────────────────
+      // ── 360° MOUSE & TOUCH ORBIT CONTROLS (NO AUTO-REVOLVE) ───────────────
       let isDragging = false
       let prevMouseX = 0
       let prevMouseY = 0
@@ -519,7 +524,7 @@ export default function Ortho3DHuman({
         e.preventDefault()
         const zoomDelta = e.deltaY * 0.0015
         const currentDist = camera.position.distanceTo(cameraTarget)
-        const newDist = Math.max(0.8, Math.min(3.8, currentDist + zoomDelta))
+        const newDist = Math.max(0.8, Math.min(4.2, currentDist + zoomDelta))
         const dir = camera.position.clone().sub(cameraTarget).normalize()
         camera.position.copy(cameraTarget.clone().add(dir.multiplyScalar(newDist)))
       }
@@ -571,7 +576,7 @@ export default function Ortho3DHuman({
       }
       window.addEventListener('resize', onResize)
 
-      // ── ANIMATION LOOP ────────────────────────────────────────────────────
+      // ── ANIMATION LOOP (STEADY POSE, ZERO AUTO-REVOLVING) ─────────────────
       let clock = new THREE.Clock()
 
       function animate() {
@@ -580,25 +585,21 @@ export default function Ortho3DHuman({
 
         const elapsedTime = clock.getElapsedTime()
 
-        // Gentle idle character sway
-        if (!isDragging) {
-          targetRotY += 0.0016
-        }
-
-        // Smooth rotation interpolation
+        // Character stands completely still: targetRotY is ONLY modified by user drag
         characterGroup.rotation.y += (targetRotY - characterGroup.rotation.y) * 0.08
         characterGroup.rotation.x += (targetRotX - characterGroup.rotation.x) * 0.08
 
-        // Smooth 3D Camera Glide
+        // Buttery-smooth camera glide transition (exponential ease-out)
         const trans = transitionRef.current
         if (trans.isTransitioning) {
-          camera.position.x += (trans.targetCamPos[0] - camera.position.x) * 0.065
-          camera.position.y += (trans.targetCamPos[1] - camera.position.y) * 0.065
-          camera.position.z += (trans.targetCamPos[2] - camera.position.z) * 0.065
+          const ease = 0.075
+          camera.position.x += (trans.targetCamPos[0] - camera.position.x) * ease
+          camera.position.y += (trans.targetCamPos[1] - camera.position.y) * ease
+          camera.position.z += (trans.targetCamPos[2] - camera.position.z) * ease
 
-          cameraTarget.x += (trans.targetLookAt[0] - cameraTarget.x) * 0.065
-          cameraTarget.y += (trans.targetLookAt[1] - cameraTarget.y) * 0.065
-          cameraTarget.z += (trans.targetLookAt[2] - cameraTarget.z) * 0.065
+          cameraTarget.x += (trans.targetLookAt[0] - cameraTarget.x) * ease
+          cameraTarget.y += (trans.targetLookAt[1] - cameraTarget.y) * ease
+          cameraTarget.z += (trans.targetLookAt[2] - cameraTarget.z) * ease
 
           camera.lookAt(cameraTarget)
 
@@ -607,16 +608,18 @@ export default function Ortho3DHuman({
             trans.targetCamPos[1] - camera.position.y,
             trans.targetCamPos[2] - camera.position.z
           )
-          if (posDist < 0.012) {
+          if (posDist < 0.005) {
+            camera.position.set(trans.targetCamPos[0], trans.targetCamPos[1], trans.targetCamPos[2])
+            cameraTarget.set(trans.targetLookAt[0], trans.targetLookAt[1], trans.targetLookAt[2])
+            camera.lookAt(cameraTarget)
             trans.isTransitioning = false
           }
         }
 
-        // Animate 3D Hotspot Pins (Locked to character)
+        // Animate 3D Hotspot Pins
         JOINTS_3D_DATA.forEach((j, idx) => {
           const pin = jointAnchorMap[j.id]
           if (pin) {
-            // Billboard the radar ring so it faces camera
             pin.ring.lookAt(camera.position)
 
             const wave = (elapsedTime * 1.5 + idx * 0.35) % 1
@@ -624,7 +627,7 @@ export default function Ortho3DHuman({
             ;(pin.ring.material as THREE.MeshBasicMaterial).opacity = (1 - wave) * 0.8
 
             const isSelected = j.id === activeJointId
-            const pulse = 1 + Math.sin(elapsedTime * 3 + idx) * (isSelected ? 0.25 : 0.1)
+            const pulse = 1 + Math.sin(elapsedTime * 3 + idx) * (isSelected ? 0.25 : 0.08)
             pin.orb.scale.setScalar(pulse)
 
             if (isSelected) {
@@ -677,10 +680,11 @@ export default function Ortho3DHuman({
   }, [activeJointId])
 
   const handleResetCamera = useCallback(() => {
+    onSelectJoint(null)
     if (stateRef.current.resetView) {
       stateRef.current.resetView()
     }
-  }, [])
+  }, [onSelectJoint])
 
   return (
     <div
@@ -709,20 +713,24 @@ export default function Ortho3DHuman({
         className="w-full h-full cursor-grab active:cursor-grabbing block"
       />
 
-      {/* Clean Reset Button (Top Right) */}
+      {/* Clean Full Body / Reset Button (Top Right) */}
       <div className="absolute top-4 right-4 z-20">
         <button
           onClick={handleResetCamera}
-          className="bg-white/95 hover:bg-slate-50 text-slate-700 hover:text-brand-700 px-3.5 py-1.5 rounded-full border border-slate-200 shadow-sm text-xs font-semibold flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+          className={`px-3.5 py-1.5 rounded-full border shadow-sm text-xs font-semibold flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer ${
+            activeJointId === null
+              ? 'bg-brand-600 text-white border-brand-600 shadow-brand-500/20'
+              : 'bg-white/95 hover:bg-slate-50 text-slate-700 hover:text-brand-700 border-slate-200'
+          }`}
         >
-          <span>↺ Reset View</span>
+          <span>↺ Full Body</span>
         </button>
       </div>
 
       {/* Subtle Drag Hint (Bottom Center) */}
       <div className="absolute bottom-3 inset-x-0 pointer-events-none text-center hidden sm:block z-10">
         <span className="text-[11px] font-medium text-slate-500 bg-white/90 px-3.5 py-1 rounded-full border border-slate-200/80 shadow-xs">
-          Drag to rotate 360° • Click any joint pin on the body to inspect
+          Drag to rotate 360° • Click any joint to inspect
         </span>
       </div>
     </div>
