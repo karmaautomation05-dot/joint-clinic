@@ -18,6 +18,17 @@ import {
 } from "lucide-react";
 import { RECOVERY_GUIDES } from "@/data/recoveryGuides";
 import { PRIMARY_CONTACT } from "@/data/clinics";
+import dynamic from "next/dynamic";
+
+const JointAnatomy3D = dynamic(() => import("@/components/common/JointAnatomy3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[460px] sm:h-[520px] rounded-3xl bg-white border border-slate-200 flex flex-col items-center justify-center gap-3 shadow-sm">
+      <div className="w-12 h-12 rounded-full border-2 border-brand-500/20 border-t-brand-600 animate-spin" />
+      <span className="text-xs text-slate-500 font-mono">Loading 3D Patient Joint Recovery Explorer...</span>
+    </div>
+  ),
+});
 
 const ICON_MAP: Record<string, typeof Bone> = {
   Bone: Bone,
@@ -199,6 +210,15 @@ export default function RecoveryGuideIndexPage() {
             Patient recovery protocols at Joint Clinic are curated by <strong>Dr. Gaurav Bhargava</strong> (Ex-Senior Resident MAMC New Delhi). Utilizing modern tissue-sparing surgical techniques and targeted sensory nerve blocks, over <strong>95% of joint replacement patients walk within 24 hours of surgery (Day 1)</strong>. Step-by-step rehabilitation roadmaps cover 7 specialized categories: Knee, Hip, Sports/ACL, Shoulder, Spine, PRP Joint Preservation, and Bone Fracture Trauma. Post-operative reviews are conducted at Joint Clinic Swaroop Nagar and BMTC Hospital Kidwai Nagar.
           </p>
         </div>
+
+        {/* Interactive 3D Patient Joint & Bone Rehabilitation Explorer */}
+        <JointAnatomy3D
+          type="knee"
+          isRecovery={true}
+          allowTypeSwitch={true}
+          title="3D Patient Joint & Bone Rehabilitation Explorer"
+          subtitle="Select any joint below to inspect reconstructed bone anatomy, Day-1 walking stabilization, and progressive healing checkpoints."
+        />
 
         <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14">
           <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block mb-2">

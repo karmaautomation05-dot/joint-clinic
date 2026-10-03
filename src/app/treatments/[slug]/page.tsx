@@ -20,6 +20,7 @@ import {
 import { TREATMENTS, TREATMENT_CATEGORIES } from "@/data/treatments";
 import { PRIMARY_CONTACT } from "@/data/clinics";
 import dynamic from "next/dynamic";
+import { getAnatomyType } from "@/utils/anatomy";
 
 const JointAnatomy3D = dynamic(() => import("@/components/common/JointAnatomy3D"), {
   ssr: false,
@@ -260,23 +261,12 @@ export default function TreatmentDetailPage({
               </p>
             </div>
 
-            {/* Embedded 3D Bone & Joint Arthroplasty Reconstruction for Knee Treatments */}
-            {treatment.slug.includes("knee") && (
-              <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-8 md:p-10 shadow-sm space-y-5">
-                <div>
-                  <span className="text-brand-600 font-bold uppercase tracking-widest text-xs mb-2 block">
-                    3D Surgical Technology &amp; Alignment
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
-                    Interactive 3D Knee Joint &amp; Implant Articulation
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                    Rotate the 3D joint model in 360° to inspect the Femur, Tibia, Patella, and the tissue-sparing cobalt-chrome implant with UHMWPE shock-absorbing bearing insert.
-                  </p>
-                </div>
-                <JointAnatomy3D />
-              </div>
-            )}
+            {/* Interactive 3D Bone & Joint Reconstruction Specific to Treatment */}
+            <JointAnatomy3D
+              type={getAnatomyType(treatment.slug)}
+              title={`${treatment.title} • 3D Surgical Model`}
+              subtitle={`Interactive 3D visualization for ${treatment.title}. Rotate 360° to inspect bone landmarks, surgical reconstruction, and internal alignment.`}
+            />
 
             {/* Overview */}
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-4 sm:space-y-5">

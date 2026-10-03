@@ -23,6 +23,18 @@ import {
 import { RECOVERY_GUIDES, CategoryRecoveryGuide } from "@/data/recoveryGuides";
 import { TREATMENT_CATEGORIES } from "@/data/treatments";
 import { PRIMARY_CONTACT } from "@/data/clinics";
+import dynamic from "next/dynamic";
+import { getAnatomyType } from "@/utils/anatomy";
+
+const JointAnatomy3D = dynamic(() => import("@/components/common/JointAnatomy3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[460px] sm:h-[520px] rounded-3xl bg-white border border-slate-200 flex flex-col items-center justify-center gap-3 shadow-sm">
+      <div className="w-12 h-12 rounded-full border-2 border-brand-500/20 border-t-brand-600 animate-spin" />
+      <span className="text-xs text-slate-500 font-mono">Loading 3D Recovery &amp; Joint Model...</span>
+    </div>
+  ),
+});
 
 const ICON_MAP: Record<string, typeof Bone> = {
   Bone: Bone,
@@ -256,6 +268,14 @@ export default function DedicatedRecoveryCategoryPage({
             The <strong>{guide.title}</strong> at Joint Clinic, Kanpur is directed by <strong>Dr. Gaurav Bhargava</strong> (Ex-Senior Resident MAMC New Delhi). Following advanced tissue-sparing techniques, patients experience a structured {guide.phases.length}-phase recovery starting with {guide.phases[0]?.focus.toLowerCase()} and progressing to {guide.phases[guide.phases.length - 1]?.focus.toLowerCase()}. Regular follow-up reviews are conducted at Joint Clinic Swaroop Nagar and BMTC Hospital Kidwai Nagar.
           </p>
         </div>
+
+        {/* Interactive 3D Joint & Bone Recovery Model */}
+        <JointAnatomy3D
+          type={getAnatomyType(params.categorySlug)}
+          isRecovery={true}
+          title={`${guide.title} • 3D Recovery & Healing Model`}
+          subtitle={`Interactive 3D visualization for ${guide.title}. Inspect reconstructed bone alignment, Day-1 load transfer points, and tissue recovery milestones.`}
+        />
 
         {/* Home Preparation Checklist (Cards) */}
         {guide.homePrep && guide.homePrep.length > 0 && (

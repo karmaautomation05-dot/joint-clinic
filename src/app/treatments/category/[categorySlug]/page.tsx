@@ -22,6 +22,18 @@ import {
 } from "lucide-react";
 import { TREATMENT_CATEGORIES, TreatmentCategory, TREATMENTS } from "@/data/treatments";
 import { PRIMARY_CONTACT } from "@/data/clinics";
+import dynamic from "next/dynamic";
+import { getAnatomyType } from "@/utils/anatomy";
+
+const JointAnatomy3D = dynamic(() => import("@/components/common/JointAnatomy3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[460px] sm:h-[520px] rounded-3xl bg-white border border-slate-200 flex flex-col items-center justify-center gap-3 shadow-sm">
+      <div className="w-12 h-12 rounded-full border-2 border-brand-500/20 border-t-brand-600 animate-spin" />
+      <span className="text-xs text-slate-500 font-mono">Loading 3D Joint Anatomy &amp; Reconstruction...</span>
+    </div>
+  ),
+});
 
 const ICON_MAP: Record<string, typeof Bone> = {
   Bone: Bone,
@@ -265,6 +277,13 @@ export default function TreatmentCategoryPage({
             Specialized <strong>{category.name}</strong> care at Joint Clinic is led by <strong>Dr. Gaurav Bhargava</strong> (Ex-Senior Resident MAMC New Delhi, 20+ years experience). Offering {category.items.length} specialized procedures ranging from {category.items.slice(0, 3).map((item) => item.name).join(", ")} to conservative treatments. Consultations are available at <strong>Joint Clinic Swaroop Nagar</strong> (Evening OPD 4–7 PM) and surgeries at <strong>BMTC Hospital Kidwai Nagar</strong> (Laminar Airflow Class-100 Modular OTs &amp; 24/7 emergency trauma).
           </p>
         </div>
+
+        {/* Interactive 3D Anatomy & Surgical Reconstruction Specific to Category */}
+        <JointAnatomy3D
+          type={getAnatomyType(params.categorySlug)}
+          title={`Interactive 3D ${category.name} Reconstruction`}
+          subtitle={`Explore bone landmarks, surgical reconstructions, and internal fixation specific to ${category.name}. Rotate 360° with mouse or touch.`}
+        />
 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 pb-4 border-b border-slate-200">
           <div>
