@@ -38,6 +38,12 @@ export interface DoctorProfile {
     }[];
   };
   image: string;
+  images: {
+    src: string;
+    alt: string;
+    label: string;
+    role: string;
+  }[];
 }
 
 export const DOCTOR_DATA: DoctorProfile = {
@@ -110,5 +116,25 @@ export const DOCTOR_DATA: DoctorProfile = {
       },
     ],
   },
-  image: "/images/doctor/gaurav-bhargava.png",
+  image: "/images/doctor/dr-gaurav-suit.png",
+  images: [
+    {
+      src: "/images/doctor/dr-gaurav-suit.png",
+      alt: "Dr. Gaurav Bhargava - Senior Joint Replacement Surgeon in Kanpur",
+      label: "Ex-SR MAMC New Delhi",
+      role: "Director & Chief Surgeon",
+    },
+    {
+      src: "/images/doctor/dr-gaurav-formal.png",
+      alt: "Dr. Gaurav Bhargava - Bone, Joint & Fracture Specialist",
+      label: "Clinical & Trauma Rigor",
+      role: "20+ Years Surgical Excellence",
+    },
+    {
+      src: "/images/doctor/gaurav-bhargava.png",
+      alt: "Dr. Gaurav Bhargava - Orthopedic Specialist Kanpur",
+      label: "Specialist OPD Consultations",
+      role: "Joint Clinic Swaroop Nagar & BMTC",
+    },
+  ],
 };

@@ -82,6 +82,9 @@ const config: Config = {
       animation: {
         'bounce-slow': 'bounce-slow 4s ease-in-out infinite',
         'pulse-slow': 'pulse-slow 3s ease-in-out infinite',
+        'float': 'float 5s ease-in-out infinite',
+        'float-delayed': 'float-delayed 5s ease-in-out infinite 2.5s',
+        'pulse-glow': 'pulse-glow 4s ease-in-out infinite',
       },
       keyframes: {
         'bounce-slow': {
@@ -91,6 +94,18 @@ const config: Config = {
         'pulse-slow': {
           '0%, 100%': { opacity: '1', transform: 'scale(1)' },
           '50%': { opacity: '0.9', transform: 'scale(1.05)' },
+        },
+        'float': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-8px)' },
+        },
+        'float-delayed': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(8px)' },
+        },
+        'pulse-glow': {
+          '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+          '50%': { opacity: '0.75', transform: 'scale(1.08)' },
         },
       },
     },

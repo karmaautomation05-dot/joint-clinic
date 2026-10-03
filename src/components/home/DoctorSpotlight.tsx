@@ -17,21 +17,29 @@ export default function DoctorSpotlight() {
     <section className="py-20 bg-slate-50/50 border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left Column: Surgeon Portrait with High-Tech Frame */}
+          {/* Left Column: Surgeon Portrait with High-Tech Frame & Float Animation */}
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto max-w-sm">
-              <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-card bg-[#b0a59e]">
+              <div className="absolute -inset-4 bg-palette-teal1/20 rounded-3xl blur-2xl -z-10 animate-pulse-glow" />
+              <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-900 group">
                 <Image
-                  src={DOCTOR_DATA.image}
+                  src="/images/doctor/dr-gaurav-suit.png"
                   alt={DOCTOR_DATA.name}
                   fill
                   sizes="(max-width: 768px) 100vw, 400px"
-                  className="object-cover object-top"
+                  className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent pointer-events-none" />
+
+                {/* Floating badge inside */}
+                <div className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold text-slate-900 shadow-lg flex items-center gap-1.5 animate-float">
+                  <span className="w-2 h-2 rounded-full bg-brand-600 animate-ping" />
+                  <span>Senior Consultant</span>
+                </div>
               </div>
 
               {/* MAMC Telemetry Pill */}
-              <div className="absolute -bottom-6 left-4 right-4 bg-brand-navy text-white p-4 rounded-2xl shadow-xl border border-white/10">
+              <div className="absolute -bottom-6 left-4 right-4 bg-brand-navy text-white p-4 rounded-2xl shadow-xl border border-white/10 animate-float-delayed">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-brand-blue/30 flex items-center justify-center text-cyan-400 shrink-0">
                     <GraduationCap className="w-5 h-5" />

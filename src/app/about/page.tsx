@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { DOCTOR_DATA } from "@/data/doctor";
 import { CLINIC_LOCATIONS, PRIMARY_CONTACT } from "@/data/clinics";
+import DoctorAnimatedCard from "@/components/common/DoctorAnimatedCard";
 
 export const metadata: Metadata = {
   title: "Best Orthopedic Doctor in Kanpur | Dr. Gaurav Bhargava | Bone & Joint Specialist",
@@ -145,14 +146,8 @@ export default function AboutPage() {
           {/* Left Column: Doctor Card & Fast Facts */}
           <div className="lg:col-span-4 space-y-6">
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-7 shadow-xl space-y-6">
-              <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-gradient-to-b from-brand-50 to-brand-100/50 border border-brand-200/40 shadow-inner">
-                <Image
-                  src={DOCTOR_DATA.image}
-                  alt={DOCTOR_DATA.name}
-                  fill
-                  className="object-cover object-top"
-                  priority
-                />
+              <div className="w-full">
+                <DoctorAnimatedCard variant="compact" showBadges={false} priority={true} />
               </div>
 
               <div className="space-y-3">

@@ -3,8 +3,9 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Calendar, ArrowRight, Star, ShieldCheck, Activity } from 'lucide-react'
+import { Calendar, ArrowRight } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/common/WhatsAppIcon'
+import DoctorAnimatedCard from '@/components/common/DoctorAnimatedCard'
 
 export default function Hero() {
   return (
@@ -90,50 +91,9 @@ export default function Hero() {
             </div>
           </div>
           
-          {/* Right Column: Signature Doctor Card (5 cols on large desktop) */}
+          {/* Right Column: Signature Doctor Card with Crossfade Animation & Floating Badges */}
           <div className="lg:col-span-5 relative max-w-sm sm:max-w-md mx-auto w-full px-2 sm:px-0">
-            {/* Ambient decorative gradient backdrops */}
-            <div className="absolute -bottom-6 -right-6 w-52 sm:w-64 h-52 sm:h-64 bg-accent-200/40 rounded-full -z-10 blur-2xl pointer-events-none" />
-            <div className="absolute -top-6 -left-6 w-40 sm:w-48 h-40 sm:h-48 bg-brand-200/40 rounded-full -z-10 blur-2xl pointer-events-none" />
-
-            {/* Doctor Portrait Container with Clean Medical Border */}
-            <div className="relative z-10 rounded-3xl overflow-hidden aspect-[4/5] shadow-2xl border-4 sm:border-8 border-white bg-gradient-to-br from-brand-50 via-white to-brand-100/50">
-              <Image 
-                src="/images/doctor/gaurav-bhargava.png" 
-                alt="Dr. Gaurav Bhargava - Senior Joint Replacement & Arthroscopy Specialist in Kanpur" 
-                fill 
-                className="object-cover object-top"
-                priority
-                sizes="(max-width: 640px) 90vw, (max-width: 1024px) 50vw, 40vw"
-              />
-            </div>
-
-            {/* Floating 20+ Years Experience Card - Positioned safely within mobile screen */}
-            <div className="absolute -bottom-4 sm:-bottom-6 left-2 sm:-left-6 z-20 bg-white/95 backdrop-blur-md p-3.5 sm:p-5 rounded-2xl shadow-xl max-w-[170px] sm:max-w-[210px] border border-brand-100">
-              <div className="text-brand-600 font-serif font-bold text-2xl sm:text-3xl mb-0.5">20+</div>
-              <div className="text-[9px] sm:text-[10px] text-slate-600 font-bold uppercase tracking-wider leading-tight">
-                Years Clinical Excellence • MAMC New Delhi
-              </div>
-            </div>
-
-            {/* Floating Verified Rating Badge */}
-            <div className="absolute -top-3 sm:-top-4 right-2 sm:-right-4 z-20 bg-white/95 backdrop-blur-md px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl shadow-lg border border-brand-100 flex items-center gap-1.5 sm:gap-2">
-              <div className="flex text-[#F18712]">
-                <Star size={14} className="fill-[#F5CD09] text-[#F18712]" />
-              </div>
-              <div className="text-left">
-                <div className="text-[11px] sm:text-xs font-bold text-slate-900 leading-none">5.0 / 5.0 Rating</div>
-                <div className="text-[8.5px] sm:text-[9px] text-slate-500 font-medium">Justdial Verified</div>
-              </div>
-            </div>
-
-            {/* Rapid Mobilization Floating Pill */}
-            <div className="absolute top-1/2 right-2 sm:-right-6 z-20 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-md border border-brand-100 hidden sm:flex items-center gap-1.5">
-              <div className="w-5 h-5 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center shrink-0">
-                <Activity size={12} />
-              </div>
-              <span className="text-[11px] font-bold text-slate-800">24-Hr Mobilization</span>
-            </div>
+            <DoctorAnimatedCard variant="hero" priority={true} />
           </div>
         </div>
       </div>

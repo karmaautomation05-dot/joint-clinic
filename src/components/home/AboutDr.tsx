@@ -4,6 +4,7 @@ import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Award, BookOpen, Heart, ShieldCheck, ArrowRight } from 'lucide-react'
+import DoctorAnimatedCard from '@/components/common/DoctorAnimatedCard'
 
 export default function AboutDr() {
   const highlights = [
@@ -40,29 +41,9 @@ export default function AboutDr() {
     <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white" id="about">
       <div className="container">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center mb-16 sm:mb-20 lg:mb-24">
-          {/* Left Column: Doctor Portrait (5 cols) */}
+          {/* Left Column: Doctor Animated Portrait (5 cols) */}
           <div className="lg:col-span-5 relative max-w-sm sm:max-w-md mx-auto w-full px-2 sm:px-0">
-            <div className="rounded-3xl overflow-hidden shadow-2xl relative aspect-[3/4] border-4 sm:border-8 border-white bg-gradient-to-br from-brand-50 to-brand-100/50">
-              <Image 
-                src="/images/doctor/gaurav-bhargava.png" 
-                alt="Dr. Gaurav Bhargava - Senior Orthopaedic Surgeon in Kanpur" 
-                fill 
-                className="object-cover object-top"
-                sizes="(max-width: 640px) 90vw, (max-width: 1024px) 50vw, 40vw"
-                priority
-              />
-            </div>
-            
-            {/* Floating Experience Card */}
-            <div className="absolute -bottom-4 sm:-bottom-6 left-2 sm:-left-6 z-20 bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl shadow-xl max-w-[170px] sm:max-w-[200px] border border-brand-100">
-              <div className="text-brand-600 font-serif font-bold text-2xl sm:text-3xl mb-0.5">20+</div>
-              <div className="text-[9px] sm:text-[10px] text-slate-600 font-bold uppercase tracking-wider leading-tight">
-                Years of Surgical Excellence
-              </div>
-            </div>
-
-            <div className="absolute -bottom-6 -right-6 w-40 sm:w-48 h-40 sm:h-48 bg-brand-100/50 rounded-full -z-10 blur-xl pointer-events-none" />
-            <div className="absolute -top-6 -left-6 w-32 sm:w-36 h-32 sm:h-36 bg-accent-100/50 rounded-full -z-10 blur-xl pointer-events-none" />
+            <DoctorAnimatedCard variant="about" showBadges={true} initialIndex={1} />
           </div>
 
           {/* Right Column: Bio & Philosophy (7 cols) */}
