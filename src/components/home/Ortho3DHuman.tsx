@@ -2,84 +2,131 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import type * as THREE from 'three'
-import { buildFullBodySkeleton } from '@/utils/skeleton3D'
 
 export interface Joint3DInfo {
   id: string
   label: string
-  boneName: string
-  surfaceOffset: [number, number, number]
+  boneNodeName: string
+  fallbackPos: [number, number, number]
   camOffset: [number, number, number]
   color: string
 }
 
 export const JOINTS_3D_DATA: Joint3DInfo[] = [
   {
-    id: 'knee',
-    label: 'Knee',
-    boneName: 'RightLeg',
-    surfaceOffset: [0, 0.02, 0.13],
-    camOffset: [0, 0.02, 0.88],
+    id: 'cranium',
+    label: 'Cranium & Skull',
+    boneNodeName: 'Cranium',
+    fallbackPos: [0.012, 1.000, 0.120],
+    camOffset: [0, 0.04, 0.65],
     color: '#02BAB9',
   },
   {
-    id: 'hip',
-    label: 'Hip',
-    boneName: 'RightUpLeg',
-    surfaceOffset: [-0.07, 0.04, 0.17],
-    camOffset: [0, 0.03, 1.05],
-    color: '#F18712',
+    id: 'cervical',
+    label: 'Cervical Spine',
+    boneNodeName: 'c4',
+    fallbackPos: [-0.004, 0.863, 0.080],
+    camOffset: [0, 0.02, 0.60],
+    color: '#0A7C97',
+  },
+  {
+    id: 'clavicle',
+    label: 'Clavicle',
+    boneNodeName: 'r_clavicle',
+    fallbackPos: [-0.100, 0.782, 0.090],
+    camOffset: [0, 0.02, 0.65],
+    color: '#059B8F',
   },
   {
     id: 'shoulder',
     label: 'Shoulder',
-    boneName: 'LeftArm',
-    surfaceOffset: [0.06, 0.03, 0.10],
-    camOffset: [0, 0.02, 0.92],
-    color: '#059B8F',
+    boneNodeName: 'r_scapula',
+    fallbackPos: [-0.145, 0.759, 0.080],
+    camOffset: [0, 0.02, 0.70],
+    color: '#02BAB9',
   },
   {
-    id: 'spine',
-    label: 'Spine',
-    boneName: 'Spine1',
-    surfaceOffset: [0, 0.0, -0.16],
-    camOffset: [0.10, 0.02, -0.98],
-    color: '#01B3BF',
+    id: 'sternum',
+    label: 'Ribcage & Sternum',
+    boneNodeName: 'Sternum',
+    fallbackPos: [-0.005, 0.677, 0.140],
+    camOffset: [0, 0.02, 0.80],
+    color: '#F18712',
   },
   {
     id: 'elbow',
     label: 'Elbow',
-    boneName: 'LeftForeArm',
-    surfaceOffset: [0.05, 0.02, 0.08],
-    camOffset: [0, 0.02, 0.88],
+    boneNodeName: 'r_ulna',
+    fallbackPos: [-0.298, 0.325, 0.060],
+    camOffset: [0, 0.02, 0.65],
     color: '#0A7C97',
   },
   {
+    id: 'spine',
+    label: 'Lumbar Spine',
+    boneNodeName: 'l3',
+    fallbackPos: [-0.009, 0.357, 0.060],
+    camOffset: [0, 0.02, 0.75],
+    color: '#01B3BF',
+  },
+  {
+    id: 'wrist',
+    label: 'Wrist & Hand',
+    boneNodeName: 'r_metacarpal3',
+    fallbackPos: [-0.377, 0.057, 0.080],
+    camOffset: [0, 0.02, 0.55],
+    color: '#059B8F',
+  },
+  {
+    id: 'pelvis',
+    label: 'Pelvis & Sacrum',
+    boneNodeName: 'Sacrum',
+    fallbackPos: [-0.006, 0.224, 0.080],
+    camOffset: [0, 0.02, 0.80],
+    color: '#0A7C97',
+  },
+  {
+    id: 'hip',
+    label: 'Hip',
+    boneNodeName: 'r_femur',
+    fallbackPos: [-0.108, -0.149, 0.080],
+    camOffset: [0, 0.02, 0.75],
+    color: '#F18712',
+  },
+  {
+    id: 'knee',
+    label: 'Knee',
+    boneNodeName: 'r_patella',
+    fallbackPos: [-0.081, -0.356, 0.080],
+    camOffset: [0, 0.02, 0.65],
+    color: '#02BAB9',
+  },
+  {
     id: 'ankle',
-    label: 'Ankle',
-    boneName: 'RightFoot',
-    surfaceOffset: [-0.04, 0.06, 0.16],
-    camOffset: [0, 0.06, 0.82],
+    label: 'Ankle & Foot',
+    boneNodeName: 'r_talus',
+    fallbackPos: [-0.050, -0.881, 0.080],
+    camOffset: [0, 0.04, 0.60],
     color: '#059B8F',
   },
 ]
 
-export type ScanMode = 'normal' | 'skeleton'
+export type SkeletonTheme = 'studio' | 'radiograph'
 
 interface Ortho3DHumanProps {
   activeJointId: string | null
   onSelectJoint: (id: string | null) => void
   activeColor: string
-  viewMode?: ScanMode
-  onToggleViewMode?: (mode: ScanMode) => void
+  theme?: SkeletonTheme
+  onToggleTheme?: (theme: SkeletonTheme) => void
 }
 
 export default function Ortho3DHuman({
   activeJointId,
   onSelectJoint,
   activeColor,
-  viewMode: propViewMode,
-  onToggleViewMode,
+  theme: propTheme,
+  onToggleTheme,
 }: Ortho3DHumanProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -87,39 +134,36 @@ export default function Ortho3DHuman({
   const [isLoading, setIsLoading] = useState(true)
   const [loadProgress, setLoadProgress] = useState(0)
 
-  // View Mode: 'normal' (Full Body Clothed) | 'skeleton' (Full High-Definition Medical Skeleton)
-  const [internalViewMode, setInternalViewMode] = useState<ScanMode>('normal')
-  const viewMode = propViewMode ?? internalViewMode
-  const setViewMode = useCallback(
-    (mode: ScanMode) => {
-      setInternalViewMode(mode)
-      onToggleViewMode?.(mode)
+  // Visual Theme: 'studio' (Pure White Background) | 'radiograph' (Deep Black Background)
+  const [internalTheme, setInternalTheme] = useState<SkeletonTheme>('studio')
+  const theme = propTheme ?? internalTheme
+  const setTheme = useCallback(
+    (newTheme: SkeletonTheme) => {
+      setInternalTheme(newTheme)
+      onToggleTheme?.(newTheme)
     },
-    [onToggleViewMode]
+    [onToggleTheme]
   )
 
-  const [showImplant, setShowImplant] = useState(false)
+  const [autoRotate, setAutoRotate] = useState<boolean>(true)
 
-  useEffect(() => {
-    setShowImplant(false)
-  }, [activeJointId])
-
-  // Full body camera initial view: z = 3.10 perfectly fits 1.85m human male head-to-toe
-  const FULL_BODY_CAM: [number, number, number] = [0, 0.0, 3.10]
-  const FULL_BODY_TARGET: [number, number, number] = [0, 0.0, 0]
+  // Camera initial full-skeleton view: fits 2.0 unit skeleton from head to toe
+  const FULL_SKELETON_CAM: [number, number, number] = [0, 0.05, 3.20]
+  const FULL_SKELETON_TARGET: [number, number, number] = [0, 0.0, 0]
 
   const transitionRef = useRef({
-    currentCamPos: [...FULL_BODY_CAM] as [number, number, number],
-    targetCamPos: [...FULL_BODY_CAM] as [number, number, number],
-    currentLookAt: [...FULL_BODY_TARGET] as [number, number, number],
-    targetLookAt: [...FULL_BODY_TARGET] as [number, number, number],
+    currentCamPos: [...FULL_SKELETON_CAM] as [number, number, number],
+    targetCamPos: [...FULL_SKELETON_CAM] as [number, number, number],
+    currentLookAt: [...FULL_SKELETON_TARGET] as [number, number, number],
+    targetLookAt: [...FULL_SKELETON_TARGET] as [number, number, number],
     isTransitioning: false,
   })
 
   const stateRef = useRef<{
     selectJoint?: (id: string | null) => void
     resetView?: () => void
-    applyVisualMode?: (mode: ScanMode, activeJoint: string | null, implant: boolean) => void
+    setTheme?: (t: SkeletonTheme) => void
+    setAutoRotate?: (enabled: boolean) => void
   }>({})
 
   useEffect(() => {
@@ -131,13 +175,14 @@ export default function Ortho3DHuman({
 
       const THREE = await import('three')
       const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js')
+      const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls.js')
 
       const canvas = canvasRef.current
       const container = containerRef.current
       const width = container.clientWidth
       const height = container.clientHeight
 
-      // ── Renderer (Pure White Studio Background) ───────────────────────────
+      // ── High Performance WebGL Renderer ────────────────────────────────────
       const renderer = new THREE.WebGLRenderer({
         canvas,
         alpha: false,
@@ -146,424 +191,266 @@ export default function Ortho3DHuman({
       })
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
       renderer.setSize(width, height, false)
-      renderer.setClearColor(0xffffff, 1)
+      renderer.setClearColor(theme === 'radiograph' ? 0x050a14 : 0xffffff, 1)
       renderer.shadowMap.enabled = true
       renderer.shadowMap.type = THREE.PCFSoftShadowMap
       renderer.toneMapping = THREE.ACESFilmicToneMapping
-      renderer.toneMappingExposure = 1.05
+      renderer.toneMappingExposure = theme === 'radiograph' ? 1.35 : 1.15
 
-      // ── Scene & Camera (Starts in Full Body Overview) ─────────────────────
+      // ── Scene & Camera Setup ──────────────────────────────────────────────
       const scene = new THREE.Scene()
-      scene.background = new THREE.Color(0xffffff)
+      scene.background = new THREE.Color(theme === 'radiograph' ? 0x050a14 : 0xffffff)
 
-      const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100)
-      camera.position.set(...FULL_BODY_CAM)
-
-      const cameraTarget = new THREE.Vector3(...FULL_BODY_TARGET)
+      const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100)
+      camera.position.set(...FULL_SKELETON_CAM)
+      const cameraTarget = new THREE.Vector3(...FULL_SKELETON_TARGET)
       camera.lookAt(cameraTarget)
 
-      // ── Studio High-Key Lighting ─────────────────────────────────────────
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1.45)
+      // ── OrbitControls with Physics Damping ─────────────────────────────────
+      const controls = new OrbitControls(camera, canvas)
+      controls.enableDamping = true
+      controls.dampingFactor = 0.06
+      controls.enablePan = false
+      controls.minDistance = 1.0
+      controls.maxDistance = 5.2
+      controls.minPolarAngle = Math.PI * 0.15
+      controls.maxPolarAngle = Math.PI * 0.85
+      controls.target.copy(cameraTarget)
+      controls.autoRotate = autoRotate
+      controls.autoRotateSpeed = 0.85
+
+      let isInteracting = false
+      controls.addEventListener('start', () => { isInteracting = true })
+      controls.addEventListener('end', () => { isInteracting = false })
+
+      // ── Studio & Radiograph Lighting ───────────────────────────────────────
+      const ambientLight = new THREE.AmbientLight(
+        theme === 'radiograph' ? 0x0c4a6e : 0xffffff,
+        theme === 'radiograph' ? 1.8 : 1.45
+      )
       scene.add(ambientLight)
 
-      // Soft Key Light from front-right
-      const keyLight = new THREE.DirectionalLight(0xfff7ed, 1.9)
-      keyLight.position.set(2.5, 3.5, 3.0)
+      const keyLight = new THREE.DirectionalLight(
+        theme === 'radiograph' ? 0x38bdf8 : 0xfff8ee,
+        theme === 'radiograph' ? 2.5 : 2.2
+      )
+      keyLight.position.set(3, 4, 3.5)
       keyLight.castShadow = true
       keyLight.shadow.mapSize.width = 1024
       keyLight.shadow.mapSize.height = 1024
-      keyLight.shadow.bias = -0.001
+      keyLight.shadow.bias = -0.0005
       scene.add(keyLight)
 
-      // Soft Fill Light from left
-      const fillLight = new THREE.DirectionalLight(0xf0fdfa, 1.2)
-      fillLight.position.set(-2.5, 2.5, 2.5)
+      const fillLight = new THREE.DirectionalLight(
+        theme === 'radiograph' ? 0x0284c7 : 0xe0f2fe,
+        1.3
+      )
+      fillLight.position.set(-3.5, 2, 2.5)
       scene.add(fillLight)
 
-      // Backlight for clean silhouette separation
-      const backLight = new THREE.DirectionalLight(0xe0f2fe, 1.0)
-      backLight.position.set(0, 2.0, -3.0)
-      scene.add(backLight)
+      const rimLight = new THREE.DirectionalLight(
+        theme === 'radiograph' ? 0x7dd3fc : 0xccfbf1,
+        theme === 'radiograph' ? 1.6 : 1.1
+      )
+      rimLight.position.set(0, -3, -3)
+      scene.add(rimLight)
 
-      // Ground bounce
-      const groundLight = new THREE.DirectionalLight(0xf8fafc, 0.7)
-      groundLight.position.set(0, -2.5, 1.5)
-      scene.add(groundLight)
-
-      // ── Soft Radial Ground Studio Shadow Disc ────────────────────────────
-      const shadowCanvas = document.createElement('canvas')
-      shadowCanvas.width = 256
-      shadowCanvas.height = 256
-      const sCtx = shadowCanvas.getContext('2d')!
-      const sGrad = sCtx.createRadialGradient(128, 128, 10, 128, 128, 120)
-      sGrad.addColorStop(0, 'rgba(15, 23, 42, 0.28)')
-      sGrad.addColorStop(0.35, 'rgba(15, 23, 42, 0.14)')
-      sGrad.addColorStop(0.7, 'rgba(15, 23, 42, 0.03)')
-      sGrad.addColorStop(1, 'rgba(255, 255, 255, 0)')
-      sCtx.fillStyle = sGrad
-      sCtx.fillRect(0, 0, 256, 256)
-
-      const shadowTex = new THREE.CanvasTexture(shadowCanvas)
-      const shadowPlaneGeo = new THREE.PlaneGeometry(2.4, 2.4)
-      const shadowPlaneMat = new THREE.MeshBasicMaterial({
-        map: shadowTex,
+      // Contact Ground Shadow Disc (Studio mode)
+      const shadowGeo = new THREE.CircleGeometry(0.75, 48)
+      const shadowMat = new THREE.MeshBasicMaterial({
+        color: 0x94a3b8,
         transparent: true,
-        depthWrite: false,
+        opacity: theme === 'radiograph' ? 0.0 : 0.20,
       })
-      const shadowMesh = new THREE.Mesh(shadowPlaneGeo, shadowPlaneMat)
+      const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat)
       shadowMesh.rotation.x = -Math.PI / 2
-      shadowMesh.position.y = -0.96
+      shadowMesh.position.y = -1.02
+      shadowMesh.visible = theme === 'studio'
       scene.add(shadowMesh)
 
-      // ── Model & Pins Groups ──────────────────────────────────────────────
-      const characterGroup = new THREE.Group()
-      scene.add(characterGroup)
+      // Master Skeleton Group
+      const skeletonGroup = new THREE.Group()
+      skeletonGroup.name = 'HighResolutionSkeleton'
+      scene.add(skeletonGroup)
 
-      const clickableObjects: THREE.Object3D[] = []
-      const jointAnchorMap: Record<string, { group: THREE.Group; orb: THREE.Mesh; ring: THREE.Mesh; glow: THREE.Mesh; sprite: THREE.Sprite }> = {}
+      // ── Physical Materials for Cortical Bone ───────────────────────────────
+      const studioBoneMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color('#faf5ea'), // Warm clinical ivory cortical bone
+        roughness: 0.42,
+        metalness: 0.04,
+      })
+
+      const radiographBoneMat = new THREE.MeshStandardMaterial({
+        color: new THREE.Color('#67e8f9'), // Luminescent X-ray cyan
+        emissive: new THREE.Color('#0284c7'),
+        emissiveIntensity: 0.45,
+        roughness: 0.25,
+        metalness: 0.08,
+        transparent: true,
+        opacity: 0.92,
+      })
+
+      const currentBoneMat = theme === 'radiograph' ? radiographBoneMat : studioBoneMat
+
+      const jointAnchorMap: Record<
+        string,
+        {
+          group: THREE.Group
+          orb: THREE.Mesh
+          ring: THREE.Mesh
+          glow: THREE.Mesh
+          sprite: THREE.Sprite
+          pinPos: THREE.Vector3
+        }
+      > = {}
       const jointCoordinates: Record<string, THREE.Vector3> = {}
 
-      // Helper to generate a crisp 3D Canvas Sprite Badge stuck to the joint
-      function createLabelSprite(text: string, color: string) {
-        const c = document.createElement('canvas')
-        c.width = 256
-        c.height = 80
-        const ctx = c.getContext('2d')!
-
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.96)'
-        ctx.strokeStyle = color
-        ctx.lineWidth = 4
-
-        const r = 24
-        const x = 8
-        const y = 8
-        const w = 240
-        const h = 64
-
-        ctx.beginPath()
-        ctx.moveTo(x + r, y)
-        ctx.lineTo(x + w - r, y)
-        ctx.quadraticCurveTo(x + w, y, x + w, y + r)
-        ctx.lineTo(x + w, y + h - r)
-        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
-        ctx.lineTo(x + r, y + h)
-        ctx.quadraticCurveTo(x, y + h, x, y + h - r)
-        ctx.lineTo(x, y + r)
-        ctx.quadraticCurveTo(x, y, x + r, y)
-        ctx.closePath()
-        ctx.fill()
-        ctx.stroke()
-
-        // Colored dot
-        ctx.fillStyle = color
-        ctx.beginPath()
-        ctx.arc(38, 40, 10, 0, Math.PI * 2)
-        ctx.fill()
-
-        // Bold Typography
-        ctx.fillStyle = '#0f172a'
-        ctx.font = 'bold 30px system-ui, -apple-system, sans-serif'
-        ctx.fillText(text, 60, 50)
-
-        const tex = new THREE.CanvasTexture(c)
-        tex.minFilter = THREE.LinearFilter
-        const mat = new THREE.SpriteMaterial({
-          map: tex,
-          depthTest: false,
-          depthWrite: false,
-          transparent: true,
-        })
-        const sprite = new THREE.Sprite(mat)
-        sprite.renderOrder = 1000
-        sprite.scale.set(0.22, 0.07, 1)
+      function makePinSprite(text: string, color: string) {
+        const pinCanvas = document.createElement('canvas')
+        pinCanvas.width = 256
+        pinCanvas.height = 64
+        const ctx = pinCanvas.getContext('2d')
+        if (ctx) {
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.88)'
+          ctx.roundRect(4, 8, 248, 48, 24)
+          ctx.fill()
+          ctx.strokeStyle = color
+          ctx.lineWidth = 3
+          ctx.roundRect(4, 8, 248, 48, 24)
+          ctx.stroke()
+          ctx.fillStyle = '#ffffff'
+          ctx.font = 'bold 20px system-ui, -apple-system, sans-serif'
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.fillText(text, 128, 32)
+        }
+        const texture = new THREE.CanvasTexture(pinCanvas)
+        texture.minFilter = THREE.LinearFilter
+        const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false })
+        const sprite = new THREE.Sprite(spriteMat)
+        sprite.scale.set(0.24, 0.06, 1)
         return sprite
       }
 
       function create3DPin(j: Joint3DInfo, pos: THREE.Vector3) {
         const pinGroup = new THREE.Group()
         pinGroup.position.copy(pos)
-        pinGroup.name = j.id
-        pinGroup.renderOrder = 998
 
-        const jColor = new THREE.Color(j.color)
-
-        // 1. Center Spherical Jewel Pin
-        const orbGeo = new THREE.SphereGeometry(0.028, 16, 16)
-        const orbMat = new THREE.MeshStandardMaterial({
-          color: jColor,
-          emissive: jColor,
-          emissiveIntensity: 0.9,
-          roughness: 0.2,
-          metalness: 0.3,
-          polygonOffset: true,
-          polygonOffsetFactor: -4,
-          polygonOffsetUnits: -4,
-        })
-        const orb = new THREE.Mesh(orbGeo, orbMat)
-        orb.renderOrder = 998
-        orb.userData = { jointId: j.id }
-        pinGroup.add(orb)
-
-        // 2. Pulse Radar Ring
-        const ringGeo = new THREE.RingGeometry(0.040, 0.052, 32)
+        // Pulsing radar ring
+        const ringGeo = new THREE.RingGeometry(0.024, 0.038, 32)
         const ringMat = new THREE.MeshBasicMaterial({
-          color: jColor,
-          transparent: true,
-          opacity: 0.85,
+          color: new THREE.Color(j.color),
           side: THREE.DoubleSide,
-          polygonOffset: true,
-          polygonOffsetFactor: -5,
-          polygonOffsetUnits: -5,
+          transparent: true,
+          opacity: 0.8,
+          depthTest: false,
         })
         const ring = new THREE.Mesh(ringGeo, ringMat)
-        ring.renderOrder = 999
         pinGroup.add(ring)
 
-        // 3. Glow Halo Sphere
-        const glowGeo = new THREE.SphereGeometry(0.048, 14, 14)
+        // Solid core orb
+        const orbGeo = new THREE.SphereGeometry(0.016, 16, 16)
+        const orbMat = new THREE.MeshStandardMaterial({
+          color: new THREE.Color(j.color),
+          emissive: new THREE.Color(j.color),
+          emissiveIntensity: 0.9,
+          roughness: 0.1,
+          metalness: 0.2,
+          depthTest: false,
+        })
+        const orb = new THREE.Mesh(orbGeo, orbMat)
+        orb.userData = { jointId: j.id, isHotspot: true }
+        pinGroup.add(orb)
+
+        // Soft outer glow halo
+        const glowGeo = new THREE.SphereGeometry(0.026, 16, 16)
         const glowMat = new THREE.MeshBasicMaterial({
-          color: jColor,
+          color: new THREE.Color(j.color),
           transparent: true,
-          opacity: 0.30,
+          opacity: 0.25,
           depthTest: false,
         })
         const glow = new THREE.Mesh(glowGeo, glowMat)
-        glow.renderOrder = 997
         pinGroup.add(glow)
 
-        // 4. Stuck 3D Sprite Label
-        const sprite = createLabelSprite(j.label, j.color)
-        sprite.position.set(0.12, 0.04, 0)
-        sprite.userData = { jointId: j.id }
+        // Label sprite floating just above the pin
+        const sprite = makePinSprite(j.label, j.color)
+        sprite.position.set(0, 0.05, 0)
         pinGroup.add(sprite)
 
-        // Invisible larger hit sphere for direct click
-        const hitGeo = new THREE.SphereGeometry(0.08, 8, 8)
-        const hitMat = new THREE.MeshBasicMaterial({ visible: false })
-        const hitMesh = new THREE.Mesh(hitGeo, hitMat)
-        hitMesh.userData = { jointId: j.id }
-        pinGroup.add(hitMesh)
+        scene.add(pinGroup)
 
-        clickableObjects.push(hitMesh, orb, sprite)
-        characterGroup.add(pinGroup)
-
-        jointAnchorMap[j.id] = { group: pinGroup, orb, ring, glow, sprite }
+        jointAnchorMap[j.id] = { group: pinGroup, orb, ring, glow, sprite, pinPos: pos.clone() }
         jointCoordinates[j.id] = pos.clone()
       }
 
-      // ── LOAD REAL 3D CLOTHED HUMAN MALE GLB ──────────────────────────────
+      // ── LOAD REAL HIGH-RESOLUTION CT SKELETON GLB ─────────────────────────
       const loader = new GLTFLoader()
 
       loader.load(
-        '/models/human-male.glb',
+        '/models/human_skeleton.glb',
         (gltf) => {
           if (disposed) return
           const model = gltf.scene
 
-          // Compute bounding box & center character vertically
+          // Compute bounding box & normalize to exactly 2.0m height
           const box = new THREE.Box3().setFromObject(model)
           const size = new THREE.Vector3()
           box.getSize(size)
           const center = new THREE.Vector3()
           box.getCenter(center)
 
-          // Normalize height to ~1.85m within 3D world
-          const targetHeight = 1.85
+          const targetHeight = 2.0
           const scale = targetHeight / (size.y || 1)
           model.scale.setScalar(scale)
 
-          // Center the model horizontally and place feet at ground
+          // Center horizontally and vertically
           model.position.x = -center.x * scale
-          model.position.y = -box.min.y * scale - 0.95
+          model.position.y = -center.y * scale
           model.position.z = -center.z * scale
 
-          // Extract anatomical bones to pose armature into natural relaxed standing posture
-          const boneMap: Record<string, any> = {}
+          skeletonGroup.add(model)
+          model.updateMatrixWorld(true)
+
+          // Index all named bones in the skeleton
+          const boneNodeMap: Record<string, THREE.Object3D> = {}
+          const allSkeletonMeshes: THREE.Mesh[] = []
+
           model.traverse((child: any) => {
-            if (child.isBone) {
-              boneMap[child.name] = child
+            if (child.name) {
+              boneNodeMap[child.name] = child
             }
-          })
-
-          // Eliminate stiff dummy A-pose: pose arms to hang naturally at the sides of the thighs
-          if (boneMap['LeftArm']) {
-            boneMap['LeftArm'].rotation.x += 0.44
-            boneMap['LeftArm'].rotation.z += 0.05
-          }
-          if (boneMap['RightArm']) {
-            boneMap['RightArm'].rotation.x += 0.44
-            boneMap['RightArm'].rotation.z -= 0.05
-          }
-
-          // Gentle natural elbow flexion (~10-15 degrees forward)
-          if (boneMap['LeftForeArm']) {
-            boneMap['LeftForeArm'].rotation.z += 0.14
-            boneMap['LeftForeArm'].rotation.y += 0.04
-          }
-          if (boneMap['RightForeArm']) {
-            boneMap['RightForeArm'].rotation.z -= 0.14
-            boneMap['RightForeArm'].rotation.y -= 0.04
-          }
-
-          // Natural inward resting palm orientation toward the body
-          if (boneMap['LeftHand']) {
-            boneMap['LeftHand'].rotation.y += 0.18
-            boneMap['LeftHand'].rotation.x += 0.05
-          }
-          if (boneMap['RightHand']) {
-            boneMap['RightHand'].rotation.y -= 0.18
-            boneMap['RightHand'].rotation.x += 0.05
-          }
-
-          // Relax shoulders down into confident clinical posture
-          if (boneMap['LeftShoulder']) {
-            boneMap['LeftShoulder'].rotation.z += 0.04
-          }
-          if (boneMap['RightShoulder']) {
-            boneMap['RightShoulder'].rotation.z -= 0.04
-          }
-
-          // Upright, distinguished spine
-          if (boneMap['Spine1']) {
-            boneMap['Spine1'].rotation.x -= 0.03
-          }
-
-          // Enable shadows and configure distinguished Indian middle-aged orthopedic surgeon aesthetic
-          model.traverse((child: any) => {
             if (child.isMesh) {
               child.castShadow = true
               child.receiveShadow = true
-
-              // Morph targets for Indian facial structure: expressive eyes, distinguished jawline
-              if (child.morphTargetDictionary && child.morphTargetInfluences) {
-                const dict = child.morphTargetDictionary
-                const infl = child.morphTargetInfluences
-                if (dict['eyeWideLeft'] !== undefined) infl[dict['eyeWideLeft']] = 0.22
-                if (dict['eyeWideRight'] !== undefined) infl[dict['eyeWideRight']] = 0.22
-                if (dict['eyeSquintLeft'] !== undefined) infl[dict['eyeSquintLeft']] = 0.0
-                if (dict['eyeSquintRight'] !== undefined) infl[dict['eyeSquintRight']] = 0.0
-                if (dict['browInnerUp'] !== undefined) infl[dict['browInnerUp']] = 0.08
-                if (dict['jawForward'] !== undefined) infl[dict['jawForward']] = 0.12
-                if (dict['mouthSmile'] !== undefined) infl[dict['mouthSmile']] = 0.09
-              }
-
-              if (child.material) {
-                if (child.name === 'Wolf3D_Hair') {
-                  // Natural Indian deep black with subtle mature charcoal luster
-                  child.material.color.setHex(0x18181b)
-                  child.material.roughness = 0.72
-                  child.material.metalness = 0.04
-                } else if (
-                  child.name === 'Wolf3D_Head' ||
-                  child.name === 'Wolf3D_Body' ||
-                  child.material.name === 'Wolf3D_Skin' ||
-                  child.material.name === 'Wolf3D_Body'
-                ) {
-                  // Authentic warm Indian wheatish-caramel skin tone with healthy warm bronze undertones
-                  child.material.color.setHex(0xb87548)
-                  child.material.roughness = 0.52
-                  child.material.metalness = 0.0
-                } else if (
-                  child.name === 'EyeLeft' ||
-                  child.name === 'EyeRight' ||
-                  child.material.name === 'Wolf3D_Eye'
-                ) {
-                  // Deep warm espresso Indian eyes
-                  child.material.color.setHex(0x2d1b10)
-                  child.material.roughness = 0.10
-                  child.material.metalness = 0.0
-                } else if (child.name === 'Wolf3D_Outfit_Top') {
-                  // Tailored deep navy clinical/orthopedic shirt
-                  child.material.color.setHex(0x1e293b)
-                  child.material.roughness = 0.75
-                  child.material.metalness = 0.05
-                } else if (child.name === 'Wolf3D_Outfit_Bottom') {
-                  // Crisp formal slate trousers
-                  child.material.color.setHex(0x334155)
-                  child.material.roughness = 0.80
-                  child.material.metalness = 0.02
-                } else if (child.name === 'Wolf3D_Outfit_Footwear') {
-                  // Polished black leather dress shoes
-                  child.material.color.setHex(0x111827)
-                  child.material.roughness = 0.35
-                  child.material.metalness = 0.15
-                } else {
-                  child.material.roughness = Math.max(0.35, child.material.roughness || 0.4)
-                  child.material.metalness = Math.min(0.25, child.material.metalness || 0.1)
-                }
-                child.material.needsUpdate = true
-              }
+              child.material = currentBoneMat
+              allSkeletonMeshes.push(child)
             }
           })
 
-          characterGroup.add(model)
-          model.updateMatrixWorld(true)
-
-          // Build ultra-high-resolution anatomical skeleton and surgical implants matching Artec HD reference
-          const skeletonResult = buildFullBodySkeleton(THREE as any, boneMap, characterGroup)
-          characterGroup.add(skeletonResult.skeletonGroup)
-
-          function applyVisualMode(
-            mode: ScanMode,
-            jointId: string | null,
-            implant: boolean
-          ) {
-            if (mode === 'normal' && !jointId) {
-              // 1. FULL BODY CLOTHED (Indian orthopedic surgeon gentleman, pure white clinical studio background)
-              scene.background = new THREE.Color(0xffffff)
-              shadowMesh.visible = true
-              model.visible = true
-              skeletonResult.skeletonGroup.visible = false
-            } else {
-              // 2. FULL SKELETON (Deep black radiograph background, glowing Artec HD skeleton)
-              scene.background = new THREE.Color(0x050a14)
-              shadowMesh.visible = false
-              model.visible = false
-              skeletonResult.skeletonGroup.visible = true
-
-              // Surgical Implants visibility
-              Object.keys(skeletonResult.jointImplants).forEach((key) => {
-                const imp = skeletonResult.jointImplants[key]
-                if (imp) {
-                  if (jointId && implant) {
-                    imp.visible = key === jointId || key === `${jointId}_femur`
-                  } else {
-                    imp.visible = false
-                  }
-                }
-              })
-            }
-          }
-
-          // Attach each 3D Pin RIGIDLY directly to the exact bone surface
+          // Place 3D Pins precisely on each anatomical bone
           JOINTS_3D_DATA.forEach((j) => {
-            const bone = boneMap[j.boneName]
-            const pinPos = new THREE.Vector3()
+            let pinPos = new THREE.Vector3(...j.fallbackPos)
+            const targetNode = boneNodeMap[j.boneNodeName]
 
-            if (bone) {
-              bone.getWorldPosition(pinPos)
-              characterGroup.worldToLocal(pinPos)
-              pinPos.x += j.surfaceOffset[0]
-              pinPos.y += j.surfaceOffset[1]
-              pinPos.z += j.surfaceOffset[2]
-            } else {
-              if (j.id === 'knee') pinPos.set(-0.11, -0.34, 0.13)
-              if (j.id === 'hip') pinPos.set(-0.14, 0.08, 0.17)
-              if (j.id === 'shoulder') pinPos.set(0.24, 0.44, 0.10)
-              if (j.id === 'spine') pinPos.set(0.0, 0.28, -0.16)
-              if (j.id === 'elbow') pinPos.set(0.25, 0.14, 0.08)
-              if (j.id === 'ankle') pinPos.set(-0.12, -0.78, 0.16)
+            if (targetNode) {
+              const bBox = new THREE.Box3().setFromObject(targetNode)
+              const bCenter = new THREE.Vector3()
+              bBox.getCenter(bCenter)
+
+              // Adjust anterior offset so pin rests smoothly on the visible bone face
+              if (bCenter.lengthSq() > 0.001) {
+                pinPos = bCenter.clone()
+                pinPos.z += 0.04
+              }
             }
 
             create3DPin(j, pinPos)
           })
 
-          stateRef.current.applyVisualMode = applyVisualMode
-          applyVisualMode(viewMode, activeJointId, showImplant)
-
           setIsLoading(false)
 
-          // Initial load: ONLY zoom to joint if activeJointId was explicitly set, otherwise stay in FULL BODY view!
+          // If a joint was initially selected, fly in, otherwise full skeleton
           if (activeJointId) {
             flyToJoint(activeJointId)
           } else {
@@ -575,13 +462,13 @@ export default function Ortho3DHuman({
             setLoadProgress(Math.round((xhr.loaded / xhr.total) * 100))
           }
         },
-        (error) => {
-          console.error('Error loading 3D human model:', error)
+        (err) => {
+          console.error('Error loading human_skeleton.glb:', err)
           setIsLoading(false)
         }
       )
 
-      // ── CAMERA FLIGHT / ZOOM TO JOINT ─────────────────────────────────────
+      // ── Smooth Camera Transition Helpers ──────────────────────────────────
       function flyToJoint(jointId: string | null) {
         if (!jointId) {
           resetView()
@@ -604,154 +491,93 @@ export default function Ortho3DHuman({
       }
 
       function resetView() {
-        transitionRef.current.targetCamPos = [...FULL_BODY_CAM]
-        transitionRef.current.targetLookAt = [...FULL_BODY_TARGET]
+        transitionRef.current.targetCamPos = [...FULL_SKELETON_CAM]
+        transitionRef.current.targetLookAt = [...FULL_SKELETON_TARGET]
         transitionRef.current.isTransitioning = true
+      }
+
+      function applyTheme(newTheme: SkeletonTheme) {
+        const isRad = newTheme === 'radiograph'
+        renderer.setClearColor(isRad ? 0x050a14 : 0xffffff, 1)
+        scene.background = new THREE.Color(isRad ? 0x050a14 : 0xffffff)
+        shadowMesh.visible = !isRad
+        ambientLight.color.setHex(isRad ? 0x0c4a6e : 0xffffff)
+        ambientLight.intensity = isRad ? 1.8 : 1.45
+        keyLight.color.setHex(isRad ? 0x38bdf8 : 0xfff8ee)
+        rimLight.color.setHex(isRad ? 0x7dd3fc : 0xccfbf1)
+
+        skeletonGroup.traverse((child: any) => {
+          if (child.isMesh) {
+            child.material = isRad ? radiographBoneMat : studioBoneMat
+          }
+        })
       }
 
       stateRef.current.selectJoint = flyToJoint
       stateRef.current.resetView = resetView
+      stateRef.current.setTheme = applyTheme
+      stateRef.current.setAutoRotate = (enabled: boolean) => {
+        controls.autoRotate = enabled
+      }
 
-      // ── RAYCASTER FOR DIRECT CLICK & HOVER ON PINS ─────────────────────────
+      // ── Raycaster for Direct Clicking on 3D Pins ───────────────────────────
       const raycaster = new THREE.Raycaster()
       const mouseVec = new THREE.Vector2()
 
       function getPointerPos(e: MouseEvent) {
         const rect = canvas.getBoundingClientRect()
-        mouseVec.x = ((e.clientX - rect.left) / rect.width) * 2 - 1
-        mouseVec.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
+        return {
+          x: ((e.clientX - rect.left) / rect.width) * 2 - 1,
+          y: -((e.clientY - rect.top) / rect.height) * 2 + 1,
+        }
       }
 
-      function onClick(e: MouseEvent) {
-        getPointerPos(e)
+      function onCanvasClick(e: MouseEvent) {
+        const pos = getPointerPos(e)
+        mouseVec.set(pos.x, pos.y)
         raycaster.setFromCamera(mouseVec, camera)
-        const intersects = raycaster.intersectObjects(clickableObjects, true)
+
+        const interactiveMeshes = Object.values(jointAnchorMap).map((item) => item.orb)
+        const intersects = raycaster.intersectObjects(interactiveMeshes, false)
 
         if (intersects.length > 0) {
-          let hitObj: any = intersects[0].object
-          while (hitObj && !hitObj.userData?.jointId && hitObj.parent) {
-            hitObj = hitObj.parent
-          }
-          const jointId = hitObj?.userData?.jointId
-          if (jointId) {
-            onSelectJoint(jointId)
+          const hit = intersects[0]
+          const jId = hit.object.userData?.jointId
+          if (jId) {
+            onSelectJoint(jId)
           }
         }
       }
 
-      function onPointerMove(e: MouseEvent) {
-        getPointerPos(e)
+      function onCanvasMouseMove(e: MouseEvent) {
+        const pos = getPointerPos(e)
+        mouseVec.set(pos.x, pos.y)
         raycaster.setFromCamera(mouseVec, camera)
-        const intersects = raycaster.intersectObjects(clickableObjects, true)
+
+        const interactiveMeshes = Object.values(jointAnchorMap).map((item) => item.orb)
+        const intersects = raycaster.intersectObjects(interactiveMeshes, false)
+
         if (intersects.length > 0) {
           canvas.style.cursor = 'pointer'
-        } else {
-          canvas.style.cursor = isDragging ? 'grabbing' : 'grab'
+        } else if (!isInteracting) {
+          canvas.style.cursor = 'grab'
         }
       }
 
-      // ── 360° MOUSE & TOUCH ORBIT CONTROLS (NO AUTO-REVOLVE) ───────────────
-      let isDragging = false
-      let prevMouseX = 0
-      let prevMouseY = 0
-      let rotSpeed = 0.007
-      let targetRotY = 0
-      let targetRotX = 0
+      canvas.addEventListener('click', onCanvasClick)
+      canvas.addEventListener('mousemove', onCanvasMouseMove)
 
-      function onMouseDown(e: MouseEvent) {
-        if (e.button !== 0) return
-        isDragging = true
-        prevMouseX = e.clientX
-        prevMouseY = e.clientY
-      }
-
-      function onMouseMove(e: MouseEvent) {
-        onPointerMove(e)
-        if (!isDragging) return
-        const deltaX = e.clientX - prevMouseX
-        const deltaY = e.clientY - prevMouseY
-        prevMouseX = e.clientX
-        prevMouseY = e.clientY
-
-        targetRotY += deltaX * rotSpeed
-        targetRotX = Math.max(-0.35, Math.min(0.35, targetRotX + deltaY * rotSpeed * 0.5))
-      }
-
-      function onMouseUp() {
-        isDragging = false
-        canvas.style.cursor = 'grab'
-      }
-
-      function onWheel(e: WheelEvent) {
-        e.preventDefault()
-        const zoomDelta = e.deltaY * 0.0015
-        const currentDist = camera.position.distanceTo(cameraTarget)
-        const newDist = Math.max(0.8, Math.min(4.2, currentDist + zoomDelta))
-        const dir = camera.position.clone().sub(cameraTarget).normalize()
-        camera.position.copy(cameraTarget.clone().add(dir.multiplyScalar(newDist)))
-      }
-
-      // Touch handling for mobile
-      let touchStartX = 0
-      let touchStartY = 0
-      function onTouchStart(e: TouchEvent) {
-        if (e.touches.length === 1) {
-          isDragging = true
-          touchStartX = e.touches[0].clientX
-          touchStartY = e.touches[0].clientY
-        }
-      }
-
-      function onTouchMove(e: TouchEvent) {
-        if (!isDragging || e.touches.length !== 1) return
-        const deltaX = e.touches[0].clientX - touchStartX
-        const deltaY = e.touches[0].clientY - touchStartY
-        touchStartX = e.touches[0].clientX
-        touchStartY = e.touches[0].clientY
-
-        targetRotY += deltaX * rotSpeed * 1.2
-        targetRotX = Math.max(-0.35, Math.min(0.35, targetRotX + deltaY * rotSpeed * 0.6))
-      }
-
-      function onTouchEnd() {
-        isDragging = false
-      }
-
-      const canvasEl = canvasRef.current
-      canvasEl.addEventListener('click', onClick)
-      canvasEl.addEventListener('mousedown', onMouseDown)
-      window.addEventListener('mousemove', onMouseMove)
-      window.addEventListener('mouseup', onMouseUp)
-      canvasEl.addEventListener('wheel', onWheel, { passive: false })
-      canvasEl.addEventListener('touchstart', onTouchStart, { passive: true })
-      window.addEventListener('touchmove', onTouchMove, { passive: true })
-      window.addEventListener('touchend', onTouchEnd)
-
-      // ── RESIZE HANDLER ────────────────────────────────────────────────────
-      function onResize() {
-        if (!containerRef.current || !canvasRef.current) return
-        const w = containerRef.current.clientWidth
-        const h = containerRef.current.clientHeight
-        renderer.setSize(w, h, false)
-        camera.aspect = w / h
-        camera.updateProjectionMatrix()
-      }
-      window.addEventListener('resize', onResize)
-
-      // ── ANIMATION LOOP (STEADY POSE, ZERO AUTO-REVOLVING) ─────────────────
-      let clock = new THREE.Clock()
+      // ── Main Animation Render Loop ─────────────────────────────────────────
+      const clock = new THREE.Clock()
 
       function animate() {
         if (disposed) return
         animId = requestAnimationFrame(animate)
 
         const elapsedTime = clock.getElapsedTime()
+        controls.update()
 
-        // Character stands completely still: targetRotY is ONLY modified by user drag
-        characterGroup.rotation.y += (targetRotY - characterGroup.rotation.y) * 0.08
-        characterGroup.rotation.x += (targetRotX - characterGroup.rotation.x) * 0.08
-
-        // Buttery-smooth camera glide transition (exponential ease-out)
+        // Smooth camera lerping when transitioning
         const trans = transitionRef.current
         if (trans.isTransitioning) {
           const ease = 0.075
@@ -764,27 +590,29 @@ export default function Ortho3DHuman({
           cameraTarget.z += (trans.targetLookAt[2] - cameraTarget.z) * ease
 
           camera.lookAt(cameraTarget)
+          controls.target.copy(cameraTarget)
 
-          const posDist = Math.hypot(
+          const dist = Math.hypot(
             trans.targetCamPos[0] - camera.position.x,
             trans.targetCamPos[1] - camera.position.y,
             trans.targetCamPos[2] - camera.position.z
           )
-          if (posDist < 0.005) {
-            camera.position.set(trans.targetCamPos[0], trans.targetCamPos[1], trans.targetCamPos[2])
-            cameraTarget.set(trans.targetLookAt[0], trans.targetLookAt[1], trans.targetLookAt[2])
+          if (dist < 0.006) {
+            camera.position.set(...trans.targetCamPos)
+            cameraTarget.set(...trans.targetLookAt)
             camera.lookAt(cameraTarget)
+            controls.target.copy(cameraTarget)
             trans.isTransitioning = false
           }
         }
 
-        // Animate 3D Hotspot Pins
+        // Animate Hotspot Pins
         JOINTS_3D_DATA.forEach((j, idx) => {
           const pin = jointAnchorMap[j.id]
           if (pin) {
             pin.ring.lookAt(camera.position)
 
-            const wave = (elapsedTime * 1.5 + idx * 0.35) % 1
+            const wave = (elapsedTime * 1.5 + idx * 0.25) % 1
             pin.ring.scale.setScalar(1 + wave * 1.5)
             ;(pin.ring.material as THREE.MeshBasicMaterial).opacity = (1 - wave) * 0.8
 
@@ -796,33 +624,42 @@ export default function Ortho3DHuman({
               pin.glow.scale.setScalar(1.6 + Math.sin(elapsedTime * 4) * 0.2)
               ;(pin.glow.material as THREE.MeshBasicMaterial).opacity = 0.45
               ;(pin.orb.material as THREE.MeshStandardMaterial).emissiveIntensity = 1.3
-              pin.sprite.scale.set(0.26, 0.082, 1)
+              pin.sprite.scale.set(0.28, 0.07, 1)
             } else {
-              pin.glow.scale.setScalar(1.0)
-              ;(pin.glow.material as THREE.MeshBasicMaterial).opacity = 0.2
-              ;(pin.orb.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.6
-              pin.sprite.scale.set(0.22, 0.07, 1)
+              pin.glow.scale.setScalar(1.2)
+              ;(pin.glow.material as THREE.MeshBasicMaterial).opacity = 0.20
+              ;(pin.orb.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.8
+              pin.sprite.scale.set(0.24, 0.06, 1)
             }
           }
         })
 
         renderer.render(scene, camera)
       }
+
       animate()
 
-      // Cleanup
+      // Handle Resize
+      const ro = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const w = entry.contentRect.width
+          const h = entry.contentRect.height
+          if (w > 0 && h > 0) {
+            camera.aspect = w / h
+            camera.updateProjectionMatrix()
+            renderer.setSize(w, h, false)
+          }
+        }
+      })
+      ro.observe(container)
+
       return () => {
         disposed = true
         cancelAnimationFrame(animId)
-        canvasEl.removeEventListener('click', onClick)
-        canvasEl.removeEventListener('mousedown', onMouseDown)
-        window.removeEventListener('mousemove', onMouseMove)
-        window.removeEventListener('mouseup', onMouseUp)
-        canvasEl.removeEventListener('wheel', onWheel)
-        canvasEl.removeEventListener('touchstart', onTouchStart)
-        window.removeEventListener('touchmove', onTouchMove)
-        window.removeEventListener('touchend', onTouchEnd)
-        window.removeEventListener('resize', onResize)
+        canvas.removeEventListener('click', onCanvasClick)
+        canvas.removeEventListener('mousemove', onCanvasMouseMove)
+        ro.disconnect()
+        controls.dispose()
         renderer.dispose()
       }
     }
@@ -832,7 +669,7 @@ export default function Ortho3DHuman({
       disposed = true
       cleanupPromise.then((fn) => fn?.())
     }
-  }, [activeJointId, onSelectJoint])
+  }, []) // Initialize once
 
   // React to external active joint change
   useEffect(() => {
@@ -841,13 +678,20 @@ export default function Ortho3DHuman({
     }
   }, [activeJointId])
 
-  // React to viewMode, activeJointId, showImplant, or scannerY changes
-  // React to viewMode, activeJointId, showImplant changes
+  // React to theme change
   useEffect(() => {
-    if (stateRef.current.applyVisualMode) {
-      stateRef.current.applyVisualMode(viewMode, activeJointId, showImplant)
+    if (stateRef.current.setTheme) {
+      stateRef.current.setTheme(theme)
     }
-  }, [viewMode, activeJointId, showImplant])
+  }, [theme])
+
+  const toggleAutoRotate = () => {
+    const next = !autoRotate
+    setAutoRotate(next)
+    if (stateRef.current.setAutoRotate) {
+      stateRef.current.setAutoRotate(next)
+    }
+  }
 
   const handleResetCamera = useCallback(() => {
     onSelectJoint(null)
@@ -856,127 +700,82 @@ export default function Ortho3DHuman({
     }
   }, [onSelectJoint])
 
-  const activeJointInfo = activeJointId ? JOINTS_3D_DATA.find((j) => j.id === activeJointId) : null
+  const isDark = theme === 'radiograph'
 
   return (
     <div
       ref={containerRef}
-      className={`relative w-full h-[520px] sm:h-[600px] md:h-[660px] rounded-3xl overflow-hidden transition-colors duration-500 shadow-xl select-none ${
-        viewMode === 'skeleton' ? 'bg-[#050a14] border-slate-800' : 'bg-white border-slate-200/90'
+      className={`relative w-full h-[540px] sm:h-[620px] md:h-[680px] rounded-3xl overflow-hidden transition-colors duration-500 shadow-xl select-none border ${
+        isDark ? 'bg-[#050a14] border-slate-800' : 'bg-white border-slate-200'
       }`}
     >
       {/* Loading Overlay */}
       {isLoading && (
-        <div className="absolute inset-0 z-30 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
+        <div
+          className={`absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 backdrop-blur-sm transition-colors ${
+            isDark ? 'bg-[#050a14]/95 text-white' : 'bg-white/95 text-slate-800'
+          }`}
+        >
           <div className="relative flex items-center justify-center">
-            <div className="w-14 h-14 rounded-full border-3 border-brand-200 border-t-brand-600 animate-spin" />
-            <span className="absolute text-xs font-bold text-brand-600 font-sans">3D</span>
+            <div className="w-16 h-16 rounded-full border-3 border-teal-500/20 border-t-[#02BAB9] animate-spin" />
+            <span className="absolute font-sans text-xs font-bold text-[#02BAB9]">
+              {loadProgress > 0 ? `${loadProgress}%` : '3D'}
+            </span>
           </div>
           <div className="text-center">
-            <div className="text-sm font-bold text-slate-800">Loading 3D Anatomy Model...</div>
-            <div className="text-xs text-slate-500 font-mono mt-0.5">
-              {loadProgress > 0 ? `${loadProgress}% loaded` : 'Preparing realistic human avatar'}
-            </div>
+            <p className="font-serif font-bold text-base">
+              Loading 3D Medical Human Skeleton...
+            </p>
+            <p className="text-xs text-slate-400 mt-0.5">
+              High-Resolution CT Anatomical Scan &bull; 206 Articulated Bones
+            </p>
           </div>
         </div>
       )}
 
-      {/* 3D WebGL Canvas */}
-      <canvas
-        ref={canvasRef}
-        className="w-full h-full cursor-grab active:cursor-grabbing block"
-      />
+      {/* WebGL Canvas */}
+      <canvas ref={canvasRef} className="w-full h-full block cursor-grab active:cursor-grabbing" />
 
-      {/* 2-Mode Switcher: Full Body (Clothed) | Full Skeleton (Artec HD Reference) */}
-      <div className="absolute top-4 left-4 z-20 flex items-center bg-slate-900/90 backdrop-blur-md p-1 rounded-2xl border border-slate-700/80 shadow-xl">
+      {/* Top Floating Control Bar */}
+      <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5 p-1.5 rounded-2xl border shadow-sm backdrop-blur-md transition-colors bg-white/90 border-slate-200">
+        {/* Reset Camera Button */}
         <button
           type="button"
-          onClick={() => setViewMode('normal')}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-            viewMode === 'normal'
-              ? 'bg-white text-slate-900 shadow-sm'
-              : 'text-slate-300 hover:text-white hover:bg-slate-800'
-          }`}
-          title="Full Body Clothed View"
-        >
-          <span>👤 Full Body</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setViewMode('skeleton')}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-            viewMode === 'skeleton'
-              ? 'bg-brand-500 text-white shadow-sm'
-              : 'text-slate-300 hover:text-white hover:bg-slate-800'
-          }`}
-          title="Full High-Definition Medical Skeleton"
-        >
-          <span>🦴 Full Skeleton</span>
-        </button>
-      </div>
-
-      {/* Active Joint Digital X-Ray HUD (Top Center) */}
-      {activeJointId && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 bg-slate-900/90 text-white backdrop-blur-md px-3.5 py-1.5 rounded-full border border-sky-400/40 shadow-lg text-[11px] font-mono">
-          <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
-          <span className="font-bold tracking-wider text-sky-300">HIGH-DEF ANATOMY</span>
-          <span className="text-slate-400">•</span>
-          <span className="text-slate-100 uppercase font-sans font-bold">
-            {activeJointInfo?.label || activeJointId}
-          </span>
-        </div>
-      )}
-
-      {/* Clean Full Body / Reset Button (Top Right) */}
-      <div className="absolute top-4 right-4 z-20">
-        <button
           onClick={handleResetCamera}
-          className={`px-3.5 py-1.5 rounded-full border shadow-sm text-xs font-semibold flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 cursor-pointer ${
-            activeJointId === null
-              ? 'bg-brand-600 text-white border-brand-600 shadow-brand-500/20'
-              : 'bg-white/95 hover:bg-slate-50 text-slate-700 hover:text-brand-700 border-slate-200'
-          }`}
+          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          title="Reset to Full Skeleton View"
         >
-          <span>↺ Reset View</span>
+          <span>🔄</span>
+          <span className="hidden sm:inline">Full Skeleton</span>
+        </button>
+
+        {/* Auto Rotate Toggle */}
+        <button
+          type="button"
+          onClick={toggleAutoRotate}
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs ${
+            autoRotate
+              ? 'bg-teal-50 text-[#059B8F]'
+              : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+          }`}
+          title="Toggle Turntable 360° Rotation"
+        >
+          <span>{autoRotate ? 'Rotating' : 'Paused'}</span>
         </button>
       </div>
 
-      {/* Joint Anatomy vs Surgical Implant Toggle (Bottom Center when Joint is Active) */}
-      {activeJointId && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center bg-white/95 backdrop-blur-md p-1 rounded-2xl border border-slate-200/90 shadow-xl">
-          <button
-            type="button"
-            onClick={() => setShowImplant(false)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-              !showImplant
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-            }`}
-          >
-            <span>🦴 Natural Bone Anatomy</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowImplant(true)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-              showImplant
-                ? 'bg-brand-600 text-white shadow-xs shadow-brand-500/20'
-                : 'text-slate-600 hover:text-brand-700 hover:bg-slate-100'
-            }`}
-          >
-            <span>🦾 Surgical Reconstruction</span>
-          </button>
-        </div>
-      )}
-
-      {/* Subtle Drag Hint (Bottom Center when in Full Body Overview) */}
-      {!activeJointId && (
-        <div className="absolute bottom-3 inset-x-0 pointer-events-none text-center hidden sm:block z-10">
-          <span className="text-[11px] font-medium text-slate-500 bg-white/90 px-3.5 py-1 rounded-full border border-slate-200/80 shadow-xs">
-            Drag to rotate 360° • Click any joint to inspect detailed anatomy &amp; implants
-          </span>
-        </div>
-      )}
+      {/* Bottom Hint Overlay */}
+      <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 pointer-events-none">
+        <span
+          className={`text-[11px] font-medium px-3.5 py-1.5 rounded-full border shadow-xs backdrop-blur-md transition-colors ${
+            isDark
+              ? 'bg-slate-900/90 text-slate-300 border-slate-700'
+              : 'bg-white/95 text-slate-600 border-slate-200'
+          }`}
+        >
+          🦴 Click any glowing bone pin &bull; Drag 360° to orbit &bull; Scroll to zoom
+        </span>
+      </div>
     </div>
   )
 }

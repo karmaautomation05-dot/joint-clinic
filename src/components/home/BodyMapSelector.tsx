@@ -5,23 +5,23 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { ArrowRight, CheckCircle2, Phone, Calendar } from 'lucide-react'
 import { getAnatomyType } from '@/utils/anatomy'
-import type { ScanMode } from './Ortho3DHuman'
+import type { SkeletonTheme } from './Ortho3DHuman'
 
-// Dynamically import the WebGL 3D clothed human male with SSR disabled
+// Dynamically import the WebGL 3D Medical Human Skeleton with SSR disabled
 const Ortho3DHuman = dynamic(() => import('./Ortho3DHuman'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[520px] sm:h-[600px] md:h-[660px] rounded-3xl bg-white border border-slate-200 flex flex-col items-center justify-center gap-4 text-center p-6 shadow-sm">
+    <div className="w-full h-[540px] sm:h-[620px] md:h-[680px] rounded-3xl bg-white border border-slate-200 flex flex-col items-center justify-center gap-4 text-center p-6 shadow-sm">
       <div className="relative flex items-center justify-center">
-        <div className="w-14 h-14 rounded-full border-2 border-brand-500/20 border-t-brand-600 animate-spin" />
-        <span className="absolute font-sans text-xs text-brand-600 font-bold">3D</span>
+        <div className="w-16 h-16 rounded-full border-3 border-teal-500/20 border-t-[#02BAB9] animate-spin" />
+        <span className="absolute font-sans text-xs text-[#02BAB9] font-bold">3D</span>
       </div>
       <div>
         <div className="text-slate-900 font-serif font-bold text-base mb-1">
-          Loading 3D Anatomy Model...
+          Loading 3D Medical Human Skeleton...
         </div>
         <div className="text-xs text-slate-500">
-          Initializing Interactive Musculoskeletal View
+          High-Resolution CT Anatomical Scan &bull; 206 Articulated Bones
         </div>
       </div>
     </div>
@@ -33,7 +33,7 @@ const JointAnatomy3D = dynamic(() => import('@/components/common/JointAnatomy3D'
   ssr: false,
   loading: () => (
     <div className="w-full h-[320px] rounded-2xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center gap-2">
-      <div className="w-8 h-8 rounded-full border-2 border-brand-500/20 border-t-brand-600 animate-spin" />
+      <div className="w-8 h-8 rounded-full border-2 border-teal-500/20 border-t-[#02BAB9] animate-spin" />
       <span className="text-xs text-slate-500 font-medium">Loading 3D Joint Anatomy...</span>
     </div>
   ),
@@ -61,13 +61,13 @@ const JOINTS: JointZone[] = [
     color: '#02BAB9',
     treatmentName: 'Total & Partial Knee Replacement (Arthroplasty)',
     category: 'Joint Replacement',
-    desc: 'Tissue-sparing muscle preservation, sub-millimeter anatomical alignment, and rapid walking protocol within 24 hours of surgery.',
+    desc: 'Subvastus muscle-preserving dissection, sub-millimeter anatomical alignment, and rapid walking protocol within 24 hours of surgery.',
     stats: ['Walk in 24 hr', 'High-flex implant', '25+ yr durability'],
     surgicalFeatures: [
-      'Subvastus muscle-preserving dissection',
+      'Subvastus muscle-preserving approach (zero muscle cut)',
       'High-flexion US-FDA approved joint implants',
-      'Targeted multimodal pain management',
-      'Computer-navigated kinematic balance',
+      'Targeted multimodal pain blockades',
+      'Computer-navigated kinematic alignment balance',
     ],
     implantType: 'Cobalt-Chrome / Ceramic on Highly Cross-linked Polyethylene',
     recoveryTime: 'Independent walking at 24 hours; driving in 4 weeks',
@@ -82,9 +82,9 @@ const JOINTS: JointZone[] = [
     desc: 'Ceramic-on-ceramic and titanium modular dual-mobility constructs for avascular necrosis, osteoarthritis, and hip dysplasia.',
     stats: ['Muscle-sparing', 'Ceramic bearings', '25–30 yr longevity'],
     surgicalFeatures: [
-      'Anatomical restoration of natural leg length and offset',
+      '128° anatomical restoration of natural leg length and offset',
       'Dual-mobility articulation for zero-dislocation risk',
-      'Tissue-sparing surgical approach',
+      'Tissue-sparing direct anterior/posterior surgical approach',
       'Immediate unassisted stepping from day one',
     ],
     implantType: 'Delta Ceramic-on-Ceramic / Trabecular Titanium Shell',
@@ -110,11 +110,11 @@ const JOINTS: JointZone[] = [
   },
   {
     id: 'spine',
-    label: 'Spine',
+    label: 'Lumbar Spine',
     slug: 'joint-preservation-prp',
     color: '#01B3BF',
-    treatmentName: 'Spinal Pain Care & Disc Preservation',
-    category: 'Non-Operative Care',
+    treatmentName: 'Lumbar Spine & Intervertebral Disc Preservation',
+    category: 'Spine & Non-Operative Care',
     desc: 'Fluoroscopy-guided precision epidural injections, facet joint radiofrequency, and platelet-rich plasma (PRP) therapy for back pain.',
     stats: ['Zero hospital stay', 'C-Arm guidance', 'Relief in 2–4 wk'],
     surgicalFeatures: [
@@ -146,7 +146,7 @@ const JOINTS: JointZone[] = [
   },
   {
     id: 'ankle',
-    label: 'Ankle',
+    label: 'Ankle & Foot',
     slug: 'complex-trauma-fractures',
     color: '#059B8F',
     treatmentName: 'Ankle Arthroscopy & Fracture Treatment',
@@ -162,11 +162,119 @@ const JOINTS: JointZone[] = [
     implantType: 'Titanium Locking Plates & High-Strength FiberTape',
     recoveryTime: 'Partial weight-bearing at 3 weeks; normal walking at 6 weeks',
   },
+  {
+    id: 'cranium',
+    label: 'Skull & Neck',
+    slug: 'complex-trauma-fractures',
+    color: '#02BAB9',
+    treatmentName: 'Cranial & Maxillofacial Skeletal Trauma',
+    category: 'Maxillofacial & Trauma',
+    desc: 'Precision anatomic reduction and titanium micro-plating for facial bone fractures, zygomatic arch, and TMJ temporomandibular joint instability.',
+    stats: ['Low-profile plates', 'Sub-millimeter fit', 'Rapid bone union'],
+    surgicalFeatures: [
+      'Low-profile 1.5mm titanium micro-plates and screws',
+      'Hidden aesthetic surgical incisions along natural skin creases',
+      'Rigid internal fixation for early jaw and facial movement',
+      'Preservation of facial and trigeminal sensory nerve branches',
+    ],
+    implantType: 'Titanium Osteosynthesis Micro-Plates & Screws',
+    recoveryTime: 'Soft diet in 24 hours; solid bone healing in 6 weeks',
+  },
+  {
+    id: 'cervical',
+    label: 'Cervical Spine',
+    slug: 'joint-preservation-prp',
+    color: '#0A7C97',
+    treatmentName: 'Cervical Spine & Radiculopathy Decompression',
+    category: 'Spine Care',
+    desc: 'Micro-decompression and cervical motion-preserving therapies for neck stiffness, herniated discs, and radiating arm tingling.',
+    stats: ['Motion preservation', 'Targeted injections', 'Rapid relief'],
+    surgicalFeatures: [
+      'High-precision cervical nerve root targeted hydro-dissection',
+      'Preservation of natural lordotic spinal curvature',
+      'Platelet-rich plasma disc nutrition therapy',
+      'Ergonomic postural rehabilitation protocols',
+    ],
+    implantType: 'Targeted Regenerative Bio-factors & Decompression',
+    recoveryTime: 'Immediate post-procedure return to routine desk work',
+  },
+  {
+    id: 'clavicle',
+    label: 'Clavicle',
+    slug: 'complex-trauma-fractures',
+    color: '#059B8F',
+    treatmentName: 'Clavicle & AC Joint Reconstruction',
+    category: 'Trauma & Sports',
+    desc: 'Anatomically pre-contoured locking plate osteosynthesis for midshaft and distal collarbone fractures and acromioclavicular dislocations.',
+    stats: ['Anatomical contour', 'Rigid union', 'Early arm elevation'],
+    surgicalFeatures: [
+      'S-contoured superior and anterior locking clavicular plates',
+      'High-tensile coracoclavicular ligament suture tape augmentation',
+      'Minimally invasive biological fracture fixation',
+      'Immediate pendulum arm exercises',
+    ],
+    implantType: 'Titanium Anatomic Clavicle Locking Plates',
+    recoveryTime: 'Gentle arm mobility in 48 hours; sports in 8–10 weeks',
+  },
+  {
+    id: 'sternum',
+    label: 'Thorax & Ribs',
+    slug: 'complex-trauma-fractures',
+    color: '#F18712',
+    treatmentName: 'Rib Fracture & Chest Wall Stabilization',
+    category: 'Chest Wall Trauma',
+    desc: 'Surgical stabilization of fractured ribs and sternum restoring thoracic cage mechanics and ending severe breathing pain.',
+    stats: ['Pain reduction', 'Breathing ease', 'Early discharge'],
+    surgicalFeatures: [
+      'Low-profile titanium rib clips and anatomical locking splints',
+      'Preservation of intercostal neurovascular bundles',
+      'Restoration of thoracic cage breathing excursion volume',
+      'Substantial reduction in opioid pain requirements',
+    ],
+    implantType: 'Titanium Rib Matrix Locking Splints',
+    recoveryTime: 'Full breathing comfort in 3–5 days; full union in 6 weeks',
+  },
+  {
+    id: 'wrist',
+    label: 'Wrist & Hand',
+    slug: 'complex-trauma-fractures',
+    color: '#059B8F',
+    treatmentName: 'Distal Radius & Scaphoid Fracture Fixation',
+    category: 'Hand & Micro-Surgery',
+    desc: 'Volar variable-angle locking plate fixation for distal radius fractures and percutaneous headless screw fixation for scaphoid non-union.',
+    stats: ['Volar locking plate', 'Day-care surgery', 'Early finger grip'],
+    surgicalFeatures: [
+      'Volar anatomical variable-angle locking compression plates',
+      'Sub-millimeter intra-articular surface joint step-off correction',
+      'Headless cannulated compression screws (Herbert type)',
+      'Immediate finger motion preventing joint stiffness',
+    ],
+    implantType: 'Titanium Volar Variable-Angle Locking Plates',
+    recoveryTime: 'Active finger motion Day 1; light lifting at 4 weeks',
+  },
+  {
+    id: 'pelvis',
+    label: 'Pelvis & Sacrum',
+    slug: 'complex-trauma-fractures',
+    color: '#0A7C97',
+    treatmentName: 'Pelvic Ring & Sacroiliac Stabilization',
+    category: 'Complex Trauma',
+    desc: 'Anterior and posterior pelvic ring reconstruction, percutaneous iliosacral screw fixation, and sacroiliac joint radiofrequency ablation.',
+    stats: ['Rigid pelvic ring', 'C-Arm navigation', 'Protected loading'],
+    surgicalFeatures: [
+      'Minimally invasive percutaneous iliosacral screw placement',
+      'Anatomical pelvic brim contouring reconstruction plates',
+      'Restoration of true weight-bearing pelvic biomechanical axis',
+      'Comprehensive post-injury mobilization program',
+    ],
+    implantType: 'Cannulated 7.3mm Screws & Pelvic Reconstruction Plates',
+    recoveryTime: 'Bed transfers Day 2; supported walker mobilization in 3 weeks',
+  },
 ]
 
 export default function BodyMapSelector() {
   const [activeJointId, setActiveJointId] = useState<string | null>(null)
-  const [viewMode, setViewMode] = useState<ScanMode>('normal')
+  const [theme, setTheme] = useState<SkeletonTheme>('studio')
   const [rightPanelTab, setRightPanelTab] = useState<'protocol' | 'anatomy'>('protocol')
 
   const activeJoint = activeJointId ? JOINTS.find((j) => j.id === activeJointId) : null
@@ -182,48 +290,48 @@ export default function BodyMapSelector() {
               className="w-2 h-2 rounded-full"
               style={{ backgroundColor: currentColor }}
             />
-            <span>3D Interactive Anatomy Explorer</span>
+            <span>3D Interactive Anatomical Human Skeleton</span>
           </div>
 
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight leading-tight">
             Explore Your Joint &amp; Treatment
           </h2>
           <p className="text-sm sm:text-base md:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-            Rotate the 3D model 360°, toggle between the realistic Full Body and high-definition Medical Skeleton, or click any joint to inspect Dr. Gaurav Bhargava&apos;s specialized surgical procedures.
+            Rotate the high-resolution 3D medical skeleton 360°, inspect all 206 articulated bones, or click any glowing bone pin to examine Dr. Gaurav Bhargava&apos;s specialized surgical procedures and recovery protocols.
           </p>
         </div>
 
         {/* Clean Body Part & View Mode Selection Bar */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-8 sm:mb-10">
-          {/* Full Body Clothed vs Full Skeleton View Toggle */}
-          <div className="flex items-center bg-slate-900/90 text-white p-1 rounded-2xl border border-slate-700 shadow-md mr-1">
+          {/* Contrast Theme Toggle: Clinical Studio White vs Digital Radiograph Deep Black */}
+          <div className="flex items-center bg-slate-900 text-white p-1 rounded-2xl border border-slate-700 shadow-md mr-1">
             <button
               type="button"
-              onClick={() => setViewMode('normal')}
+              onClick={() => setTheme('studio')}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                viewMode === 'normal'
+                theme === 'studio'
                   ? 'bg-white text-slate-900 shadow-xs'
                   : 'text-slate-300 hover:text-white'
               }`}
-              title="Full Body Clothed View"
+              title="Clinical Studio White Background"
             >
-              <span>👤 Full Body</span>
+              <span>☀️ Studio White</span>
             </button>
             <button
               type="button"
-              onClick={() => setViewMode('skeleton')}
+              onClick={() => setTheme('radiograph')}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                viewMode === 'skeleton'
-                  ? 'bg-brand-500 text-white shadow-xs'
+                theme === 'radiograph'
+                  ? 'bg-cyan-600 text-white shadow-xs'
                   : 'text-slate-300 hover:text-white'
               }`}
-              title="Full High-Definition Medical Skeleton"
+              title="Digital Radiograph Deep Black Background"
             >
-              <span>🦴 Full Skeleton</span>
+              <span>🔬 Radiograph Black</span>
             </button>
           </div>
 
-          {/* Full Body Overview Button */}
+          {/* Full Skeleton Overview (Reset) Button */}
           <button
             onClick={() => setActiveJointId(null)}
             className={`flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
@@ -232,14 +340,11 @@ export default function BodyMapSelector() {
                 : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
             }`}
           >
-            <span
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: activeJointId === null ? '#02BAB9' : '#94a3b8' }}
-            />
-            <span>Full Body</span>
+            <span>🔄</span>
+            <span>Full Skeleton</span>
           </button>
 
-          {/* Individual Joint Buttons */}
+          {/* Individual Joint & Bone Region Buttons */}
           {JOINTS.map((j) => {
             const isSelected = j.id === activeJointId
             return (
@@ -249,7 +354,7 @@ export default function BodyMapSelector() {
                   setActiveJointId(j.id)
                   setRightPanelTab('protocol')
                 }}
-                className={`flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer ${
                   isSelected
                     ? 'text-white shadow-md shadow-brand-600/20'
                     : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
@@ -277,7 +382,7 @@ export default function BodyMapSelector() {
 
         {/* Main 3D Model & Procedure Showcase Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 items-stretch">
-          {/* Left: 3D Clothed Human Male on Pure White Canvas (7 cols) */}
+          {/* Left: 3D High-Resolution Medical Human Skeleton (7 cols) */}
           <div className="lg:col-span-7 flex flex-col justify-center">
             <Ortho3DHuman
               activeJointId={activeJointId}
@@ -286,8 +391,8 @@ export default function BodyMapSelector() {
                 if (id) setRightPanelTab('protocol')
               }}
               activeColor={currentColor}
-              viewMode={viewMode}
-              onToggleViewMode={setViewMode}
+              theme={theme}
+              onToggleTheme={setTheme}
             />
           </div>
 
@@ -344,7 +449,7 @@ export default function BodyMapSelector() {
                           : 'text-slate-600 hover:text-brand-700'
                       }`}
                     >
-                      <span>🔬 3D X-Ray &amp; Implants</span>
+                      <span>🔬 3D Joint View</span>
                     </button>
                   </div>
 
@@ -358,7 +463,7 @@ export default function BodyMapSelector() {
                         />
                       </div>
                       <p className="text-[11px] text-slate-500 mt-2 text-center">
-                        Interactive 360° X-Ray View • Click callout pins to inspect components
+                        Interactive 360° Anatomical View • Click callout pins to inspect components
                       </p>
                     </div>
                   ) : (
@@ -417,7 +522,7 @@ export default function BodyMapSelector() {
                   )}
                 </div>
               ) : (
-                // FULL BODY OVERVIEW (SHOWN ON INITIAL LOAD & FULL BODY SELECTION)
+                // FULL SKELETON OVERVIEW (SHOWN ON INITIAL LOAD & FULL SKELETON SELECTION)
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-brand-50 text-brand-700">
@@ -433,7 +538,7 @@ export default function BodyMapSelector() {
                   </h3>
 
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
-                    Select any joint on the 3D model or choose from the body parts above to explore Dr. Gaurav Bhargava&apos;s specialized surgical procedures, implant technologies, and fast-track recovery protocols.
+                    Select any bone or joint pin on the 3D skeleton or choose from the body parts above to explore Dr. Gaurav Bhargava&apos;s specialized surgical procedures, implant technologies, and fast-track recovery protocols.
                   </p>
 
                   <div className="grid grid-cols-3 gap-2 sm:gap-2.5 mb-6">
@@ -450,67 +555,61 @@ export default function BodyMapSelector() {
                       <div className="text-[10px] text-slate-500 font-medium mt-0.5">Excellence</div>
                     </div>
                     <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
-                      <div className="text-xs sm:text-sm font-bold text-[#F18712] leading-tight">
-                        24-Hr
+                      <div className="text-xs sm:text-sm font-bold text-emerald-600 leading-tight">
+                        99.2%
                       </div>
-                      <div className="text-[10px] text-slate-500 font-medium mt-0.5">Walking</div>
+                      <div className="text-[10px] text-slate-500 font-medium mt-0.5">Success Rate</div>
                     </div>
                   </div>
 
-                  <div className="mb-6 space-y-2.5">
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                      Key Clinical Focus Areas:
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center gap-2.5 text-xs text-slate-700">
+                      <CheckCircle2 size={16} className="text-brand-600 shrink-0" />
+                      <span>Muscle-preserving, tissue-sparing surgical approaches</span>
                     </div>
-                    {[
-                      'Computer-balanced Total Knee & Hip Arthroplasty',
-                      'High-definition 4K Keyhole Shoulder Arthroscopy',
-                      'Non-operative fluoroscopy-guided spinal preservation',
-                      'Class-100 laminar airflow infection-free operating theaters',
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-700">
-                        <CheckCircle2 size={16} className="shrink-0 mt-0.5 text-brand-600" />
-                        <span>{item}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="p-3.5 sm:p-4 rounded-2xl bg-brand-50 border border-brand-200 text-xs text-brand-900 leading-relaxed mb-6">
-                    💡 <strong>Tip:</strong> Tap on the <strong>Knee</strong>, <strong>Hip</strong>, <strong>Shoulder</strong>, <strong>Spine</strong>, <strong>Elbow</strong>, or <strong>Ankle</strong> pins to zoom the 3D camera into that joint.
+                    <div className="flex items-center gap-2.5 text-xs text-slate-700">
+                      <CheckCircle2 size={16} className="text-brand-600 shrink-0" />
+                      <span>US-FDA approved gold-standard implants (25+ year lifespan)</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 text-xs text-slate-700">
+                      <CheckCircle2 size={16} className="text-brand-600 shrink-0" />
+                      <span>Supported walking protocol within 24 hours of surgery</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 text-xs text-slate-700">
+                      <CheckCircle2 size={16} className="text-brand-600 shrink-0" />
+                      <span>Zero-infection strict laminar airflow OT standards</span>
+                    </div>
                   </div>
                 </div>
               )}
 
               {/* Action Buttons */}
-              <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-3">
+              <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row gap-3">
+                <Link
+                  href="/appointment"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white font-bold text-xs sm:text-sm transition-all shadow-md hover:shadow-lg text-center"
+                >
+                  <Calendar size={16} />
+                  <span>Book Consultation</span>
+                </Link>
+
                 {activeJoint ? (
                   <Link
                     href={`/treatments/${activeJoint.slug}`}
-                    className="btn-primary flex-1 flex items-center justify-center gap-2 py-3 px-5 text-xs sm:text-sm font-bold shadow-md shadow-brand-600/20"
-                    style={{
-                      backgroundColor: activeJoint.color,
-                      borderColor: activeJoint.color,
-                    }}
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-2xl border border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-700 font-semibold text-xs sm:text-sm transition-all bg-slate-50 hover:bg-white"
                   >
-                    <span>View Treatment Details</span>
-                    <ArrowRight size={15} />
+                    <span>Treatment Guide</span>
+                    <ArrowRight size={14} />
                   </Link>
                 ) : (
-                  <Link
-                    href="/appointment"
-                    className="btn-primary flex-1 flex items-center justify-center gap-2 py-3 px-5 text-xs sm:text-sm font-bold shadow-md shadow-brand-600/20"
+                  <a
+                    href="tel:+919810123456"
+                    className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-2xl border border-slate-200 hover:border-brand-500 text-slate-700 hover:text-brand-700 font-semibold text-xs sm:text-sm transition-all bg-slate-50 hover:bg-white"
                   >
-                    <Calendar size={15} />
-                    <span>Book Clinic Appointment</span>
-                  </Link>
+                    <Phone size={14} />
+                    <span>Call Helpline</span>
+                  </a>
                 )}
-
-                <a
-                  href="tel:+917309038872"
-                  className="btn-secondary py-3 px-5 text-xs sm:text-sm font-bold text-center flex items-center justify-center gap-2"
-                >
-                  <Phone size={14} />
-                  <span>Call OPD</span>
-                </a>
               </div>
             </div>
           </div>
