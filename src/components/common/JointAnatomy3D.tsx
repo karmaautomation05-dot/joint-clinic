@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
+import React, { useEffect, useRef, useState, useMemo } from 'react'
 import type * as THREE from 'three'
 import { AnatomyType, getAnatomyType } from '@/utils/anatomy'
 
@@ -18,100 +18,100 @@ export interface CalloutPoint {
 const CALLOUTS_DATA: Record<AnatomyType, { surgical: CalloutPoint[]; recovery: CalloutPoint[] }> = {
   knee: {
     surgical: [
-      { id: 'femoral', title: 'Femoral Component', desc: 'Anatomically contoured cobalt-chrome femoral shield replicating natural condylar curvature and trochlear groove.', pos: [-0.07, -0.34, 0.09], color: '#02BAB9' },
-      { id: 'poly', title: 'UHMWPE Bearing Insert', desc: 'Highly cross-linked polyethylene shock-absorbing insert for frictionless gliding and 25+ year durability.', pos: [-0.07, -0.39, 0.08], color: '#F18712' },
-      { id: 'tibial', title: 'Tibial Baseplate', desc: 'Titanium alloy tibial tray providing sub-millimeter fixation to the proximal tibial bone bed with central keel.', pos: [-0.07, -0.44, 0.08], color: '#059B8F' },
-      { id: 'patella', title: 'Patellar Tracking', desc: 'Preserved native kneecap with optimized trochlear groove tracking for natural, pain-free stair climbing.', pos: [-0.07, -0.36, 0.12], color: '#0A7C97' },
+      { id: 'femoral', title: 'Femoral Component', desc: 'Anatomically contoured cobalt-chrome femoral shield replicating natural condylar curvature and trochlear groove.', pos: [-0.067, -0.340, 0.008], color: '#02BAB9' },
+      { id: 'patella', title: 'Patellar Tracking', desc: 'Preserved native kneecap with optimized trochlear groove tracking for natural, pain-free stair climbing.', pos: [-0.067, -0.385, 0.014], color: '#0A7C97' },
+      { id: 'poly', title: 'UHMWPE Bearing Insert', desc: 'Highly cross-linked polyethylene shock-absorbing insert for frictionless gliding and 25+ year durability.', pos: [-0.095, -0.415, 0.008], color: '#F18712' },
+      { id: 'tibial', title: 'Tibial Baseplate', desc: 'Titanium alloy tibial tray providing sub-millimeter fixation to the proximal tibial bone bed with central keel.', pos: [-0.065, -0.450, 0.008], color: '#059B8F' },
     ],
     recovery: [
-      { id: 'rec-day1', title: 'Day-1 Load Transfer', desc: 'Direct axial stability allows 100% safe weight-bearing and supported walking within 24 hours of surgery.', pos: [-0.07, -0.44, 0.08], color: '#059B8F' },
-      { id: 'rec-quad', title: 'Quadriceps Gliding', desc: 'Active patellar tendon excursion enables early straight leg raises and rapid neuromuscular reactivation.', pos: [-0.07, -0.36, 0.12], color: '#02BAB9' },
-      { id: 'rec-rom', title: 'Bending Arc (0°-120°)', desc: 'Optimized posterior condylar offset facilitates smooth knee flexion without impingement or stiffness.', pos: [-0.07, -0.34, 0.09], color: '#F18712' },
-      { id: 'rec-bearing', title: 'Zero Wear Cushion', desc: 'UHMWPE articular insert eliminates bone friction for pain-free long-distance walking.', pos: [-0.07, -0.39, 0.08], color: '#0A7C97' },
+      { id: 'rec-rom', title: 'Bending Arc (0°-120°)', desc: 'Optimized posterior condylar offset facilitates smooth knee flexion without impingement or stiffness.', pos: [-0.067, -0.340, 0.008], color: '#F18712' },
+      { id: 'rec-quad', title: 'Quadriceps Gliding', desc: 'Active patellar tendon excursion enables early straight leg raises and rapid neuromuscular reactivation.', pos: [-0.067, -0.385, 0.014], color: '#02BAB9' },
+      { id: 'rec-bearing', title: 'Zero Wear Cushion', desc: 'UHMWPE articular insert eliminates bone friction for pain-free long-distance walking.', pos: [-0.095, -0.415, 0.008], color: '#0A7C97' },
+      { id: 'rec-day1', title: 'Day-1 Load Transfer', desc: 'Direct axial stability allows 100% safe weight-bearing and supported walking within 24 hours of surgery.', pos: [-0.065, -0.450, 0.008], color: '#059B8F' },
     ],
   },
   hip: {
     surgical: [
-      { id: 'acetabulum', title: 'Acetabular Cup', desc: 'Titanium shell with trabecular porous coating for rapid biological bone ingrowth.', pos: [0.06, 0.09, 0.07], color: '#02BAB9' },
-      { id: 'head', title: 'Ceramic Femoral Ball', desc: 'High-hardness BIOLOX Delta ceramic head providing micro-smooth articulation and low friction.', pos: [0.08, 0.06, 0.07], color: '#F18712' },
-      { id: 'neck', title: 'Anatomical Offset Neck', desc: '128° angle of inclination restores exact limb length and abductor muscle biomechanics.', pos: [0.11, 0.04, 0.06], color: '#0A7C97' },
-      { id: 'stem', title: 'Titanium Femoral Stem', desc: 'Triple-tapered femoral stem achieving rigid proximal press-fit fixation inside femoral canal.', pos: [0.12, -0.03, 0.05], color: '#059B8F' },
+      { id: 'acetabulum', title: 'Acetabular Cup', desc: 'Titanium shell with trabecular porous coating for rapid biological bone ingrowth.', pos: [-0.065, 0.080, 0.010], color: '#02BAB9' },
+      { id: 'head', title: 'Ceramic Femoral Ball', desc: 'High-hardness BIOLOX Delta ceramic head providing micro-smooth articulation and low friction.', pos: [-0.088, 0.055, 0.010], color: '#F18712' },
+      { id: 'neck', title: 'Anatomical Offset Neck', desc: '128° angle of inclination restores exact limb length and abductor muscle biomechanics.', pos: [-0.115, 0.035, 0.008], color: '#0A7C97' },
+      { id: 'stem', title: 'Titanium Femoral Stem', desc: 'Triple-tapered femoral stem achieving rigid proximal press-fit fixation inside femoral canal.', pos: [-0.135, -0.040, 0.006], color: '#059B8F' },
     ],
     recovery: [
-      { id: 'rec-walk', title: 'Day-1 Walking Axis', desc: 'Immediate stable mechanical press-fit allows walker-assisted stepping on Day 1.', pos: [0.12, -0.03, 0.05], color: '#059B8F' },
-      { id: 'rec-abductor', title: 'Gluteus Medius Strength', desc: 'Restored hip offset empowers abductor muscles for level pelvic control without Trendelenburg gait.', pos: [0.11, 0.04, 0.06], color: '#02BAB9' },
-      { id: 'rec-ingrowth', title: 'Porous Bone Ingrowth', desc: 'Biological osseointegration locks the acetabular cup permanently into pelvic bone over 6 weeks.', pos: [0.06, 0.09, 0.07], color: '#F18712' },
-      { id: 'rec-disloc', title: 'Capsular Stability', desc: 'Tissue-sparing surgical approach protects posterior capsule, enabling safe sitting and movement.', pos: [0.08, 0.06, 0.07], color: '#0A7C97' },
+      { id: 'rec-ingrowth', title: 'Porous Bone Ingrowth', desc: 'Biological osseointegration locks the acetabular cup permanently into pelvic bone over 6 weeks.', pos: [-0.065, 0.080, 0.010], color: '#F18712' },
+      { id: 'rec-disloc', title: 'Capsular Stability', desc: 'Tissue-sparing surgical approach protects posterior capsule, enabling safe sitting and movement.', pos: [-0.088, 0.055, 0.010], color: '#0A7C97' },
+      { id: 'rec-abductor', title: 'Gluteus Medius Strength', desc: 'Restored hip offset empowers abductor muscles for level pelvic control without Trendelenburg gait.', pos: [-0.115, 0.035, 0.008], color: '#02BAB9' },
+      { id: 'rec-walk', title: 'Day-1 Walking Axis', desc: 'Immediate stable mechanical press-fit allows walker-assisted stepping on Day 1.', pos: [-0.135, -0.040, 0.006], color: '#059B8F' },
     ],
   },
   shoulder: {
     surgical: [
-      { id: 'rotator', title: 'Supraspinatus Tendon', desc: 'Anatomically re-anchored rotator cuff tendon restored flush onto humeral greater tuberosity.', pos: [-0.20, 0.68, 0.08], color: '#F18712' },
-      { id: 'head', title: 'Humeral Head Articulation', desc: 'Smooth spherical humeral head articulating with preserved glenoid socket.', pos: [-0.19, 0.65, 0.07], color: '#02BAB9' },
-      { id: 'glenoid', title: 'Glenoid Labrum', desc: 'Repaired fibrocartilaginous labral bumper preventing shoulder instability and subluxation.', pos: [-0.15, 0.65, 0.05], color: '#059B8F' },
-      { id: 'acromion', title: 'Subacromial Clearance', desc: 'Targeted decompression creates ample space for impingement-free arm lifting.', pos: [-0.18, 0.72, 0.08], color: '#0A7C97' },
+      { id: 'acromion', title: 'Subacromial Clearance', desc: 'Targeted decompression creates ample space for impingement-free arm lifting.', pos: [-0.150, 0.695, 0.030], color: '#0A7C97' },
+      { id: 'rotator', title: 'Supraspinatus Tendon', desc: 'Anatomically re-anchored rotator cuff tendon restored flush onto humeral greater tuberosity.', pos: [-0.190, 0.670, 0.025], color: '#F18712' },
+      { id: 'head', title: 'Humeral Head Articulation', desc: 'Smooth spherical humeral head articulating with preserved glenoid socket.', pos: [-0.180, 0.640, 0.015], color: '#02BAB9' },
+      { id: 'glenoid', title: 'Glenoid Labrum', desc: 'Repaired fibrocartilaginous labral bumper preventing shoulder instability and subluxation.', pos: [-0.130, 0.645, 0.010], color: '#059B8F' },
     ],
     recovery: [
-      { id: 'rec-pendulum', title: 'Passive Pendulum Glide', desc: 'Early gentle Codman exercises prevent joint capsule contracture and adhesive capsulitis.', pos: [-0.19, 0.65, 0.07], color: '#02BAB9' },
-      { id: 'rec-tendon', title: 'Tendon-Bone Union', desc: 'Protected sling phase allows vascular ingrowth between tendon footprint and cortical bone.', pos: [-0.20, 0.68, 0.08], color: '#F18712' },
-      { id: 'rec-scapula', title: 'Scapulothoracic Rhythm', desc: 'Targeted trapezius and serratus exercises rebuild dynamic overhead elevation.', pos: [-0.15, 0.65, 0.05], color: '#059B8F' },
-      { id: 'rec-reach', title: 'Active Overhead Reach', desc: 'Progressive resistance training restores full overhead functional mobility at 8-12 weeks.', pos: [-0.18, 0.72, 0.08], color: '#0A7C97' },
+      { id: 'rec-reach', title: 'Active Overhead Reach', desc: 'Progressive resistance training restores full overhead functional mobility at 8-12 weeks.', pos: [-0.150, 0.695, 0.030], color: '#0A7C97' },
+      { id: 'rec-tendon', title: 'Tendon-Bone Union', desc: 'Protected sling phase allows vascular ingrowth between tendon footprint and cortical bone.', pos: [-0.190, 0.670, 0.025], color: '#F18712' },
+      { id: 'rec-pendulum', title: 'Passive Pendulum Glide', desc: 'Early gentle Codman exercises prevent joint capsule contracture and adhesive capsulitis.', pos: [-0.180, 0.640, 0.015], color: '#02BAB9' },
+      { id: 'rec-scapula', title: 'Scapulothoracic Rhythm', desc: 'Targeted trapezius and serratus exercises rebuild dynamic overhead elevation.', pos: [-0.130, 0.645, 0.010], color: '#059B8F' },
     ],
   },
   spine: {
     surgical: [
-      { id: 'disc', title: 'Intervertebral Disc Space', desc: 'Cushioning fibrocartilage space maintaining neural foramen height between vertebrae.', pos: [0.0, 0.27, 0.06], color: '#02BAB9' },
-      { id: 'herniation', title: 'Targeted Discectomy Site', desc: 'Microscopic removal of protruding disc fragment relieving mechanical nerve compression.', pos: [0.03, 0.26, 0.06], color: '#F18712' },
-      { id: 'nerve', title: 'Decompressed Nerve Root', desc: 'Spinal root fully freed from stenosis, ending radiating leg sciatica and numbness.', pos: [0.05, 0.24, 0.05], color: '#059B8F' },
-      { id: 'vertebra', title: 'Lumbar Motion Segment', desc: 'Preserved L4-L5 vertebral bodies and facet joints providing natural rotational and flexion stability.', pos: [0.0, 0.32, 0.06], color: '#0A7C97' },
+      { id: 'vertebra', title: 'Lumbar Motion Segment', desc: 'Preserved L1-L4 vertebral bodies and facet joints providing natural rotational and flexion stability.', pos: [0.005, 0.350, 0.005], color: '#0A7C97' },
+      { id: 'disc', title: 'Intervertebral Disc Space', desc: 'Cushioning fibrocartilage space maintaining neural foramen height between vertebrae.', pos: [0.005, 0.280, 0.005], color: '#02BAB9' },
+      { id: 'herniation', title: 'Targeted Discectomy Site', desc: 'Microscopic removal of protruding disc fragment relieving mechanical nerve compression.', pos: [0.030, 0.260, 0.005], color: '#F18712' },
+      { id: 'nerve', title: 'Decompressed Nerve Root', desc: 'Spinal root fully freed from stenosis, ending radiating leg sciatica and numbness.', pos: [0.050, 0.210, 0.002], color: '#059B8F' },
     ],
     recovery: [
-      { id: 'rec-decomp', title: 'Sciatic Nerve Relief', desc: 'Immediate relief of burning leg pain as root swelling resolves with anti-inflammatory therapy.', pos: [0.05, 0.24, 0.05], color: '#059B8F' },
-      { id: 'rec-core', title: 'Core Muscle Activation', desc: 'Deep abdominal bracing stabilizes the lumbar motion segment during daily transfers.', pos: [0.0, 0.32, 0.06], color: '#0A7C97' },
-      { id: 'rec-annulus', title: 'Annular Scar Healing', desc: 'Fibrous outer disc ring consolidates over 6 weeks, preventing recurrent disc herniation.', pos: [0.03, 0.26, 0.06], color: '#F18712' },
-      { id: 'rec-walk', title: 'Day-1 Walking Protocol', desc: 'Early upright walking promotes disc hydration and prevents epidural adhesion.', pos: [0.0, 0.27, 0.06], color: '#02BAB9' },
+      { id: 'rec-core', title: 'Core Muscle Activation', desc: 'Deep abdominal bracing stabilizes the lumbar motion segment during daily transfers.', pos: [0.005, 0.350, 0.005], color: '#0A7C97' },
+      { id: 'rec-walk', title: 'Day-1 Walking Protocol', desc: 'Early upright walking promotes disc hydration and prevents epidural adhesion.', pos: [0.005, 0.280, 0.005], color: '#02BAB9' },
+      { id: 'rec-annulus', title: 'Annular Scar Healing', desc: 'Fibrous outer disc ring consolidates over 6 weeks, preventing recurrent disc herniation.', pos: [0.030, 0.260, 0.005], color: '#F18712' },
+      { id: 'rec-decomp', title: 'Sciatic Nerve Relief', desc: 'Immediate relief of burning leg pain as root swelling resolves with anti-inflammatory therapy.', pos: [0.050, 0.210, 0.002], color: '#059B8F' },
     ],
   },
   sports: {
     surgical: [
-      { id: 'acl', title: 'ACL Tendon Graft', desc: 'Anatomically aligned quadrupled autograft replicating native cruciate biomechanics.', pos: [-0.07, -0.38, 0.08], color: '#F18712' },
-      { id: 'screw', title: 'Interference Fixation', desc: 'Bio-composite fixation screws securing graft rigidly within femoral and tibial tunnels.', pos: [-0.05, -0.33, 0.08], color: '#02BAB9' },
-      { id: 'meniscus', title: 'Meniscal Shock Absorber', desc: 'Preserved and sutured meniscus cushions distributing contact stresses across tibial plateau.', pos: [-0.11, -0.39, 0.08], color: '#059B8F' },
-      { id: 'tunnel', title: 'Tibial Tunnel Anchor', desc: 'Precision-drilled anatomical aperture preventing graft impingement in full extension.', pos: [-0.07, -0.44, 0.08], color: '#0A7C97' },
+      { id: 'screw', title: 'Interference Fixation', desc: 'Bio-composite fixation screws securing graft rigidly within femoral and tibial tunnels.', pos: [-0.050, -0.335, 0.005], color: '#02BAB9' },
+      { id: 'acl', title: 'ACL Tendon Graft', desc: 'Anatomically aligned quadrupled autograft replicating native cruciate biomechanics.', pos: [-0.067, -0.380, 0.008], color: '#F18712' },
+      { id: 'meniscus', title: 'Meniscal Shock Absorber', desc: 'Preserved and sutured meniscus cushions distributing contact stresses across tibial plateau.', pos: [-0.095, -0.410, 0.008], color: '#059B8F' },
+      { id: 'tunnel', title: 'Tibial Tunnel Anchor', desc: 'Precision-drilled anatomical aperture preventing graft impingement in full extension.', pos: [-0.065, -0.450, 0.005], color: '#0A7C97' },
     ],
     recovery: [
-      { id: 'rec-ligament', title: 'Graft Ligamentization', desc: 'Cellular repopulation and collagen remodeling transforms tendon graft into true living ligament.', pos: [-0.07, -0.38, 0.08], color: '#F18712' },
-      { id: 'rec-extension', title: 'Full Terminal Extension', desc: 'Achieving 0° hyperextension in week 1 is critical to avoid cyclops lesion and limp.', pos: [-0.07, -0.44, 0.08], color: '#0A7C97' },
-      { id: 'rec-proprio', title: 'Neuro-Muscular Control', desc: 'Wobble board and balance training restores subconscious joint position sense.', pos: [-0.11, -0.39, 0.08], color: '#059B8F' },
-      { id: 'rec-rts', title: 'Return-to-Sport Testing', desc: 'Rigorous 9-month criteria including quad index >90% and functional hop symmetry.', pos: [-0.05, -0.33, 0.08], color: '#02BAB9' },
+      { id: 'rec-rts', title: 'Return-to-Sport Testing', desc: 'Rigorous 9-month criteria including quad index >90% and functional hop symmetry.', pos: [-0.050, -0.335, 0.005], color: '#02BAB9' },
+      { id: 'rec-ligament', title: 'Graft Ligamentization', desc: 'Cellular repopulation and collagen remodeling transforms tendon graft into true living ligament.', pos: [-0.067, -0.380, 0.008], color: '#F18712' },
+      { id: 'rec-proprio', title: 'Neuro-Muscular Control', desc: 'Wobble board and balance training restores subconscious joint position sense.', pos: [-0.095, -0.410, 0.008], color: '#059B8F' },
+      { id: 'rec-extension', title: 'Full Terminal Extension', desc: 'Achieving 0° hyperextension in week 1 is critical to avoid cyclops lesion and limp.', pos: [-0.065, -0.450, 0.005], color: '#0A7C97' },
     ],
   },
   prp: {
     surgical: [
-      { id: 'cartilage', title: 'Articular Cartilage Matrix', desc: 'Target chondrocyte surface receiving biological platelet growth factor stimulation.', pos: [-0.07, -0.36, 0.08], color: '#02BAB9' },
-      { id: 'biofluid', title: 'Hyaluronic Fluid Layer', desc: 'High-viscosity bio-gel cushion restoring hydrodynamic lubrication and easing friction.', pos: [-0.07, -0.39, 0.09], color: '#F18712' },
-      { id: 'factors', title: 'Platelet Growth Factors', desc: 'High-concentration PDGF and VEGF inducing tissue repair and suppressing inflammation.', pos: [-0.03, -0.38, 0.08], color: '#059B8F' },
-      { id: 'boneplate', title: 'Subchondral Protection', desc: 'Relieves subchondral bone marrow edema and prevents progressive joint space narrowing.', pos: [-0.07, -0.43, 0.08], color: '#0A7C97' },
+      { id: 'cartilage', title: 'Articular Cartilage Matrix', desc: 'Target chondrocyte surface receiving biological platelet growth factor stimulation.', pos: [-0.067, -0.350, 0.008], color: '#02BAB9' },
+      { id: 'biofluid', title: 'Hyaluronic Fluid Layer', desc: 'High-viscosity bio-gel cushion restoring hydrodynamic lubrication and easing friction.', pos: [-0.067, -0.385, 0.012], color: '#F18712' },
+      { id: 'factors', title: 'Platelet Growth Factors', desc: 'High-concentration PDGF and VEGF inducing tissue repair and suppressing inflammation.', pos: [-0.095, -0.410, 0.008], color: '#059B8F' },
+      { id: 'boneplate', title: 'Subchondral Protection', desc: 'Relieves subchondral bone marrow edema and prevents progressive joint space narrowing.', pos: [-0.065, -0.450, 0.005], color: '#0A7C97' },
     ],
     recovery: [
-      { id: 'rec-infil', title: 'Cellular Activation (Day 1-3)', desc: 'Growth factors trigger localized cascade to stimulate native chondrocyte collagen synthesis.', pos: [-0.03, -0.38, 0.08], color: '#059B8F' },
-      { id: 'rec-cycle', title: 'Gentle Cycling Nourishment', desc: 'Non-impact spinning stimulates joint fluid circulation and cartilage nutrient absorption.', pos: [-0.07, -0.39, 0.09], color: '#F18712' },
-      { id: 'rec-maturation', title: 'Collagen Maturation (Wks 3-6)', desc: 'Proteoglycan synthesis strengthens cartilage surface resilience against compressive loads.', pos: [-0.07, -0.36, 0.08], color: '#02BAB9' },
-      { id: 'rec-longevity', title: 'Long-Term Preservation', desc: 'Delays or prevents invasive joint surgery by maintaining healthy biological joint margins.', pos: [-0.07, -0.43, 0.08], color: '#0A7C97' },
+      { id: 'rec-maturation', title: 'Collagen Maturation (Wks 3-6)', desc: 'Proteoglycan synthesis strengthens cartilage surface resilience against compressive loads.', pos: [-0.067, -0.350, 0.008], color: '#02BAB9' },
+      { id: 'rec-cycle', title: 'Gentle Cycling Nourishment', desc: 'Non-impact spinning stimulates joint fluid circulation and cartilage nutrient absorption.', pos: [-0.067, -0.385, 0.012], color: '#F18712' },
+      { id: 'rec-infil', title: 'Cellular Activation (Day 1-3)', desc: 'Growth factors trigger localized cascade to stimulate native chondrocyte collagen synthesis.', pos: [-0.095, -0.410, 0.008], color: '#059B8F' },
+      { id: 'rec-longevity', title: 'Long-Term Preservation', desc: 'Delays or prevents invasive joint surgery by maintaining healthy biological joint margins.', pos: [-0.065, -0.450, 0.005], color: '#0A7C97' },
     ],
   },
   trauma: {
     surgical: [
-      { id: 'plate', title: 'Titanium Locking Plate', desc: 'Anatomically pre-contoured Low-Contact Locking Compression Plate (LCP) bridging fracture.', pos: [0.11, -0.05, 0.06], color: '#02BAB9' },
-      { id: 'screws', title: 'Bi-Cortical Locking Screws', desc: 'Angular-stable threaded screws locking rigidly into plate and bone for maximum pull-out strength.', pos: [0.12, 0.02, 0.06], color: '#F18712' },
-      { id: 'fracture', title: 'Anatomical Reduction Line', desc: 'Sub-millimeter reduction restoring bone length, axial alignment, and rotational profile.', pos: [0.10, -0.10, 0.05], color: '#059B8F' },
-      { id: 'periosteum', title: 'Preserved Biology & Blood', desc: 'Minimally-invasive MIPO plate insertion preserves critical periosteal vascular network.', pos: [0.08, -0.14, 0.05], color: '#0A7C97' },
+      { id: 'screws', title: 'Bi-Cortical Locking Screws', desc: 'Angular-stable threaded screws locking rigidly into plate and bone for maximum pull-out strength.', pos: [-0.140, -0.040, 0.005], color: '#F18712' },
+      { id: 'plate', title: 'Titanium Locking Plate', desc: 'Anatomically pre-contoured Low-Contact Locking Compression Plate (LCP) bridging fracture.', pos: [-0.140, -0.100, 0.005], color: '#02BAB9' },
+      { id: 'fracture', title: 'Anatomical Reduction Line', desc: 'Sub-millimeter reduction restoring bone length, axial alignment, and rotational profile.', pos: [-0.110, -0.150, 0.005], color: '#059B8F' },
+      { id: 'periosteum', title: 'Preserved Biology & Blood', desc: 'Minimally-invasive MIPO plate insertion preserves critical periosteal vascular network.', pos: [-0.080, -0.210, 0.005], color: '#0A7C97' },
     ],
     recovery: [
-      { id: 'rec-callus', title: 'Biological Callus Knit', desc: 'Woven primary callus bridges fracture gap over 3-6 weeks under dynamic micro-motion.', pos: [0.10, -0.10, 0.05], color: '#059B8F' },
-      { id: 'rec-load', title: 'Progressive Weight-Bearing', desc: 'Controlled axial loading stimulates osteoblast bone deposition via Wolff’s law.', pos: [0.11, -0.05, 0.06], color: '#F18712' },
-      { id: 'rec-stability', title: 'Internal Splint Stability', desc: 'Locked construct protects bone against bending and torsional stresses during daily transfers.', pos: [0.12, 0.02, 0.06], color: '#02BAB9' },
-      { id: 'rec-union', title: 'Solid Cortical Union', desc: 'Dense lamellar bone remodeling completes solid radiological union at 8-12 weeks.', pos: [0.08, -0.14, 0.05], color: '#0A7C97' },
+      { id: 'rec-stability', title: 'Internal Splint Stability', desc: 'Locked construct protects bone against bending and torsional stresses during daily transfers.', pos: [-0.140, -0.040, 0.005], color: '#02BAB9' },
+      { id: 'rec-load', title: 'Progressive Weight-Bearing', desc: 'Controlled axial loading stimulates osteoblast bone deposition via Wolff’s law.', pos: [-0.140, -0.100, 0.005], color: '#F18712' },
+      { id: 'rec-callus', title: 'Biological Callus Knit', desc: 'Woven primary callus bridges fracture gap over 3-6 weeks under dynamic micro-motion.', pos: [-0.110, -0.150, 0.005], color: '#059B8F' },
+      { id: 'rec-union', title: 'Solid Cortical Union', desc: 'Dense lamellar bone remodeling completes solid radiological union at 8-12 weeks.', pos: [-0.080, -0.210, 0.005], color: '#0A7C97' },
     ],
   },
 }
@@ -138,6 +138,7 @@ interface ProjectedPin {
   id: string
   title: string
   color: string
+  index: number
   x: number
   y: number
   visible: boolean
@@ -224,8 +225,8 @@ export default function JointAnatomy3D({
       scene.background = new THREE.Color(visualTheme === 'radiograph' ? 0x050a14 : 0x181e28)
 
       const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100)
-      const cameraTarget = new THREE.Vector3(0, 0.05, 0)
-      camera.position.set(0, 0.15, 2.5)
+      const cameraTarget = new THREE.Vector3(-0.07, -0.39, 0.005)
+      camera.position.set(-0.07, -0.39, 0.65)
       camera.lookAt(cameraTarget)
 
       // ── OrbitControls with Physics Damping ─────────────────────────────────
@@ -233,8 +234,8 @@ export default function JointAnatomy3D({
       controls.enableDamping = true
       controls.dampingFactor = 0.06
       controls.enablePan = false
-      controls.minDistance = 0.4
-      controls.maxDistance = 5.0
+      controls.minDistance = 0.35
+      controls.maxDistance = 4.5
       controls.minPolarAngle = Math.PI * 0.08
       controls.maxPolarAngle = Math.PI * 0.92
       controls.target.copy(cameraTarget)
@@ -320,7 +321,7 @@ export default function JointAnatomy3D({
       shadowPlane.visible = visualTheme === 'studio'
       scene.add(shadowPlane)
 
-      // Master Root Groups
+      // Master Groups
       const masterGroup = new THREE.Group()
       masterGroup.name = 'HumanSkeletonMaster'
       scene.add(masterGroup)
@@ -348,13 +349,13 @@ export default function JointAnatomy3D({
 
       // ── Anatomical Joint Camera Framing Targets on 3D Human Skeleton ───────
       const jointFraming: Record<AnatomyType, { camPos: [number, number, number]; target: [number, number, number] }> = {
-        knee: { camPos: [-0.07, -0.39, 0.72], target: [-0.07, -0.39, 0] },
-        hip: { camPos: [0.10, 0.06, 0.72], target: [0.10, 0.06, 0] },
-        shoulder: { camPos: [-0.19, 0.67, 0.70], target: [-0.19, 0.67, 0] },
-        spine: { camPos: [0.0, 0.27, 0.72], target: [0.0, 0.27, 0] },
-        sports: { camPos: [-0.07, -0.39, 0.72], target: [-0.07, -0.39, 0] },
-        prp: { camPos: [-0.07, -0.39, 0.72], target: [-0.07, -0.39, 0] },
-        trauma: { camPos: [0.10, 0.06, 0.72], target: [0.10, 0.06, 0] },
+        knee: { camPos: [-0.07, -0.39, 0.65], target: [-0.07, -0.39, 0.005] },
+        hip: { camPos: [-0.09, 0.05, 0.65], target: [-0.09, 0.05, 0.005] },
+        shoulder: { camPos: [-0.18, 0.66, 0.65], target: [-0.18, 0.66, 0.015] },
+        spine: { camPos: [0.005, 0.28, 0.65], target: [0.005, 0.28, 0.005] },
+        sports: { camPos: [-0.07, -0.39, 0.65], target: [-0.07, -0.39, 0.005] },
+        prp: { camPos: [-0.07, -0.39, 0.65], target: [-0.07, -0.39, 0.005] },
+        trauma: { camPos: [-0.11, -0.15, 0.65], target: [-0.11, -0.15, 0.005] },
       }
 
       let pinAnchors: { id: string; mesh: THREE.Mesh; worldPos: THREE.Vector3; color: string; title: string }[] = []
@@ -374,26 +375,28 @@ export default function JointAnatomy3D({
           const beacon = new THREE.Group()
           beacon.position.set(...c.pos)
 
-          // Glowing Sphere Core
+          // Small Refined Glowing Jewel Sphere Core
           const orb = new THREE.Mesh(
-            new THREE.SphereGeometry(0.018, 16, 16),
+            new THREE.SphereGeometry(0.006, 16, 16),
             new THREE.MeshStandardMaterial({
               color: new THREE.Color(c.color),
               emissive: new THREE.Color(c.color),
-              emissiveIntensity: visualTheme === 'radiograph' ? 1.2 : 0.85,
-              roughness: 0.15,
+              emissiveIntensity: visualTheme === 'radiograph' ? 1.4 : 1.0,
+              roughness: 0.1,
+              depthTest: false,
             })
           )
           beacon.add(orb)
 
-          // Soft Radar Ring
+          // Subtle Outer Ring
           const ring = new THREE.Mesh(
-            new THREE.RingGeometry(0.024, 0.034, 28),
+            new THREE.RingGeometry(0.009, 0.015, 24),
             new THREE.MeshBasicMaterial({
               color: new THREE.Color(c.color),
               side: THREE.DoubleSide,
               transparent: true,
               opacity: 0.75,
+              depthTest: false,
             })
           )
           beacon.add(ring)
@@ -424,7 +427,7 @@ export default function JointAnatomy3D({
         controls.update()
       }
 
-      // ── Load the Exact Realistic Human Skeleton 3D Model ───────────────────
+      // ── Load Realistic Human Skeleton 3D Model ────────────────────────────
       gltfLoader.load(
         '/models/human_skeleton.glb',
         (gltf) => {
@@ -471,7 +474,7 @@ export default function JointAnatomy3D({
       stateRef.current.setCameraView = (cv) => applyCameraFocus(activeType, cv)
       stateRef.current.resetCam = () => applyCameraFocus(activeType, cameraView)
       stateRef.current.zoom = (delta: number) => {
-        camera.position.z = Math.max(0.4, Math.min(4.5, camera.position.z + delta))
+        camera.position.z = Math.max(0.35, Math.min(4.5, camera.position.z + delta))
         controls.update()
       }
       stateRef.current.setAutoRotate = (enabled: boolean) => {
@@ -492,7 +495,7 @@ export default function JointAnatomy3D({
           const rect = containerRef.current.getBoundingClientRect()
           const newPins: ProjectedPin[] = []
 
-          pinAnchors.forEach((pin) => {
+          pinAnchors.forEach((pin, idx) => {
             tempVec.copy(pin.worldPos)
             tempVec.project(camera)
 
@@ -504,9 +507,10 @@ export default function JointAnatomy3D({
               id: pin.id,
               title: pin.title,
               color: pin.color,
+              index: idx + 1,
               x,
               y,
-              visible: isFront && x >= 10 && x <= rect.width - 10 && y >= 10 && y <= rect.height - 10,
+              visible: isFront && x >= 15 && x <= rect.width - 15 && y >= 15 && y <= rect.height - 15,
             })
           })
 
@@ -633,7 +637,7 @@ export default function JointAnatomy3D({
 
         {/* View Mode & Contrast Theme Selectors */}
         <div className="flex flex-wrap items-center gap-2 shrink-0 self-start md:self-auto">
-          {/* Camera Framing: Focus Joint vs Full Skeleton HD */}
+          {/* Camera Framing: Focus Joint vs Full Skeleton */}
           <div
             className={`flex items-center gap-1 p-1 rounded-2xl border shadow-2xs transition-colors ${
               isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
@@ -787,12 +791,13 @@ export default function JointAnatomy3D({
 
           <canvas ref={canvasRef} className="w-full h-full block" />
 
-          {/* Interactive Floating 2D Vector Pin Badges projected onto 3D Coordinates */}
+          {/* Interactive Non-Overlapping Numbered Pin Hotspots */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             {projectedPins.map((pin) => {
               if (!pin.visible) return null
               const isSelected = activeCallout.id === pin.id
               const matchingCallout = callouts.find((c) => c.id === pin.id)
+
               return (
                 <div
                   key={pin.id}
@@ -802,32 +807,48 @@ export default function JointAnatomy3D({
                     left: 0,
                     top: 0,
                   }}
-                  className="-translate-x-1/2 -translate-y-1/2 pointer-events-auto transition-transform duration-75"
+                  className="-translate-x-1/2 -translate-y-1/2 pointer-events-auto z-20"
                 >
                   <button
                     type="button"
                     onClick={() => matchingCallout && setActiveCallout(matchingCallout)}
-                    className={`group flex items-center gap-1.5 px-3 py-1.5 rounded-full shadow-md backdrop-blur-xs border transition-all cursor-pointer ${
-                      isSelected
-                        ? isDark
-                          ? 'bg-slate-900 border-cyan-400 ring-2 ring-cyan-400/40 scale-105'
-                          : 'bg-white border-[#059B8F] ring-2 ring-[#059B8F]/30 scale-105'
-                        : isDark
-                        ? 'bg-slate-900/90 border-slate-700 hover:border-cyan-400 hover:bg-slate-800'
-                        : 'bg-white/95 border-slate-200 hover:border-[#059B8F] hover:bg-white'
+                    className={`group relative flex items-center transition-all duration-200 cursor-pointer ${
+                      isSelected ? 'z-30 scale-110' : 'z-10 hover:scale-110'
                     }`}
                   >
-                    <span
-                      className="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs"
-                      style={{ backgroundColor: pin.color }}
-                    />
-                    <span
-                      className={`text-[11px] font-bold whitespace-nowrap leading-none ${
-                        isDark ? 'text-slate-100' : 'text-slate-800'
+                    {/* Compact Numbered Circle Badge */}
+                    <div
+                      className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-black shadow-lg backdrop-blur-md transition-all border-2 ${
+                        isSelected
+                          ? 'text-white'
+                          : 'text-slate-100 group-hover:text-white'
                       }`}
+                      style={{
+                        backgroundColor: isSelected ? pin.color : '#0f172ae6',
+                        borderColor: pin.color,
+                        boxShadow: isSelected ? `0 0 14px ${pin.color}` : '0 2px 8px rgba(0,0,0,0.5)',
+                      }}
                     >
-                      {pin.title}
-                    </span>
+                      {pin.index}
+                    </div>
+
+                    {/* Clean Expanded Pill: Always Visible for Active, or on Hover */}
+                    <div
+                      className={`absolute left-8.5 px-3 py-1 rounded-full whitespace-nowrap text-[11px] font-bold shadow-xl backdrop-blur-md transition-all pointer-events-none border ${
+                        isSelected
+                          ? 'opacity-100 translate-x-0 bg-slate-900/95 border-slate-700 text-white'
+                          : 'opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 bg-slate-900/90 border-slate-700 text-slate-200'
+                      }`}
+                      style={{
+                        borderLeftColor: pin.color,
+                        borderLeftWidth: '3px',
+                      }}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: pin.color }} />
+                        <span>{pin.title}</span>
+                      </div>
+                    </div>
                   </button>
                 </div>
               )
@@ -842,7 +863,7 @@ export default function JointAnatomy3D({
           >
             <button
               type="button"
-              onClick={() => stateRef.current.zoom && stateRef.current.zoom(-0.4)}
+              onClick={() => stateRef.current.zoom && stateRef.current.zoom(-0.35)}
               className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-base transition-colors bg-slate-800 hover:bg-slate-700 text-slate-100 cursor-pointer shadow-2xs border border-slate-700/50"
               title="Zoom In"
             >
@@ -850,7 +871,7 @@ export default function JointAnatomy3D({
             </button>
             <button
               type="button"
-              onClick={() => stateRef.current.zoom && stateRef.current.zoom(0.4)}
+              onClick={() => stateRef.current.zoom && stateRef.current.zoom(0.35)}
               className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-base transition-colors bg-slate-800 hover:bg-slate-700 text-slate-100 cursor-pointer shadow-2xs border border-slate-700/50"
               title="Zoom Out"
             >
@@ -916,7 +937,7 @@ export default function JointAnatomy3D({
 
             {/* Callouts Pill Selectors */}
             <div className="space-y-2.5">
-              {callouts.map((point) => {
+              {callouts.map((point, idx) => {
                 const isSelected = activeCallout.id === point.id
                 return (
                   <button
@@ -934,9 +955,11 @@ export default function JointAnatomy3D({
                     }`}
                   >
                     <div
-                      className="w-3.5 h-3.5 rounded-full shrink-0 mt-1 shadow-xs"
+                      className="w-5 h-5 rounded-full shrink-0 flex items-center justify-center text-[10px] font-black text-white shadow-xs mt-0.5"
                       style={{ backgroundColor: point.color }}
-                    />
+                    >
+                      {idx + 1}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <h4
