@@ -436,13 +436,13 @@ export default function JointAnatomy3D({
 
       // ── Anatomical Model Sculptor (Artec HD / Sketchfab Reference Standard) ──
       const jointFraming: Record<AnatomyType, { camPos: [number, number, number]; target: [number, number, number] }> = {
-        knee: { camPos: [0, -0.38, 1.45], target: [0, -0.38, 0] },
-        hip: { camPos: [0.14, -0.15, 1.45], target: [0.14, -0.15, 0] },
-        shoulder: { camPos: [-0.24, 0.44, 1.45], target: [-0.24, 0.44, 0] },
-        spine: { camPos: [0.0, 0.34, 1.45], target: [0.0, 0.34, 0] },
-        sports: { camPos: [-0.10, -0.38, 1.45], target: [-0.10, -0.38, 0] },
-        prp: { camPos: [0.0, -0.38, 1.45], target: [0.0, -0.38, 0] },
-        trauma: { camPos: [0.18, 0.0, 1.45], target: [0.18, 0.0, 0] },
+        knee: { camPos: [-0.07, -0.39, 1.35], target: [-0.07, -0.39, 0] },
+        hip: { camPos: [0.10, 0.06, 1.35], target: [0.10, 0.06, 0] },
+        shoulder: { camPos: [-0.19, 0.67, 1.35], target: [-0.19, 0.67, 0] },
+        spine: { camPos: [0.0, 0.27, 1.35], target: [0.0, 0.27, 0] },
+        sports: { camPos: [-0.07, -0.39, 1.35], target: [-0.07, -0.39, 0] },
+        prp: { camPos: [-0.07, -0.39, 1.35], target: [-0.07, -0.39, 0] },
+        trauma: { camPos: [0.10, 0.06, 1.35], target: [0.10, 0.06, 0] },
       }
 
       function buildModel(currentType: AnatomyType, currentModelView: 'joint' | 'skeleton' = modelView) {
