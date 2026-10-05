@@ -163,24 +163,6 @@ const JOINTS: JointZone[] = [
     recoveryTime: 'Partial weight-bearing at 3 weeks; normal walking at 6 weeks',
   },
   {
-    id: 'cranium',
-    label: 'Skull & Neck',
-    slug: 'complex-trauma-fractures',
-    color: '#02BAB9',
-    treatmentName: 'Cranial & Maxillofacial Skeletal Trauma',
-    category: 'Maxillofacial & Trauma',
-    desc: 'Precision anatomic reduction and titanium micro-plating for facial bone fractures, zygomatic arch, and TMJ temporomandibular joint instability.',
-    stats: ['Low-profile plates', 'Sub-millimeter fit', 'Rapid bone union'],
-    surgicalFeatures: [
-      'Low-profile 1.5mm titanium micro-plates and screws',
-      'Hidden aesthetic surgical incisions along natural skin creases',
-      'Rigid internal fixation for early jaw and facial movement',
-      'Preservation of facial and trigeminal sensory nerve branches',
-    ],
-    implantType: 'Titanium Osteosynthesis Micro-Plates & Screws',
-    recoveryTime: 'Soft diet in 24 hours; solid bone healing in 6 weeks',
-  },
-  {
     id: 'cervical',
     label: 'Cervical Spine',
     slug: 'joint-preservation-prp',
@@ -199,42 +181,6 @@ const JOINTS: JointZone[] = [
     recoveryTime: 'Immediate post-procedure return to routine desk work',
   },
   {
-    id: 'clavicle',
-    label: 'Clavicle',
-    slug: 'complex-trauma-fractures',
-    color: '#059B8F',
-    treatmentName: 'Clavicle & AC Joint Reconstruction',
-    category: 'Trauma & Sports',
-    desc: 'Anatomically pre-contoured locking plate osteosynthesis for midshaft and distal collarbone fractures and acromioclavicular dislocations.',
-    stats: ['Anatomical contour', 'Rigid union', 'Early arm elevation'],
-    surgicalFeatures: [
-      'S-contoured superior and anterior locking clavicular plates',
-      'High-tensile coracoclavicular ligament suture tape augmentation',
-      'Minimally invasive biological fracture fixation',
-      'Immediate pendulum arm exercises',
-    ],
-    implantType: 'Titanium Anatomic Clavicle Locking Plates',
-    recoveryTime: 'Gentle arm mobility in 48 hours; sports in 8–10 weeks',
-  },
-  {
-    id: 'sternum',
-    label: 'Thorax & Ribs',
-    slug: 'complex-trauma-fractures',
-    color: '#F18712',
-    treatmentName: 'Rib Fracture & Chest Wall Stabilization',
-    category: 'Chest Wall Trauma',
-    desc: 'Surgical stabilization of fractured ribs and sternum restoring thoracic cage mechanics and ending severe breathing pain.',
-    stats: ['Pain reduction', 'Breathing ease', 'Early discharge'],
-    surgicalFeatures: [
-      'Low-profile titanium rib clips and anatomical locking splints',
-      'Preservation of intercostal neurovascular bundles',
-      'Restoration of thoracic cage breathing excursion volume',
-      'Substantial reduction in opioid pain requirements',
-    ],
-    implantType: 'Titanium Rib Matrix Locking Splints',
-    recoveryTime: 'Full breathing comfort in 3–5 days; full union in 6 weeks',
-  },
-  {
     id: 'wrist',
     label: 'Wrist & Hand',
     slug: 'complex-trauma-fractures',
@@ -251,24 +197,6 @@ const JOINTS: JointZone[] = [
     ],
     implantType: 'Titanium Volar Variable-Angle Locking Plates',
     recoveryTime: 'Active finger motion Day 1; light lifting at 4 weeks',
-  },
-  {
-    id: 'pelvis',
-    label: 'Pelvis & Sacrum',
-    slug: 'complex-trauma-fractures',
-    color: '#0A7C97',
-    treatmentName: 'Pelvic Ring & Sacroiliac Stabilization',
-    category: 'Complex Trauma',
-    desc: 'Anterior and posterior pelvic ring reconstruction, percutaneous iliosacral screw fixation, and sacroiliac joint radiofrequency ablation.',
-    stats: ['Rigid pelvic ring', 'C-Arm navigation', 'Protected loading'],
-    surgicalFeatures: [
-      'Minimally invasive percutaneous iliosacral screw placement',
-      'Anatomical pelvic brim contouring reconstruction plates',
-      'Restoration of true weight-bearing pelvic biomechanical axis',
-      'Comprehensive post-injury mobilization program',
-    ],
-    implantType: 'Cannulated 7.3mm Screws & Pelvic Reconstruction Plates',
-    recoveryTime: 'Bed transfers Day 2; supported walker mobilization in 3 weeks',
   },
 ]
 
@@ -303,19 +231,19 @@ export default function BodyMapSelector() {
 
         {/* Clean Body Part & View Mode Selection Bar */}
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-8 sm:mb-10">
-          {/* Contrast Theme Toggle: Clinical Studio White vs Digital Radiograph Deep Black */}
+          {/* Contrast Theme Toggle: Clinical Studio Dark Grey vs Digital Radiograph Deep Black */}
           <div className="flex items-center bg-slate-900 text-white p-1 rounded-2xl border border-slate-700 shadow-md mr-1">
             <button
               type="button"
               onClick={() => setTheme('studio')}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 theme === 'studio'
-                  ? 'bg-white text-slate-900 shadow-xs'
+                  ? 'bg-slate-700 text-white shadow-xs'
                   : 'text-slate-300 hover:text-white'
               }`}
-              title="Clinical Studio White Background"
+              title="Clinical Studio Dark Grey Background"
             >
-              <span>☀️ Studio White</span>
+              <span>🏛️ Studio Dark Grey</span>
             </button>
             <button
               type="button"

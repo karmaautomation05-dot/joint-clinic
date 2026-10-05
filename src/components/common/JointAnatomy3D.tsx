@@ -209,17 +209,17 @@ export default function JointAnatomy3D({
         antialias: true,
         powerPreference: 'high-performance',
       })
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.5))
       renderer.setSize(width, height, false)
-      renderer.setClearColor(visualTheme === 'radiograph' ? 0x050a14 : 0xffffff, 1)
+      renderer.setClearColor(visualTheme === 'radiograph' ? 0x050a14 : 0x181e28, 1)
       renderer.shadowMap.enabled = true
       renderer.shadowMap.type = THREE.PCFSoftShadowMap
       renderer.toneMapping = THREE.ACESFilmicToneMapping
-      renderer.toneMappingExposure = visualTheme === 'radiograph' ? 1.35 : 1.15
+      renderer.toneMappingExposure = visualTheme === 'radiograph' ? 1.35 : 1.25
 
       // ── Scene & Camera ─────────────────────────────────────────────────────
       const scene = new THREE.Scene()
-      scene.background = new THREE.Color(visualTheme === 'radiograph' ? 0x050a14 : 0xffffff)
+      scene.background = new THREE.Color(visualTheme === 'radiograph' ? 0x050a14 : 0x181e28)
 
       const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100)
       camera.position.set(0, 0.15, 3.2)
@@ -246,13 +246,13 @@ export default function JointAnatomy3D({
       // ── Studio High-Key & Radiograph Dual Lighting Setup ───────────────────
       const ambientLight = new THREE.AmbientLight(
         visualTheme === 'radiograph' ? 0x0c4a6e : 0xfffaf0,
-        visualTheme === 'radiograph' ? 1.8 : 0.95
+        visualTheme === 'radiograph' ? 1.8 : 1.15
       )
       scene.add(ambientLight)
 
       const keyLight = new THREE.DirectionalLight(
-        visualTheme === 'radiograph' ? 0x38bdf8 : 0xfff5e4,
-        visualTheme === 'radiograph' ? 2.5 : 1.75
+        visualTheme === 'radiograph' ? 0x38bdf8 : 0xfff6ea,
+        visualTheme === 'radiograph' ? 2.5 : 2.20
       )
       keyLight.position.set(3, 4, 3.5)
       keyLight.castShadow = true
@@ -262,15 +262,15 @@ export default function JointAnatomy3D({
       scene.add(keyLight)
 
       const fillLight = new THREE.DirectionalLight(
-        visualTheme === 'radiograph' ? 0x0284c7 : 0xe2e8f0,
-        visualTheme === 'radiograph' ? 1.3 : 0.75
+        visualTheme === 'radiograph' ? 0x0284c7 : 0x93c5fd,
+        visualTheme === 'radiograph' ? 1.3 : 0.85
       )
       fillLight.position.set(-3.5, 2, 2.5)
       scene.add(fillLight)
 
       const rimLight = new THREE.DirectionalLight(
-        visualTheme === 'radiograph' ? 0x7dd3fc : 0xcbd5e1,
-        visualTheme === 'radiograph' ? 1.6 : 0.65
+        visualTheme === 'radiograph' ? 0x7dd3fc : 0xbfdbfe,
+        visualTheme === 'radiograph' ? 1.6 : 1.35
       )
       rimLight.position.set(0, -3, -3)
       scene.add(rimLight)
@@ -290,10 +290,10 @@ export default function JointAnatomy3D({
           grad.addColorStop(0.7, '#075985')
           grad.addColorStop(1, '#020617')
         } else {
-          grad.addColorStop(0, '#ffffff')
-          grad.addColorStop(0.35, '#f8fafc')
-          grad.addColorStop(0.65, '#e2e8f0')
-          grad.addColorStop(1, '#cbd5e1')
+          grad.addColorStop(0, '#475569')
+          grad.addColorStop(0.35, '#334155')
+          grad.addColorStop(0.65, '#1e293b')
+          grad.addColorStop(1, '#0f172a')
         }
         envCtx.fillStyle = grad
         envCtx.fillRect(0, 0, 512, 256)
@@ -312,9 +312,9 @@ export default function JointAnatomy3D({
       // Soft Ground Contact Shadow Disk (visible in studio mode only)
       const shadowGeo = new THREE.CircleGeometry(1.35, 48)
       const shadowMat = new THREE.MeshBasicMaterial({
-        color: 0x94a3b8,
+        color: 0x090d14,
         transparent: true,
-        opacity: visualTheme === 'radiograph' ? 0.0 : 0.16,
+        opacity: visualTheme === 'radiograph' ? 0.0 : 0.35,
       })
       const shadowPlane = new THREE.Mesh(shadowGeo, shadowMat)
       shadowPlane.rotation.x = -Math.PI / 2
@@ -329,11 +329,16 @@ export default function JointAnatomy3D({
       // ── Physical Materials (Studio vs Radiograph) ───────────────────────────
       const isRad = visualTheme === 'radiograph'
 
-      // Cortical bone material - warm yellowish realistic bone tone (#cfbd92)
-      const boneMat = new THREE.MeshStandardMaterial({
-        color: isRad ? 0x67e8f9 : 0xcfbd92,
-        roughness: isRad ? 0.28 : 0.50,
+      // Cortical bone material - warm yellowish realistic bone tone (#d8c7a3)
+      const boneMat = new THREE.MeshPhysicalMaterial({
+        color: isRad ? 0x67e8f9 : 0xd8c7a3,
+        roughness: isRad ? 0.28 : 0.38,
         metalness: isRad ? 0.08 : 0.02,
+        clearcoat: isRad ? 0.0 : 0.18,
+        clearcoatRoughness: 0.35,
+        reflectivity: 0.40,
+        sheen: isRad ? 0.0 : 0.20,
+        sheenColor: new THREE.Color('#fff2db'),
         emissive: isRad ? new THREE.Color(0x0369a1) : new THREE.Color(0x000000),
         emissiveIntensity: isRad ? 0.42 : 0.0,
         transparent: isRad,
@@ -1225,6 +1230,7 @@ export default function JointAnatomy3D({
         renderer.dispose()
         pmrem.dispose()
         envTex.dispose()
+        envRT.dispose()
       }
     }
 
@@ -1346,7 +1352,7 @@ export default function JointAnatomy3D({
           {/* Studio vs Digital Radiograph Theme */}
           <div
             className={`flex items-center gap-1 p-1 rounded-2xl border shadow-2xs transition-colors ${
-              isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+              isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-900 text-white border-slate-700'
             }`}
           >
             <button
@@ -1354,12 +1360,12 @@ export default function JointAnatomy3D({
               onClick={() => handleThemeChange('studio')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 !isDark
-                  ? 'bg-[#059B8F] text-white shadow-xs'
+                  ? 'bg-slate-700 text-white shadow-xs'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <span>☀️</span>
-              <span>Clinical Studio</span>
+              <span>🏛️</span>
+              <span>Studio Dark Grey</span>
             </button>
             <button
               type="button"
@@ -1367,7 +1373,7 @@ export default function JointAnatomy3D({
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 isDark
                   ? 'bg-cyan-600 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               <span>🔬</span>
@@ -1447,7 +1453,7 @@ export default function JointAnatomy3D({
         <div
           ref={containerRef}
           className={`lg:col-span-8 relative min-h-[440px] sm:min-h-[520px] lg:min-h-[560px] cursor-grab active:cursor-grabbing flex items-center justify-center select-none overflow-hidden transition-colors duration-500 ${
-            isDark ? 'bg-[#050a14]' : 'bg-white'
+            isDark ? 'bg-[#050a14]' : 'bg-[#181e28]'
           }`}
         >
           <canvas ref={canvasRef} className="w-full h-full block" />

@@ -15,13 +15,6 @@ export interface Joint3DInfo {
 // so NO two pins or markers ever overlap!
 export const JOINTS_3D_DATA: Joint3DInfo[] = [
   {
-    id: 'cranium',
-    label: 'Cranium & Skull',
-    pos: [0.0, 0.88, 0.20],
-    camOffset: [0, 0.02, 0.65],
-    color: '#02BAB9',
-  },
-  {
     id: 'cervical',
     label: 'Cervical Spine',
     pos: [0.0, 0.74, 0.06],
@@ -29,25 +22,11 @@ export const JOINTS_3D_DATA: Joint3DInfo[] = [
     color: '#0A7C97',
   },
   {
-    id: 'clavicle',
-    label: 'Clavicle',
-    pos: [0.10, 0.68, 0.08],
-    camOffset: [0, 0.02, 0.65],
-    color: '#059B8F',
-  },
-  {
     id: 'shoulder',
     label: 'Shoulder Joint',
     pos: [-0.19, 0.67, 0.06],
     camOffset: [0, 0.02, 0.65],
     color: '#02BAB9',
-  },
-  {
-    id: 'sternum',
-    label: 'Ribcage & Sternum',
-    pos: [0.0, 0.56, 0.13],
-    camOffset: [0, 0.02, 0.75],
-    color: '#F18712',
   },
   {
     id: 'elbow',
@@ -69,13 +48,6 @@ export const JOINTS_3D_DATA: Joint3DInfo[] = [
     pos: [-0.31, 0.07, 0.08],
     camOffset: [0, 0.02, 0.55],
     color: '#059B8F',
-  },
-  {
-    id: 'pelvis',
-    label: 'Pelvis & Sacrum',
-    pos: [0.0, 0.12, 0.06],
-    camOffset: [0, 0.02, 0.75],
-    color: '#0A7C97',
   },
   {
     id: 'hip',
@@ -180,17 +152,17 @@ export default function Ortho3DHuman({
         antialias: true,
         powerPreference: 'high-performance',
       })
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.5))
       renderer.setSize(width, height, false)
-      renderer.setClearColor(theme === 'radiograph' ? 0x050a14 : 0xffffff, 1)
+      renderer.setClearColor(theme === 'radiograph' ? 0x050a14 : 0x181e28, 1)
       renderer.shadowMap.enabled = true
       renderer.shadowMap.type = THREE.PCFSoftShadowMap
       renderer.toneMapping = THREE.ACESFilmicToneMapping
-      renderer.toneMappingExposure = theme === 'radiograph' ? 1.35 : 1.15
+      renderer.toneMappingExposure = theme === 'radiograph' ? 1.35 : 1.25
 
       // ── Scene & Camera Setup ──────────────────────────────────────────────
       const scene = new THREE.Scene()
-      scene.background = new THREE.Color(theme === 'radiograph' ? 0x050a14 : 0xffffff)
+      scene.background = new THREE.Color(theme === 'radiograph' ? 0x050a14 : 0x181e28)
 
       const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100)
       camera.position.set(...FULL_SKELETON_CAM)
@@ -219,16 +191,50 @@ export default function Ortho3DHuman({
         isInteracting = false
       })
 
+      // ── Gradient Studio Reflection Environment (PMREM) ─────────────────────
+      const pmrem = new THREE.PMREMGenerator(renderer)
+      pmrem.compileEquirectangularShader()
+      const envCanvas = document.createElement('canvas')
+      envCanvas.width = 512
+      envCanvas.height = 256
+      const envCtx = envCanvas.getContext('2d')
+      if (envCtx) {
+        const grad = envCtx.createLinearGradient(0, 0, 0, 256)
+        if (theme === 'radiograph') {
+          grad.addColorStop(0, '#020617')
+          grad.addColorStop(0.4, '#0c4a6e')
+          grad.addColorStop(0.7, '#075985')
+          grad.addColorStop(1, '#020617')
+        } else {
+          grad.addColorStop(0, '#1e293b')
+          grad.addColorStop(0.35, '#334155')
+          grad.addColorStop(0.65, '#1e293b')
+          grad.addColorStop(1, '#0f172a')
+        }
+        envCtx.fillStyle = grad
+        envCtx.fillRect(0, 0, 512, 256)
+
+        // Studio key softbox reflection highlight
+        envCtx.fillStyle = theme === 'radiograph' ? '#38bdf8' : '#ffffff'
+        envCtx.beginPath()
+        envCtx.ellipse(256, 60, 180, 45, 0, 0, Math.PI * 2)
+        envCtx.fill()
+      }
+      const envTex = new THREE.CanvasTexture(envCanvas)
+      envTex.mapping = THREE.EquirectangularReflectionMapping
+      const envRT = pmrem.fromEquirectangular(envTex)
+      scene.environment = envRT.texture
+
       // ── Studio & Radiograph Lighting ───────────────────────────────────────
       const ambientLight = new THREE.AmbientLight(
         theme === 'radiograph' ? 0x0c4a6e : 0xfffaf0,
-        theme === 'radiograph' ? 1.8 : 0.95
+        theme === 'radiograph' ? 1.8 : 1.15
       )
       scene.add(ambientLight)
 
       const keyLight = new THREE.DirectionalLight(
-        theme === 'radiograph' ? 0x38bdf8 : 0xfff5e4,
-        theme === 'radiograph' ? 2.5 : 1.75
+        theme === 'radiograph' ? 0x38bdf8 : 0xfff6ea,
+        theme === 'radiograph' ? 2.5 : 2.20
       )
       keyLight.position.set(3, 4, 3.5)
       keyLight.castShadow = true
@@ -238,15 +244,15 @@ export default function Ortho3DHuman({
       scene.add(keyLight)
 
       const fillLight = new THREE.DirectionalLight(
-        theme === 'radiograph' ? 0x0284c7 : 0xe2e8f0,
-        theme === 'radiograph' ? 1.3 : 0.75
+        theme === 'radiograph' ? 0x0284c7 : 0x93c5fd,
+        theme === 'radiograph' ? 1.3 : 0.85
       )
       fillLight.position.set(-3.5, 2, 2.5)
       scene.add(fillLight)
 
       const rimLight = new THREE.DirectionalLight(
-        theme === 'radiograph' ? 0x7dd3fc : 0xcbd5e1,
-        theme === 'radiograph' ? 1.6 : 0.65
+        theme === 'radiograph' ? 0x7dd3fc : 0xbfdbfe,
+        theme === 'radiograph' ? 1.6 : 1.35
       )
       rimLight.position.set(0, -3, -3)
       scene.add(rimLight)
@@ -254,9 +260,9 @@ export default function Ortho3DHuman({
       // Contact Ground Shadow Disc (Studio mode)
       const shadowGeo = new THREE.CircleGeometry(0.75, 48)
       const shadowMat = new THREE.MeshBasicMaterial({
-        color: 0x94a3b8,
+        color: 0x090d14,
         transparent: true,
-        opacity: theme === 'radiograph' ? 0.0 : 0.20,
+        opacity: theme === 'radiograph' ? 0.0 : 0.35,
       })
       const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat)
       shadowMesh.rotation.x = -Math.PI / 2
@@ -270,10 +276,15 @@ export default function Ortho3DHuman({
       scene.add(skeletonGroup)
 
       // ── Physical Materials for Cortical Bone ───────────────────────────────
-      const studioBoneMat = new THREE.MeshStandardMaterial({
-        color: new THREE.Color('#cfbd92'), // Warm yellowish anatomical cortical bone
-        roughness: 0.50,
+      const studioBoneMat = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color('#d8c7a3'), // Warm realistic cortical bone tone
+        roughness: 0.38,
         metalness: 0.02,
+        clearcoat: 0.18,
+        clearcoatRoughness: 0.35,
+        reflectivity: 0.40,
+        sheen: 0.20,
+        sheenColor: new THREE.Color('#fff2db'),
       })
 
       const radiographBoneMat = new THREE.MeshStandardMaterial({
@@ -500,17 +511,18 @@ export default function Ortho3DHuman({
 
       function applyTheme(newTheme: SkeletonTheme) {
         const isRad = newTheme === 'radiograph'
-        renderer.setClearColor(isRad ? 0x050a14 : 0xffffff, 1)
-        scene.background = new THREE.Color(isRad ? 0x050a14 : 0xffffff)
+        const studioBg = 0x181e28
+        renderer.setClearColor(isRad ? 0x050a14 : studioBg, 1)
+        scene.background = new THREE.Color(isRad ? 0x050a14 : studioBg)
         shadowMesh.visible = !isRad
         ambientLight.color.setHex(isRad ? 0x0c4a6e : 0xfffaf0)
-        ambientLight.intensity = isRad ? 1.8 : 0.95
-        keyLight.color.setHex(isRad ? 0x38bdf8 : 0xfff5e4)
-        keyLight.intensity = isRad ? 2.5 : 1.75
-        fillLight.color.setHex(isRad ? 0x0284c7 : 0xe2e8f0)
-        fillLight.intensity = isRad ? 1.3 : 0.75
-        rimLight.color.setHex(isRad ? 0x7dd3fc : 0xcbd5e1)
-        rimLight.intensity = isRad ? 1.6 : 0.65
+        ambientLight.intensity = isRad ? 1.8 : 1.15
+        keyLight.color.setHex(isRad ? 0x38bdf8 : 0xfff6ea)
+        keyLight.intensity = isRad ? 2.5 : 2.20
+        fillLight.color.setHex(isRad ? 0x0284c7 : 0x93c5fd)
+        fillLight.intensity = isRad ? 1.3 : 0.85
+        rimLight.color.setHex(isRad ? 0x7dd3fc : 0xbfdbfe)
+        rimLight.intensity = isRad ? 1.6 : 1.35
 
         skeletonGroup.traverse((child: any) => {
           if (child.isMesh) {
@@ -711,6 +723,9 @@ export default function Ortho3DHuman({
         ro.disconnect()
         controls.dispose()
         renderer.dispose()
+        pmrem.dispose()
+        envTex.dispose()
+        envRT.dispose()
       }
     }
 
@@ -757,15 +772,15 @@ export default function Ortho3DHuman({
   return (
     <div
       ref={containerRef}
-      className={`relative w-full h-[540px] sm:h-[620px] md:h-[680px] rounded-3xl overflow-hidden transition-colors duration-500 shadow-xl select-none border ${
-        isDark ? 'bg-[#050a14] border-slate-800' : 'bg-white border-slate-200'
+      className={`relative w-full h-[540px] sm:h-[620px] md:h-[680px] rounded-3xl overflow-hidden transition-colors duration-500 shadow-2xl select-none border ${
+        isDark ? 'bg-[#050a14] border-slate-800' : 'bg-[#181e28] border-slate-700/80'
       }`}
     >
       {/* Loading Overlay */}
       {isLoading && (
         <div
           className={`absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 backdrop-blur-sm transition-colors ${
-            isDark ? 'bg-[#050a14]/95 text-white' : 'bg-white/95 text-slate-800'
+            isDark ? 'bg-[#050a14]/95 text-white' : 'bg-[#181e28]/95 text-slate-100'
           }`}
         >
           <div className="relative flex items-center justify-center">
@@ -793,7 +808,7 @@ export default function Ortho3DHuman({
         {activeJointInfo ? (
           <div
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border shadow-md backdrop-blur-md transition-all ${
-              isDark ? 'bg-slate-900/90 border-cyan-500/40 text-white' : 'bg-white/95 border-slate-200 text-slate-800'
+              isDark ? 'bg-slate-900/90 border-cyan-500/40 text-white' : 'bg-slate-900/85 border-slate-700 text-white'
             }`}
           >
             <span
@@ -810,7 +825,7 @@ export default function Ortho3DHuman({
         ) : hoveredJointInfo ? (
           <div
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border shadow-md backdrop-blur-md transition-all ${
-              isDark ? 'bg-slate-900/90 border-cyan-500/40 text-white' : 'bg-white/95 border-slate-200 text-slate-800'
+              isDark ? 'bg-slate-900/90 border-cyan-500/40 text-white' : 'bg-slate-900/85 border-slate-700 text-white'
             }`}
           >
             <span
@@ -820,7 +835,7 @@ export default function Ortho3DHuman({
             <span className="text-xs font-bold tracking-wide">
               {hoveredJointInfo.label}
             </span>
-            <span className="text-[10px] text-teal-600 font-semibold">
+            <span className="text-[10px] text-teal-400 font-semibold">
               &bull; Click to Inspect
             </span>
           </div>
@@ -829,7 +844,7 @@ export default function Ortho3DHuman({
             className={`hidden sm:flex items-center gap-2 px-3 py-1 rounded-full border text-[11px] font-medium backdrop-blur-md ${
               isDark
                 ? 'bg-slate-900/80 border-slate-800 text-slate-400'
-                : 'bg-white/90 border-slate-200/80 text-slate-500'
+                : 'bg-slate-900/80 border-slate-700 text-slate-300'
             }`}
           >
             <span>🦴 3D Skeleton Overview</span>
@@ -838,12 +853,16 @@ export default function Ortho3DHuman({
       </div>
 
       {/* Top Right: Floating Camera & Turntable Control Bar */}
-      <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5 p-1.5 rounded-2xl border shadow-sm backdrop-blur-md transition-colors bg-white/90 border-slate-200">
+      <div className={`absolute top-4 right-4 z-10 flex items-center gap-1.5 p-1.5 rounded-2xl border shadow-md backdrop-blur-md transition-colors ${
+        isDark
+          ? 'bg-slate-900/90 border-slate-800'
+          : 'bg-slate-900/80 border-slate-700'
+      }`}>
         {/* Reset Camera Button */}
         <button
           type="button"
           onClick={handleResetCamera}
-          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800/90 hover:bg-slate-700 text-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs border border-slate-700/50"
           title="Reset to Full Skeleton View"
         >
           <span>🔄</span>
@@ -854,10 +873,10 @@ export default function Ortho3DHuman({
         <button
           type="button"
           onClick={toggleAutoRotate}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs border ${
             autoRotate
-              ? 'bg-teal-50 text-[#059B8F]'
-              : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+              ? 'bg-teal-500/20 text-teal-300 border-teal-500/40'
+              : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 border-slate-700/50'
           }`}
           title="Toggle Turntable 360° Rotation"
         >
@@ -871,7 +890,7 @@ export default function Ortho3DHuman({
           className={`text-[11px] font-medium px-4 py-1.5 rounded-full border shadow-xs backdrop-blur-md transition-colors whitespace-nowrap ${
             isDark
               ? 'bg-slate-900/90 text-slate-300 border-slate-700'
-              : 'bg-white/95 text-slate-600 border-slate-200'
+              : 'bg-slate-900/85 text-slate-200 border-slate-700'
           }`}
         >
           Hover or click any glowing pin &bull; Drag 360° to orbit &bull; Scroll to zoom
