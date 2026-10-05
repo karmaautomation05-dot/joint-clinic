@@ -6,106 +6,95 @@ import type * as THREE from 'three'
 export interface Joint3DInfo {
   id: string
   label: string
-  boneNodeName: string
-  fallbackPos: [number, number, number]
+  pos: [number, number, number]
   camOffset: [number, number, number]
   color: string
 }
 
+// Perfectly staggered anatomical landmarks distributed across left, right, and center
+// so NO two pins or markers ever overlap!
 export const JOINTS_3D_DATA: Joint3DInfo[] = [
   {
     id: 'cranium',
     label: 'Cranium & Skull',
-    boneNodeName: 'Cranium',
-    fallbackPos: [0.012, 1.000, 0.120],
+    pos: [0.0, 0.96, 0.12],
     camOffset: [0, 0.04, 0.65],
     color: '#02BAB9',
   },
   {
     id: 'cervical',
     label: 'Cervical Spine',
-    boneNodeName: 'c4',
-    fallbackPos: [-0.004, 0.863, 0.080],
+    pos: [0.0, 0.84, 0.08],
     camOffset: [0, 0.02, 0.60],
     color: '#0A7C97',
   },
   {
     id: 'clavicle',
     label: 'Clavicle',
-    boneNodeName: 'r_clavicle',
-    fallbackPos: [-0.100, 0.782, 0.090],
+    pos: [0.15, 0.77, 0.08],
     camOffset: [0, 0.02, 0.65],
     color: '#059B8F',
   },
   {
     id: 'shoulder',
-    label: 'Shoulder',
-    boneNodeName: 'r_scapula',
-    fallbackPos: [-0.145, 0.759, 0.080],
+    label: 'Shoulder Joint',
+    pos: [-0.22, 0.74, 0.08],
     camOffset: [0, 0.02, 0.70],
     color: '#02BAB9',
   },
   {
     id: 'sternum',
     label: 'Ribcage & Sternum',
-    boneNodeName: 'Sternum',
-    fallbackPos: [-0.005, 0.677, 0.140],
+    pos: [0.0, 0.62, 0.12],
     camOffset: [0, 0.02, 0.80],
     color: '#F18712',
   },
   {
     id: 'elbow',
-    label: 'Elbow',
-    boneNodeName: 'r_ulna',
-    fallbackPos: [-0.298, 0.325, 0.060],
+    label: 'Elbow Joint',
+    pos: [0.31, 0.31, 0.06],
     camOffset: [0, 0.02, 0.65],
     color: '#0A7C97',
   },
   {
     id: 'spine',
     label: 'Lumbar Spine',
-    boneNodeName: 'l3',
-    fallbackPos: [-0.009, 0.357, 0.060],
+    pos: [0.0, 0.36, 0.08],
     camOffset: [0, 0.02, 0.75],
     color: '#01B3BF',
   },
   {
     id: 'wrist',
     label: 'Wrist & Hand',
-    boneNodeName: 'r_metacarpal3',
-    fallbackPos: [-0.377, 0.057, 0.080],
+    pos: [-0.38, 0.04, 0.06],
     camOffset: [0, 0.02, 0.55],
     color: '#059B8F',
   },
   {
     id: 'pelvis',
     label: 'Pelvis & Sacrum',
-    boneNodeName: 'Sacrum',
-    fallbackPos: [-0.006, 0.224, 0.080],
+    pos: [0.0, 0.20, 0.08],
     camOffset: [0, 0.02, 0.80],
     color: '#0A7C97',
   },
   {
     id: 'hip',
-    label: 'Hip',
-    boneNodeName: 'r_femur',
-    fallbackPos: [-0.108, -0.149, 0.080],
+    label: 'Hip Joint',
+    pos: [0.16, -0.15, 0.08],
     camOffset: [0, 0.02, 0.75],
     color: '#F18712',
   },
   {
     id: 'knee',
-    label: 'Knee',
-    boneNodeName: 'r_patella',
-    fallbackPos: [-0.081, -0.356, 0.080],
+    label: 'Knee Joint',
+    pos: [-0.11, -0.36, 0.08],
     camOffset: [0, 0.02, 0.65],
     color: '#02BAB9',
   },
   {
     id: 'ankle',
     label: 'Ankle & Foot',
-    boneNodeName: 'r_talus',
-    fallbackPos: [-0.050, -0.881, 0.080],
+    pos: [0.08, -0.88, 0.08],
     camOffset: [0, 0.04, 0.60],
     color: '#059B8F',
   },
@@ -133,8 +122,9 @@ export default function Ortho3DHuman({
 
   const [isLoading, setIsLoading] = useState(true)
   const [loadProgress, setLoadProgress] = useState(0)
+  const [hoveredJoint, setHoveredJoint] = useState<string | null>(null)
 
-  // Visual Theme: 'studio' (Pure White Background) | 'radiograph' (Deep Black Background)
+  // Visual Theme: 'studio' (Pure White) | 'radiograph' (Deep Black)
   const [internalTheme, setInternalTheme] = useState<SkeletonTheme>('studio')
   const theme = propTheme ?? internalTheme
   const setTheme = useCallback(
@@ -147,7 +137,7 @@ export default function Ortho3DHuman({
 
   const [autoRotate, setAutoRotate] = useState<boolean>(true)
 
-  // Camera initial full-skeleton view: fits 2.0 unit skeleton from head to toe
+  // Camera initial full-skeleton view: fits 2.0 unit skeleton head-to-toe
   const FULL_SKELETON_CAM: [number, number, number] = [0, 0.05, 3.20]
   const FULL_SKELETON_TARGET: [number, number, number] = [0, 0.0, 0]
 
@@ -169,6 +159,7 @@ export default function Ortho3DHuman({
   useEffect(() => {
     let animId: number
     let disposed = false
+    let currentHoveredId: string | null = null
 
     async function init3D() {
       if (!canvasRef.current || !containerRef.current || disposed) return
@@ -299,36 +290,57 @@ export default function Ortho3DHuman({
           orb: THREE.Mesh
           ring: THREE.Mesh
           glow: THREE.Mesh
+          hitSphere: THREE.Mesh
           sprite: THREE.Sprite
           pinPos: THREE.Vector3
         }
       > = {}
       const jointCoordinates: Record<string, THREE.Vector3> = {}
 
+      // High-resolution Canvas Sprite Badge: Only displayed on hover or when active!
       function makePinSprite(text: string, color: string) {
         const pinCanvas = document.createElement('canvas')
-        pinCanvas.width = 256
-        pinCanvas.height = 64
+        pinCanvas.width = 384
+        pinCanvas.height = 96
         const ctx = pinCanvas.getContext('2d')
         if (ctx) {
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.88)'
-          ctx.roundRect(4, 8, 248, 48, 24)
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.45)'
+          ctx.shadowBlur = 10
+          ctx.shadowOffsetY = 4
+
+          // Sleek dark frosted glass pill
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.94)'
+          ctx.beginPath()
+          ctx.roundRect(8, 12, 368, 72, 36)
           ctx.fill()
+
+          ctx.shadowBlur = 0
+          ctx.shadowOffsetY = 0
           ctx.strokeStyle = color
-          ctx.lineWidth = 3
-          ctx.roundRect(4, 8, 248, 48, 24)
+          ctx.lineWidth = 3.5
+          ctx.beginPath()
+          ctx.roundRect(8, 12, 368, 72, 36)
           ctx.stroke()
+
+          // Vibrant accent indicator dot
+          ctx.fillStyle = color
+          ctx.beginPath()
+          ctx.arc(46, 48, 10, 0, Math.PI * 2)
+          ctx.fill()
+
+          // Joint title text
           ctx.fillStyle = '#ffffff'
-          ctx.font = 'bold 20px system-ui, -apple-system, sans-serif'
-          ctx.textAlign = 'center'
+          ctx.font = 'bold 24px system-ui, -apple-system, sans-serif'
+          ctx.textAlign = 'left'
           ctx.textBaseline = 'middle'
-          ctx.fillText(text, 128, 32)
+          ctx.fillText(text, 72, 48)
         }
         const texture = new THREE.CanvasTexture(pinCanvas)
         texture.minFilter = THREE.LinearFilter
         const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false })
         const sprite = new THREE.Sprite(spriteMat)
-        sprite.scale.set(0.24, 0.06, 1)
+        sprite.scale.set(0, 0, 1)
+        sprite.visible = false
         return sprite
       }
 
@@ -336,19 +348,19 @@ export default function Ortho3DHuman({
         const pinGroup = new THREE.Group()
         pinGroup.position.copy(pos)
 
-        // Pulsing radar ring
-        const ringGeo = new THREE.RingGeometry(0.024, 0.038, 32)
+        // Pulsing radar ripple ring
+        const ringGeo = new THREE.RingGeometry(0.020, 0.034, 32)
         const ringMat = new THREE.MeshBasicMaterial({
           color: new THREE.Color(j.color),
           side: THREE.DoubleSide,
           transparent: true,
-          opacity: 0.8,
+          opacity: 0.75,
           depthTest: false,
         })
         const ring = new THREE.Mesh(ringGeo, ringMat)
         pinGroup.add(ring)
 
-        // Solid core orb
+        // Luminous core jewel orb
         const orbGeo = new THREE.SphereGeometry(0.016, 16, 16)
         const orbMat = new THREE.MeshStandardMaterial({
           color: new THREE.Color(j.color),
@@ -362,7 +374,7 @@ export default function Ortho3DHuman({
         orb.userData = { jointId: j.id, isHotspot: true }
         pinGroup.add(orb)
 
-        // Soft outer glow halo
+        // Soft outer glow aura
         const glowGeo = new THREE.SphereGeometry(0.026, 16, 16)
         const glowMat = new THREE.MeshBasicMaterial({
           color: new THREE.Color(j.color),
@@ -373,14 +385,21 @@ export default function Ortho3DHuman({
         const glow = new THREE.Mesh(glowGeo, glowMat)
         pinGroup.add(glow)
 
-        // Label sprite floating just above the pin
+        // Large invisible hit target for effortless clicking & hovering
+        const hitGeo = new THREE.SphereGeometry(0.052, 8, 8)
+        const hitMat = new THREE.MeshBasicMaterial({ visible: false })
+        const hitSphere = new THREE.Mesh(hitGeo, hitMat)
+        hitSphere.userData = { jointId: j.id, isHotspot: true }
+        pinGroup.add(hitSphere)
+
+        // Floating label sprite: only revealed on hover or when active!
         const sprite = makePinSprite(j.label, j.color)
-        sprite.position.set(0, 0.05, 0)
+        sprite.position.set(0, 0.055, 0)
         pinGroup.add(sprite)
 
         scene.add(pinGroup)
 
-        jointAnchorMap[j.id] = { group: pinGroup, orb, ring, glow, sprite, pinPos: pos.clone() }
+        jointAnchorMap[j.id] = { group: pinGroup, orb, ring, glow, hitSphere, sprite, pinPos: pos.clone() }
         jointCoordinates[j.id] = pos.clone()
       }
 
@@ -412,39 +431,17 @@ export default function Ortho3DHuman({
           skeletonGroup.add(model)
           model.updateMatrixWorld(true)
 
-          // Index all named bones in the skeleton
-          const boneNodeMap: Record<string, THREE.Object3D> = {}
-          const allSkeletonMeshes: THREE.Mesh[] = []
-
           model.traverse((child: any) => {
-            if (child.name) {
-              boneNodeMap[child.name] = child
-            }
             if (child.isMesh) {
               child.castShadow = true
               child.receiveShadow = true
               child.material = currentBoneMat
-              allSkeletonMeshes.push(child)
             }
           })
 
-          // Place 3D Pins precisely on each anatomical bone
+          // Place 3D Pins precisely using the staggered coordinates
           JOINTS_3D_DATA.forEach((j) => {
-            let pinPos = new THREE.Vector3(...j.fallbackPos)
-            const targetNode = boneNodeMap[j.boneNodeName]
-
-            if (targetNode) {
-              const bBox = new THREE.Box3().setFromObject(targetNode)
-              const bCenter = new THREE.Vector3()
-              bBox.getCenter(bCenter)
-
-              // Adjust anterior offset so pin rests smoothly on the visible bone face
-              if (bCenter.lengthSq() > 0.001) {
-                pinPos = bCenter.clone()
-                pinPos.z += 0.04
-              }
-            }
-
+            const pinPos = new THREE.Vector3(...j.pos)
             create3DPin(j, pinPos)
           })
 
@@ -520,7 +517,7 @@ export default function Ortho3DHuman({
         controls.autoRotate = enabled
       }
 
-      // ── Raycaster for Direct Clicking on 3D Pins ───────────────────────────
+      // ── Raycaster for Direct Clicking & Hovering on 3D Pins ────────────────
       const raycaster = new THREE.Raycaster()
       const mouseVec = new THREE.Vector2()
 
@@ -537,7 +534,7 @@ export default function Ortho3DHuman({
         mouseVec.set(pos.x, pos.y)
         raycaster.setFromCamera(mouseVec, camera)
 
-        const interactiveMeshes = Object.values(jointAnchorMap).map((item) => item.orb)
+        const interactiveMeshes = Object.values(jointAnchorMap).map((item) => item.hitSphere)
         const intersects = raycaster.intersectObjects(interactiveMeshes, false)
 
         if (intersects.length > 0) {
@@ -554,13 +551,24 @@ export default function Ortho3DHuman({
         mouseVec.set(pos.x, pos.y)
         raycaster.setFromCamera(mouseVec, camera)
 
-        const interactiveMeshes = Object.values(jointAnchorMap).map((item) => item.orb)
+        const interactiveMeshes = Object.values(jointAnchorMap).map((item) => item.hitSphere)
         const intersects = raycaster.intersectObjects(interactiveMeshes, false)
 
         if (intersects.length > 0) {
           canvas.style.cursor = 'pointer'
-        } else if (!isInteracting) {
-          canvas.style.cursor = 'grab'
+          const hitId = intersects[0].object.userData?.jointId || null
+          if (hitId !== currentHoveredId) {
+            currentHoveredId = hitId
+            setHoveredJoint(hitId)
+          }
+        } else {
+          if (currentHoveredId !== null) {
+            currentHoveredId = null
+            setHoveredJoint(null)
+          }
+          if (!isInteracting) {
+            canvas.style.cursor = 'grab'
+          }
         }
       }
 
@@ -612,24 +620,37 @@ export default function Ortho3DHuman({
           if (pin) {
             pin.ring.lookAt(camera.position)
 
-            const wave = (elapsedTime * 1.5 + idx * 0.25) % 1
-            pin.ring.scale.setScalar(1 + wave * 1.5)
-            ;(pin.ring.material as THREE.MeshBasicMaterial).opacity = (1 - wave) * 0.8
-
             const isSelected = j.id === activeJointId
-            const pulse = 1 + Math.sin(elapsedTime * 3 + idx) * (isSelected ? 0.25 : 0.08)
-            pin.orb.scale.setScalar(pulse)
+            const isHovered = j.id === currentHoveredId
 
-            if (isSelected) {
+            // Pulsing radar ring
+            const wave = (elapsedTime * 1.5 + idx * 0.25) % 1
+            pin.ring.scale.setScalar(1 + wave * 1.4)
+            ;(pin.ring.material as THREE.MeshBasicMaterial).opacity = (1 - wave) * (isSelected || isHovered ? 0.9 : 0.6)
+
+            // Core orb pulse & scale
+            const pulse = 1 + Math.sin(elapsedTime * 3 + idx) * (isSelected ? 0.25 : isHovered ? 0.20 : 0.08)
+            pin.orb.scale.setScalar(pulse * (isHovered ? 1.3 : isSelected ? 1.4 : 1.0))
+
+            // Only show floating text sprite on HOVER or when ACTIVE!
+            // This prevents overlapping text clutter across the skeleton!
+            if (isSelected || isHovered) {
               pin.glow.scale.setScalar(1.6 + Math.sin(elapsedTime * 4) * 0.2)
-              ;(pin.glow.material as THREE.MeshBasicMaterial).opacity = 0.45
-              ;(pin.orb.material as THREE.MeshStandardMaterial).emissiveIntensity = 1.3
-              pin.sprite.scale.set(0.28, 0.07, 1)
+              ;(pin.glow.material as THREE.MeshBasicMaterial).opacity = 0.5
+              ;(pin.orb.material as THREE.MeshStandardMaterial).emissiveIntensity = 1.4
+
+              pin.sprite.visible = true
+              const targetScaleX = isSelected ? 0.26 : 0.22
+              const targetScaleY = isSelected ? 0.065 : 0.055
+              pin.sprite.scale.x += (targetScaleX - pin.sprite.scale.x) * 0.2
+              pin.sprite.scale.y += (targetScaleY - pin.sprite.scale.y) * 0.2
             } else {
-              pin.glow.scale.setScalar(1.2)
-              ;(pin.glow.material as THREE.MeshBasicMaterial).opacity = 0.20
+              pin.glow.scale.setScalar(1.1)
+              ;(pin.glow.material as THREE.MeshBasicMaterial).opacity = 0.2
               ;(pin.orb.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.8
-              pin.sprite.scale.set(0.24, 0.06, 1)
+
+              pin.sprite.visible = false
+              pin.sprite.scale.set(0, 0, 1)
             }
           }
         })
@@ -701,6 +722,8 @@ export default function Ortho3DHuman({
   }, [onSelectJoint])
 
   const isDark = theme === 'radiograph'
+  const activeJointInfo = activeJointId ? JOINTS_3D_DATA.find((j) => j.id === activeJointId) : null
+  const hoveredJointInfo = hoveredJoint ? JOINTS_3D_DATA.find((j) => j.id === hoveredJoint) : null
 
   return (
     <div
@@ -736,7 +759,56 @@ export default function Ortho3DHuman({
       {/* WebGL Canvas */}
       <canvas ref={canvasRef} className="w-full h-full block cursor-grab active:cursor-grabbing" />
 
-      {/* Top Floating Control Bar */}
+      {/* Top Left: Clean Active / Hover Status Pill */}
+      <div className="absolute top-4 left-4 z-10 pointer-events-none">
+        {activeJointInfo ? (
+          <div
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border shadow-md backdrop-blur-md transition-all ${
+              isDark ? 'bg-slate-900/90 border-cyan-500/40 text-white' : 'bg-white/95 border-slate-200 text-slate-800'
+            }`}
+          >
+            <span
+              className="w-2.5 h-2.5 rounded-full animate-pulse shadow-xs"
+              style={{ backgroundColor: activeJointInfo.color }}
+            />
+            <span className="text-xs font-bold tracking-wide">
+              {activeJointInfo.label}
+            </span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+              &bull; Active View
+            </span>
+          </div>
+        ) : hoveredJointInfo ? (
+          <div
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border shadow-md backdrop-blur-md transition-all ${
+              isDark ? 'bg-slate-900/90 border-cyan-500/40 text-white' : 'bg-white/95 border-slate-200 text-slate-800'
+            }`}
+          >
+            <span
+              className="w-2.5 h-2.5 rounded-full"
+              style={{ backgroundColor: hoveredJointInfo.color }}
+            />
+            <span className="text-xs font-bold tracking-wide">
+              {hoveredJointInfo.label}
+            </span>
+            <span className="text-[10px] text-teal-600 font-semibold">
+              &bull; Click to Inspect
+            </span>
+          </div>
+        ) : (
+          <div
+            className={`hidden sm:flex items-center gap-2 px-3 py-1 rounded-full border text-[11px] font-medium backdrop-blur-md ${
+              isDark
+                ? 'bg-slate-900/80 border-slate-800 text-slate-400'
+                : 'bg-white/90 border-slate-200/80 text-slate-500'
+            }`}
+          >
+            <span>🦴 3D Skeleton Overview</span>
+          </div>
+        )}
+      </div>
+
+      {/* Top Right: Floating Camera & Turntable Control Bar */}
       <div className="absolute top-4 right-4 z-10 flex items-center gap-1.5 p-1.5 rounded-2xl border shadow-sm backdrop-blur-md transition-colors bg-white/90 border-slate-200">
         {/* Reset Camera Button */}
         <button
@@ -764,16 +836,16 @@ export default function Ortho3DHuman({
         </button>
       </div>
 
-      {/* Bottom Hint Overlay */}
-      <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 pointer-events-none">
+      {/* Bottom Center: Minimalist Interaction Hint */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 pointer-events-none">
         <span
-          className={`text-[11px] font-medium px-3.5 py-1.5 rounded-full border shadow-xs backdrop-blur-md transition-colors ${
+          className={`text-[11px] font-medium px-4 py-1.5 rounded-full border shadow-xs backdrop-blur-md transition-colors whitespace-nowrap ${
             isDark
               ? 'bg-slate-900/90 text-slate-300 border-slate-700'
               : 'bg-white/95 text-slate-600 border-slate-200'
           }`}
         >
-          🦴 Click any glowing bone pin &bull; Drag 360° to orbit &bull; Scroll to zoom
+          Hover or click any glowing pin &bull; Drag 360° to orbit &bull; Scroll to zoom
         </span>
       </div>
     </div>
