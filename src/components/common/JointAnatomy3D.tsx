@@ -154,6 +154,7 @@ export default function JointAnatomy3D({
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const [activeType, setActiveType] = useState<AnatomyType>(initialType)
+  const [modelView, setModelView] = useState<'joint' | 'skeleton'>('joint')
   const [viewMode, setViewMode] = useState<'surgical' | 'biological'>(isRecovery ? 'biological' : 'surgical')
   const [visualTheme, setVisualTheme] = useState<'studio' | 'radiograph'>('studio')
   const [autoRotate, setAutoRotate] = useState<boolean>(true)
@@ -177,7 +178,8 @@ export default function JointAnatomy3D({
   const stateRef = useRef<{
     setMode?: (mode: 'surgical' | 'biological') => void
     setTheme?: (theme: 'studio' | 'radiograph') => void
-    rebuild?: (type: AnatomyType) => void
+    setModelView?: (mv: 'joint' | 'skeleton') => void
+    rebuild?: (type: AnatomyType, mv?: 'joint' | 'skeleton') => void
     resetCam?: () => void
     zoom?: (delta: number) => void
     setAutoRotate?: (enabled: boolean) => void
@@ -192,6 +194,8 @@ export default function JointAnatomy3D({
 
       const THREE = await import('three')
       const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls.js')
+      const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js')
+      const gltfLoader = new GLTFLoader()
 
       const canvas = canvasRef.current
       const container = containerRef.current
@@ -211,7 +215,7 @@ export default function JointAnatomy3D({
       renderer.shadowMap.enabled = true
       renderer.shadowMap.type = THREE.PCFSoftShadowMap
       renderer.toneMapping = THREE.ACESFilmicToneMapping
-      renderer.toneMappingExposure = visualTheme === 'radiograph' ? 1.35 : 1.18
+      renderer.toneMappingExposure = visualTheme === 'radiograph' ? 1.35 : 1.15
 
       // ── Scene & Camera ─────────────────────────────────────────────────────
       const scene = new THREE.Scene()
@@ -227,10 +231,10 @@ export default function JointAnatomy3D({
       controls.enableDamping = true
       controls.dampingFactor = 0.06
       controls.enablePan = false
-      controls.minDistance = 1.4
-      controls.maxDistance = 5.0
-      controls.minPolarAngle = Math.PI * 0.18
-      controls.maxPolarAngle = Math.PI * 0.82
+      controls.minDistance = 0.5
+      controls.maxDistance = 6.0
+      controls.minPolarAngle = Math.PI * 0.10
+      controls.maxPolarAngle = Math.PI * 0.90
       controls.target.copy(cameraTarget)
       controls.autoRotate = autoRotate
       controls.autoRotateSpeed = 0.85
@@ -241,14 +245,14 @@ export default function JointAnatomy3D({
 
       // ── Studio High-Key & Radiograph Dual Lighting Setup ───────────────────
       const ambientLight = new THREE.AmbientLight(
-        visualTheme === 'radiograph' ? 0x0c4a6e : 0xffffff,
-        visualTheme === 'radiograph' ? 1.8 : 1.45
+        visualTheme === 'radiograph' ? 0x0c4a6e : 0xfffaf0,
+        visualTheme === 'radiograph' ? 1.8 : 0.95
       )
       scene.add(ambientLight)
 
       const keyLight = new THREE.DirectionalLight(
-        visualTheme === 'radiograph' ? 0x38bdf8 : 0xfff8ee,
-        visualTheme === 'radiograph' ? 2.5 : 2.2
+        visualTheme === 'radiograph' ? 0x38bdf8 : 0xfff5e4,
+        visualTheme === 'radiograph' ? 2.5 : 1.75
       )
       keyLight.position.set(3, 4, 3.5)
       keyLight.castShadow = true
@@ -258,15 +262,15 @@ export default function JointAnatomy3D({
       scene.add(keyLight)
 
       const fillLight = new THREE.DirectionalLight(
-        visualTheme === 'radiograph' ? 0x0284c7 : 0xe0f2fe,
-        1.3
+        visualTheme === 'radiograph' ? 0x0284c7 : 0xe2e8f0,
+        visualTheme === 'radiograph' ? 1.3 : 0.75
       )
       fillLight.position.set(-3.5, 2, 2.5)
       scene.add(fillLight)
 
       const rimLight = new THREE.DirectionalLight(
-        visualTheme === 'radiograph' ? 0x7dd3fc : 0xccfbf1,
-        visualTheme === 'radiograph' ? 1.6 : 1.1
+        visualTheme === 'radiograph' ? 0x7dd3fc : 0xcbd5e1,
+        visualTheme === 'radiograph' ? 1.6 : 0.65
       )
       rimLight.position.set(0, -3, -3)
       scene.add(rimLight)
@@ -325,10 +329,10 @@ export default function JointAnatomy3D({
       // ── Physical Materials (Studio vs Radiograph) ───────────────────────────
       const isRad = visualTheme === 'radiograph'
 
-      // Cortical bone material
+      // Cortical bone material - warm yellowish realistic bone tone (#cfbd92)
       const boneMat = new THREE.MeshStandardMaterial({
-        color: isRad ? 0x67e8f9 : 0xfaf6ec,
-        roughness: isRad ? 0.28 : 0.38,
+        color: isRad ? 0x67e8f9 : 0xcfbd92,
+        roughness: isRad ? 0.28 : 0.50,
         metalness: isRad ? 0.08 : 0.02,
         emissive: isRad ? new THREE.Color(0x0369a1) : new THREE.Color(0x000000),
         emissiveIntensity: isRad ? 0.42 : 0.0,
@@ -431,7 +435,17 @@ export default function JointAnatomy3D({
       let pinAnchors: { id: string; mesh: THREE.Mesh; worldPos: THREE.Vector3; color: string; title: string }[] = []
 
       // ── Anatomical Model Sculptor (Artec HD / Sketchfab Reference Standard) ──
-      function buildModel(currentType: AnatomyType) {
+      const jointFraming: Record<AnatomyType, { camPos: [number, number, number]; target: [number, number, number] }> = {
+        knee: { camPos: [0, -0.38, 1.45], target: [0, -0.38, 0] },
+        hip: { camPos: [0.14, -0.15, 1.45], target: [0.14, -0.15, 0] },
+        shoulder: { camPos: [-0.24, 0.44, 1.45], target: [-0.24, 0.44, 0] },
+        spine: { camPos: [0.0, 0.34, 1.45], target: [0.0, 0.34, 0] },
+        sports: { camPos: [-0.10, -0.38, 1.45], target: [-0.10, -0.38, 0] },
+        prp: { camPos: [0.0, -0.38, 1.45], target: [0.0, -0.38, 0] },
+        trauma: { camPos: [0.18, 0.0, 1.45], target: [0.18, 0.0, 0] },
+      }
+
+      function buildModel(currentType: AnatomyType, currentModelView: 'joint' | 'skeleton' = modelView) {
         while (jointGroup.children.length > 0) {
           jointGroup.remove(jointGroup.children[0])
         }
@@ -439,10 +453,54 @@ export default function JointAnatomy3D({
         biologicalObjects = []
         pinAnchors = []
 
-        if (currentType === 'knee') {
-          // ── KNEE: Distal Femur, Tibial Plateau, Patella & Implants ──────────
-          // 1. Distal Femur Diaphysis & Metaphysis
-          const femurShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 1.15, 32), boneMat)
+        if (currentModelView === 'skeleton') {
+          const framing = jointFraming[currentType] || jointFraming.knee
+          camera.position.set(...framing.camPos)
+          cameraTarget.set(...framing.target)
+          controls.target.copy(cameraTarget)
+          controls.update()
+
+          gltfLoader.load(
+            '/models/human_skeleton.glb',
+            (gltf) => {
+              if (disposed) return
+              const model = gltf.scene
+
+              const box = new THREE.Box3().setFromObject(model)
+              const size = new THREE.Vector3()
+              box.getSize(size)
+              const center = new THREE.Vector3()
+              box.getCenter(center)
+
+              const targetHeight = 2.0
+              const scale = targetHeight / (size.y || 1)
+              model.scale.setScalar(scale)
+              model.position.x = -center.x * scale
+              model.position.y = -center.y * scale
+              model.position.z = -center.z * scale
+
+              model.traverse((child: any) => {
+                if (child.isMesh) {
+                  child.castShadow = true
+                  child.receiveShadow = true
+                  child.material = boneMat
+                }
+              })
+              jointGroup.add(model)
+            },
+            undefined,
+            (err) => console.error('Error loading human_skeleton in JointAnatomy3D:', err)
+          )
+        } else {
+          camera.position.set(0, 0.15, 3.2)
+          cameraTarget.set(0, 0.05, 0)
+          controls.target.copy(cameraTarget)
+          controls.update()
+
+          if (currentType === 'knee') {
+            // ── KNEE: Distal Femur, Tibial Plateau, Patella & Implants ──────────
+            // 1. Distal Femur Diaphysis & Metaphysis
+            const femurShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 1.15, 32), boneMat)
           femurShaft.position.set(0, 0.94, -0.04)
           femurShaft.castShadow = true
           jointGroup.add(femurShaft)
@@ -1011,76 +1069,92 @@ export default function JointAnatomy3D({
           jointGroup.add(bGroup)
           biologicalObjects.push(bGroup)
         }
+      }
 
-        // ── 3D Visual Glowing Beacon Anchors ──────────────────────────────────
-        const currentCallouts = isRecovery
-          ? CALLOUTS_DATA[currentType].recovery
-          : CALLOUTS_DATA[currentType].surgical
+      // ── 3D Visual Glowing Beacon Anchors ──────────────────────────────────
+      const currentCallouts = isRecovery
+        ? CALLOUTS_DATA[currentType].recovery
+        : CALLOUTS_DATA[currentType].surgical
 
-        currentCallouts.forEach((c) => {
-          const beaconGroup = new THREE.Group()
-          beaconGroup.position.set(...c.pos)
+      currentCallouts.forEach((c) => {
+        const beaconGroup = new THREE.Group()
+        const pinPos: [number, number, number] =
+          currentModelView === 'skeleton'
+            ? [
+                (jointFraming[currentType]?.target[0] || 0) + c.pos[0] * 0.35,
+                (jointFraming[currentType]?.target[1] || 0) + c.pos[1] * 0.35,
+                c.pos[2] * 0.35 + 0.08,
+              ]
+            : c.pos
+        beaconGroup.position.set(...pinPos)
 
-          // Glowing Sphere
-          const orb = new THREE.Mesh(
-            new THREE.SphereGeometry(0.038, 16, 16),
-            new THREE.MeshStandardMaterial({
-              color: new THREE.Color(c.color),
-              emissive: new THREE.Color(c.color),
-              emissiveIntensity: visualTheme === 'radiograph' ? 1.2 : 0.8,
-              roughness: 0.1,
-            })
-          )
-          beaconGroup.add(orb)
-
-          // Pulse Radar Ring
-          const ring = new THREE.Mesh(
-            new THREE.RingGeometry(0.052, 0.072, 28),
-            new THREE.MeshBasicMaterial({
-              color: new THREE.Color(c.color),
-              side: THREE.DoubleSide,
-              transparent: true,
-              opacity: 0.8,
-            })
-          )
-          beaconGroup.add(ring)
-
-          jointGroup.add(beaconGroup)
-
-          pinAnchors.push({
-            id: c.id,
-            mesh: orb,
-            worldPos: new THREE.Vector3(...c.pos),
-            color: c.color,
-            title: c.title,
+        // Glowing Sphere
+        const orb = new THREE.Mesh(
+          new THREE.SphereGeometry(0.038, 16, 16),
+          new THREE.MeshStandardMaterial({
+            color: new THREE.Color(c.color),
+            emissive: new THREE.Color(c.color),
+            emissiveIntensity: visualTheme === 'radiograph' ? 1.2 : 0.8,
+            roughness: 0.1,
           })
+        )
+        beaconGroup.add(orb)
+
+        // Pulse Radar Ring
+        const ring = new THREE.Mesh(
+          new THREE.RingGeometry(0.052, 0.072, 28),
+          new THREE.MeshBasicMaterial({
+            color: new THREE.Color(c.color),
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.8,
+          })
+        )
+        beaconGroup.add(ring)
+
+        jointGroup.add(beaconGroup)
+
+        pinAnchors.push({
+          id: c.id,
+          mesh: orb,
+          worldPos: new THREE.Vector3(...pinPos),
+          color: c.color,
+          title: c.title,
         })
+      })
 
-        applyMode(viewMode)
-      }
+      applyMode(viewMode)
+    }
 
-      function applyMode(mode: 'surgical' | 'biological') {
-        surgicalObjects.forEach((obj) => (obj.visible = mode === 'surgical'))
-        biologicalObjects.forEach((obj) => (obj.visible = mode === 'biological'))
-      }
+    function applyMode(mode: 'surgical' | 'biological') {
+      surgicalObjects.forEach((obj) => (obj.visible = mode === 'surgical'))
+      biologicalObjects.forEach((obj) => (obj.visible = mode === 'biological'))
+    }
 
-      stateRef.current.setMode = applyMode
-      stateRef.current.rebuild = buildModel
-      stateRef.current.resetCam = () => {
+    stateRef.current.setMode = applyMode
+    stateRef.current.setModelView = (mv: 'joint' | 'skeleton') => buildModel(activeType, mv)
+    stateRef.current.rebuild = (type: AnatomyType, mv?: 'joint' | 'skeleton') => buildModel(type, mv ?? modelView)
+    stateRef.current.resetCam = () => {
+      if (modelView === 'skeleton') {
+        const framing = jointFraming[activeType] || jointFraming.knee
+        camera.position.set(...framing.camPos)
+        cameraTarget.set(...framing.target)
+      } else {
         camera.position.set(0, 0.15, 3.2)
         cameraTarget.set(0, 0.05, 0)
-        controls.target.copy(cameraTarget)
-        controls.update()
       }
-      stateRef.current.zoom = (delta: number) => {
-        camera.position.z = Math.max(1.4, Math.min(5.0, camera.position.z + delta))
-        controls.update()
-      }
-      stateRef.current.setAutoRotate = (enabled: boolean) => {
-        controls.autoRotate = enabled
-      }
+      controls.target.copy(cameraTarget)
+      controls.update()
+    }
+    stateRef.current.zoom = (delta: number) => {
+      camera.position.z = Math.max(0.6, Math.min(5.5, camera.position.z + delta))
+      controls.update()
+    }
+    stateRef.current.setAutoRotate = (enabled: boolean) => {
+      controls.autoRotate = enabled
+    }
 
-      buildModel(activeType)
+    buildModel(activeType, modelView)
 
       // ── Main Render & Projection Loop ─────────────────────────────────────
       const clock = new THREE.Clock()
@@ -1160,12 +1234,19 @@ export default function JointAnatomy3D({
       disposed = true
       cleanupPromise.then((cleanup) => cleanup && cleanup())
     }
-  }, [activeType, isRecovery, viewMode, visualTheme])
+  }, [activeType, isRecovery, viewMode, visualTheme, modelView])
 
   function handleTypeChange(newType: AnatomyType) {
     setActiveType(newType)
     if (stateRef.current.rebuild) {
       stateRef.current.rebuild(newType)
+    }
+  }
+
+  function handleModelViewChange(newMv: 'joint' | 'skeleton') {
+    setModelView(newMv)
+    if (stateRef.current.setModelView) {
+      stateRef.current.setModelView(newMv)
     }
   }
 
@@ -1230,6 +1311,38 @@ export default function JointAnatomy3D({
 
         {/* View Mode & Contrast Theme Selectors */}
         <div className="flex flex-wrap items-center gap-2 shrink-0 self-start md:self-auto">
+          {/* Model View: Joint Detail vs Full Skeleton HD */}
+          <div
+            className={`flex items-center gap-1 p-1 rounded-2xl border shadow-2xs transition-colors ${
+              isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            }`}
+          >
+            <button
+              type="button"
+              onClick={() => handleModelViewChange('joint')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                modelView === 'joint'
+                  ? 'bg-[#059B8F] text-white shadow-xs'
+                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>🦴</span>
+              <span>Joint Implants</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleModelViewChange('skeleton')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                modelView === 'skeleton'
+                  ? 'bg-[#059B8F] text-white shadow-xs'
+                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <span>💀</span>
+              <span>Full Skeleton HD</span>
+            </button>
+          </div>
+
           {/* Studio vs Digital Radiograph Theme */}
           <div
             className={`flex items-center gap-1 p-1 rounded-2xl border shadow-2xs transition-colors ${
@@ -1262,35 +1375,37 @@ export default function JointAnatomy3D({
             </button>
           </div>
 
-          {/* Surgical vs Biological Toggle */}
-          <div
-            className={`flex items-center gap-1 p-1 rounded-2xl border shadow-2xs transition-colors ${
-              isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
-            }`}
-          >
-            <button
-              type="button"
-              onClick={() => handleModeChange('surgical')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                viewMode === 'surgical'
-                  ? 'bg-[#059B8F] text-white shadow-xs'
-                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+          {/* Surgical vs Biological Toggle (Only shown when inspecting joint reconstruction) */}
+          {modelView === 'joint' && (
+            <div
+              className={`flex items-center gap-1 p-1 rounded-2xl border shadow-2xs transition-colors ${
+                isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
               }`}
             >
-              {isRecovery ? 'Load Stabilization' : 'Surgical Reconstruction'}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleModeChange('biological')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                viewMode === 'biological'
-                  ? 'bg-[#059B8F] text-white shadow-xs'
-                  : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              {isRecovery ? 'Biological Tissue Healing' : 'Native Bone Anatomy'}
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={() => handleModeChange('surgical')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  viewMode === 'surgical'
+                    ? 'bg-[#059B8F] text-white shadow-xs'
+                    : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {isRecovery ? 'Load Stabilization' : 'Surgical Reconstruction'}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleModeChange('biological')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  viewMode === 'biological'
+                    ? 'bg-[#059B8F] text-white shadow-xs'
+                    : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {isRecovery ? 'Biological Tissue Healing' : 'Native Bone Anatomy'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -202,28 +202,33 @@ export default function Ortho3DHuman({
       controls.enableDamping = true
       controls.dampingFactor = 0.06
       controls.enablePan = false
-      controls.minDistance = 1.0
-      controls.maxDistance = 5.2
-      controls.minPolarAngle = Math.PI * 0.15
-      controls.maxPolarAngle = Math.PI * 0.85
+      controls.minDistance = 0.35
+      controls.maxDistance = 6.0
+      controls.minPolarAngle = Math.PI * 0.10
+      controls.maxPolarAngle = Math.PI * 0.90
       controls.target.copy(cameraTarget)
       controls.autoRotate = autoRotate
       controls.autoRotateSpeed = 0.85
 
       let isInteracting = false
-      controls.addEventListener('start', () => { isInteracting = true })
-      controls.addEventListener('end', () => { isInteracting = false })
+      controls.addEventListener('start', () => {
+        isInteracting = true
+        transitionRef.current.isTransitioning = false // Give user immediate orbital control
+      })
+      controls.addEventListener('end', () => {
+        isInteracting = false
+      })
 
       // ── Studio & Radiograph Lighting ───────────────────────────────────────
       const ambientLight = new THREE.AmbientLight(
-        theme === 'radiograph' ? 0x0c4a6e : 0xffffff,
-        theme === 'radiograph' ? 1.8 : 1.45
+        theme === 'radiograph' ? 0x0c4a6e : 0xfffaf0,
+        theme === 'radiograph' ? 1.8 : 0.95
       )
       scene.add(ambientLight)
 
       const keyLight = new THREE.DirectionalLight(
-        theme === 'radiograph' ? 0x38bdf8 : 0xfff8ee,
-        theme === 'radiograph' ? 2.5 : 2.2
+        theme === 'radiograph' ? 0x38bdf8 : 0xfff5e4,
+        theme === 'radiograph' ? 2.5 : 1.75
       )
       keyLight.position.set(3, 4, 3.5)
       keyLight.castShadow = true
@@ -233,15 +238,15 @@ export default function Ortho3DHuman({
       scene.add(keyLight)
 
       const fillLight = new THREE.DirectionalLight(
-        theme === 'radiograph' ? 0x0284c7 : 0xe0f2fe,
-        1.3
+        theme === 'radiograph' ? 0x0284c7 : 0xe2e8f0,
+        theme === 'radiograph' ? 1.3 : 0.75
       )
       fillLight.position.set(-3.5, 2, 2.5)
       scene.add(fillLight)
 
       const rimLight = new THREE.DirectionalLight(
-        theme === 'radiograph' ? 0x7dd3fc : 0xccfbf1,
-        theme === 'radiograph' ? 1.6 : 1.1
+        theme === 'radiograph' ? 0x7dd3fc : 0xcbd5e1,
+        theme === 'radiograph' ? 1.6 : 0.65
       )
       rimLight.position.set(0, -3, -3)
       scene.add(rimLight)
@@ -266,9 +271,9 @@ export default function Ortho3DHuman({
 
       // ── Physical Materials for Cortical Bone ───────────────────────────────
       const studioBoneMat = new THREE.MeshStandardMaterial({
-        color: new THREE.Color('#faf5ea'), // Warm clinical ivory cortical bone
-        roughness: 0.42,
-        metalness: 0.04,
+        color: new THREE.Color('#cfbd92'), // Warm yellowish anatomical cortical bone
+        roughness: 0.50,
+        metalness: 0.02,
       })
 
       const radiographBoneMat = new THREE.MeshStandardMaterial({
@@ -498,10 +503,14 @@ export default function Ortho3DHuman({
         renderer.setClearColor(isRad ? 0x050a14 : 0xffffff, 1)
         scene.background = new THREE.Color(isRad ? 0x050a14 : 0xffffff)
         shadowMesh.visible = !isRad
-        ambientLight.color.setHex(isRad ? 0x0c4a6e : 0xffffff)
-        ambientLight.intensity = isRad ? 1.8 : 1.45
-        keyLight.color.setHex(isRad ? 0x38bdf8 : 0xfff8ee)
-        rimLight.color.setHex(isRad ? 0x7dd3fc : 0xccfbf1)
+        ambientLight.color.setHex(isRad ? 0x0c4a6e : 0xfffaf0)
+        ambientLight.intensity = isRad ? 1.8 : 0.95
+        keyLight.color.setHex(isRad ? 0x38bdf8 : 0xfff5e4)
+        keyLight.intensity = isRad ? 2.5 : 1.75
+        fillLight.color.setHex(isRad ? 0x0284c7 : 0xe2e8f0)
+        fillLight.intensity = isRad ? 1.3 : 0.75
+        rimLight.color.setHex(isRad ? 0x7dd3fc : 0xcbd5e1)
+        rimLight.intensity = isRad ? 1.6 : 0.65
 
         skeletonGroup.traverse((child: any) => {
           if (child.isMesh) {
@@ -521,6 +530,21 @@ export default function Ortho3DHuman({
       const raycaster = new THREE.Raycaster()
       const mouseVec = new THREE.Vector2()
 
+      let pointerDownPos = { x: 0, y: 0 }
+      let hasDragged = false
+
+      function onPointerDown(e: PointerEvent) {
+        pointerDownPos = { x: e.clientX, y: e.clientY }
+        hasDragged = false
+        transitionRef.current.isTransitioning = false
+      }
+
+      function onPointerMove(e: PointerEvent) {
+        if (Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y) > 6) {
+          hasDragged = true
+        }
+      }
+
       function getPointerPos(e: MouseEvent) {
         const rect = canvas.getBoundingClientRect()
         return {
@@ -530,6 +554,7 @@ export default function Ortho3DHuman({
       }
 
       function onCanvasClick(e: MouseEvent) {
+        if (hasDragged) return // User was dragging/orbiting the camera, NOT clicking a pin!
         const pos = getPointerPos(e)
         mouseVec.set(pos.x, pos.y)
         raycaster.setFromCamera(mouseVec, camera)
@@ -572,6 +597,8 @@ export default function Ortho3DHuman({
         }
       }
 
+      canvas.addEventListener('pointerdown', onPointerDown)
+      canvas.addEventListener('pointermove', onPointerMove)
       canvas.addEventListener('click', onCanvasClick)
       canvas.addEventListener('mousemove', onCanvasMouseMove)
 
@@ -585,9 +612,9 @@ export default function Ortho3DHuman({
         const elapsedTime = clock.getElapsedTime()
         controls.update()
 
-        // Smooth camera lerping when transitioning
+        // Smooth camera lerping when transitioning (only if user is not actively interacting/dragging)
         const trans = transitionRef.current
-        if (trans.isTransitioning) {
+        if (trans.isTransitioning && !isInteracting) {
           const ease = 0.075
           camera.position.x += (trans.targetCamPos[0] - camera.position.x) * ease
           camera.position.y += (trans.targetCamPos[1] - camera.position.y) * ease
@@ -677,6 +704,8 @@ export default function Ortho3DHuman({
       return () => {
         disposed = true
         cancelAnimationFrame(animId)
+        canvas.removeEventListener('pointerdown', onPointerDown)
+        canvas.removeEventListener('pointermove', onPointerMove)
         canvas.removeEventListener('click', onCanvasClick)
         canvas.removeEventListener('mousemove', onCanvasMouseMove)
         ro.disconnect()
