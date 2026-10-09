@@ -55,9 +55,9 @@ export const CLINIC_LOCATIONS: ClinicLocation[] = [
     phoneDisplay: "+91 73090 38872",
     whatsapp: "917309038872",
     mapEmbedUrl:
-      "https://maps.google.com/maps?q=7/198-A%20Anand%20Bazar%20Khalasi%20Line%20Swaroop%20Nagar%20Kanpur&t=&z=16&ie=UTF8&iwloc=&output=embed",
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3571.241331358117!2d80.30819031110792!3d26.48017347681141!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399c39c9d326ac11%3A0xa8cc4c17ce27548a!2sDr.%20Gaurav%20Bhargava%20-%20Best%20Orthopedic%20Doctor%20%7C%20Bone%2C%20Joint%20%26%20Fracture%20Treatment%20in%20Kanpur!5e0!3m2!1sen!2sus!4v1791535691852!5m2!1sen!2sus",
     mapDirectionsUrl:
-      "https://maps.google.com/?q=7/198-A+Anand+Bazar+Khalasi+Line+Swaroop+Nagar+Kanpur+Uttar+Pradesh+208002",
+      "https://www.google.com/maps/place/Dr.+Gaurav+Bhargava+-+Best+Orthopedic+Doctor+%7C+Bone,+Joint+%26+Fracture+Treatment+in+Kanpur/@26.4801735,80.3081903,17z",
     features: [
       "Specialist Joint & Sports Injury Consultations",
       "Comprehensive Digital X-Ray & Diagnostics",
