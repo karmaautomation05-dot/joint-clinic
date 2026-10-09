@@ -203,10 +203,21 @@ export default function Footer() {
             <Link href="/about" className="hover:text-brand-600 transition-colors">About Doctor</Link>
             <Link href="/appointment" className="hover:text-brand-600 transition-colors">Book Appointment</Link>
             <Link href="/contact" className="hover:text-brand-600 transition-colors">Directions</Link>
-            <a href="https://karmait.in/" target="_blank" rel="noopener noreferrer" className="hover:text-brand-600 transition-colors">
-              Managed by Karma Automation
-            </a>
           </div>
+        </div>
+
+        <div className="mt-4 pt-4 border-t border-slate-200/60 flex items-center justify-center text-xs text-slate-500 text-center">
+          <p>
+            Managed by{' '}
+            <a
+              href="https://karmait.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-slate-700 hover:text-brand-600 transition-colors underline decoration-slate-300 underline-offset-2"
+            >
+              Karma Automation
+            </a>
+          </p>
         </div>
       </div>
     </footer>
