@@ -29,6 +29,7 @@ export default function MedicalSchema() {
         ],
         description:
           "Kanpur's Premier Centre of Arthroplasty, Arthroscopy, Bone Fracture Treatment & Joint Preservation led by Dr. Gaurav Bhargava (MAMC New Delhi).",
+        image: "https://jointclinic.in/images/logo.png",
         publisher: { "@id": "https://jointclinic.in/#physician" },
         inLanguage: "en-IN",
         potentialAction: {
@@ -160,7 +161,8 @@ export default function MedicalSchema() {
         alternateName: "Joint Clinic Swaroop Nagar",
         description:
           "Kanpur's premier orthopedic clinic in Swaroop Nagar for joint replacement consultation, bone and joint specialist care, knee pain treatment, arthritis care, and PRP therapy.",
-        image: "https://jointclinic.in/images/doctor/gaurav-bhargava.png",
+        image: "https://jointclinic.in/images/logo.png",
+        logo: "https://jointclinic.in/images/logo.png",
         telephone: PRIMARY_CONTACT.phone,
         url: "https://jointclinic.in",
         medicalDirector: { "@id": "https://jointclinic.in/#physician" },

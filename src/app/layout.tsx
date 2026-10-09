@@ -67,6 +67,16 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/images/logo-emblem.png", type: "image/png", sizes: "304x270" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [
+      { url: "/images/logo-emblem.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   openGraph: {
     type: "website",
     locale: "en_IN",
@@ -76,6 +86,12 @@ export const metadata: Metadata = {
     description:
       "Looking for the best orthopedic doctor near me in Kanpur? Dr. Gaurav Bhargava (MAMC New Delhi) provides advanced bone, joint & fracture treatment, knee/hip replacement, and sports keyhole surgery.",
     images: [
+      {
+        url: "/images/logo.png",
+        width: 404,
+        height: 430,
+        alt: "Joint Clinic Kanpur — Dr. Gaurav Bhargava Logo",
+      },
       {
         url: "/images/doctor/gaurav-bhargava.png",
         width: 800,
@@ -89,7 +105,7 @@ export const metadata: Metadata = {
     title: "Best Orthopedic Doctor & Surgeon in Kanpur | Dr. Gaurav Bhargava",
     description:
       "Leading bone, joint & fracture treatment, knee replacement, and sports arthroscopy in Kanpur by Dr. Gaurav Bhargava.",
-    images: ["/images/doctor/gaurav-bhargava.png"],
+    images: ["/images/logo.png", "/images/doctor/gaurav-bhargava.png"],
   },
   other: {
     "theme-color": "#059B8F",
@@ -109,6 +125,9 @@ export default function RootLayout({
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
       <head>
         <MedicalSchema />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" href="/images/logo-emblem.png" />
+        <link rel="apple-touch-icon" href="/images/logo-emblem.png" />
         <link rel="alternate" type="text/markdown" href="/llms.txt" title="LLM Knowledge Context" />
         <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM Plaintext Context" />
         <link rel="help" href="/llms.txt" title="AI Search & LLM Knowledge Base" />

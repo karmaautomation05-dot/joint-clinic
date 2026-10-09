@@ -198,7 +198,11 @@ export default function JointAnatomy3D({
       const THREE = await import('three')
       const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls.js')
       const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js')
+      const { DRACOLoader } = await import('three/examples/jsm/loaders/DRACOLoader.js')
       const gltfLoader = new GLTFLoader()
+      const dracoLoader = new DRACOLoader()
+      dracoLoader.setDecoderPath('/draco/')
+      gltfLoader.setDRACOLoader(dracoLoader)
 
       const canvas = canvasRef.current
       const container = containerRef.current
@@ -545,6 +549,7 @@ export default function JointAnatomy3D({
         pmrem.dispose()
         envTex.dispose()
         envRT.dispose()
+        dracoLoader.dispose()
       }
     }
 

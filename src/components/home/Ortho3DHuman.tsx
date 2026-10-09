@@ -131,6 +131,7 @@ export default function Ortho3DHuman({
 
       const THREE = await import('three')
       const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js')
+      const { DRACOLoader } = await import('three/examples/jsm/loaders/DRACOLoader.js')
       const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls.js')
 
       const canvas = canvasRef.current
@@ -417,6 +418,9 @@ export default function Ortho3DHuman({
 
       // ── LOAD REAL HIGH-RESOLUTION CT SKELETON GLB ─────────────────────────
       const loader = new GLTFLoader()
+      const dracoLoader = new DRACOLoader()
+      dracoLoader.setDecoderPath('/draco/')
+      loader.setDRACOLoader(dracoLoader)
 
       loader.load(
         '/models/human_skeleton.glb',
@@ -767,6 +771,7 @@ export default function Ortho3DHuman({
         pmrem.dispose()
         envTex.dispose()
         envRT.dispose()
+        dracoLoader.dispose()
       }
     }
 
