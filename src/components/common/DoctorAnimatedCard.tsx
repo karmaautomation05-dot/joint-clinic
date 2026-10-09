@@ -102,34 +102,16 @@ export default function DoctorAnimatedCard({
           )
         })}
 
-        {/* Subtle Vignette Gradient at the Bottom for contrast */}
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950/80 via-slate-900/40 to-transparent z-15 pointer-events-none" />
-
-        {/* Dynamic Credential Caption Badge */}
-        <div className="absolute bottom-5 inset-x-3 sm:inset-x-4 z-20 transition-all duration-500">
-          <div className="bg-slate-900/85 backdrop-blur-md text-white px-3 py-1.5 rounded-xl border border-white/20 shadow-lg flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="w-2 h-2 rounded-full bg-brand-400 shrink-0 animate-ping" />
-              <span className="text-[11px] sm:text-xs font-bold text-white truncate">
-                {photos[currentIdx].role}
-              </span>
-            </div>
-            <span className="text-[9.5px] sm:text-[10px] text-brand-300 font-medium whitespace-nowrap shrink-0">
-              {photos[currentIdx].label}
-            </span>
-          </div>
-        </div>
-
         {/* Interactive Thumbnail / Indicator Bars */}
-        <div className="absolute bottom-2 inset-x-0 z-20 flex justify-center items-center gap-1.5 px-4 pointer-events-auto">
+        <div className="absolute bottom-3 inset-x-0 z-20 flex justify-center items-center gap-1.5 px-4 pointer-events-auto">
           {photos.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentIdx(idx)}
-              className={`h-1 rounded-full transition-all duration-500 cursor-pointer ${
+              className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer shadow-sm ${
                 idx === currentIdx
-                  ? 'w-8 bg-brand-400 shadow-xs'
-                  : 'w-2 bg-white/50 hover:bg-white/80'
+                  ? 'w-7 bg-brand-500 shadow-xs'
+                  : 'w-2 bg-slate-900/40 hover:bg-slate-900/70'
               }`}
               aria-label={`View photo ${idx + 1}`}
             />
