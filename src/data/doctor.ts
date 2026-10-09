@@ -87,7 +87,7 @@ export const DOCTOR_DATA: DoctorProfile = {
   ],
   stats: {
     experience: "20+ Years",
-    surgeries: "5,000+",
+    surgeries: "500+",
     patients: "10,000+",
     rating: "5.0",
     reviewCount: 41,

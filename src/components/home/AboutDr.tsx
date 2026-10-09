@@ -25,8 +25,8 @@ export default function AboutDr() {
     },
     { 
       icon: ShieldCheck, 
-      title: '5,000+ Joint Procedures', 
-      description: 'High-volume mastery in primary, complex, and revision Knee & Hip replacements.' 
+      title: '500+ Joint Procedures', 
+      description: 'Mastery in primary, complex, and revision Knee & Hip replacements.' 
     },
   ]
 

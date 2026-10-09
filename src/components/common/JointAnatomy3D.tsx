@@ -818,7 +818,9 @@ export default function JointAnatomy3D({
                   >
                     {/* Compact Numbered Circle Badge */}
                     <div
-                      className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-black shadow-lg backdrop-blur-md transition-all border-2 ${
+                      className={`flex items-center justify-center rounded-full font-black shadow-lg backdrop-blur-md transition-all border-2 ${
+                        cameraView === 'skeleton' ? 'w-8 h-8 text-xs sm:text-sm' : 'w-7 h-7 text-xs'
+                      } ${
                         isSelected
                           ? 'text-white'
                           : 'text-slate-100 group-hover:text-white'
@@ -834,18 +836,25 @@ export default function JointAnatomy3D({
 
                     {/* Clean Expanded Pill: Always Visible for Active, or on Hover */}
                     <div
-                      className={`absolute left-8.5 px-3 py-1 rounded-full whitespace-nowrap text-[11px] font-bold shadow-xl backdrop-blur-md transition-all pointer-events-none border ${
+                      className={`absolute rounded-full whitespace-nowrap shadow-xl backdrop-blur-md transition-all pointer-events-none border ${
+                        cameraView === 'skeleton'
+                          ? 'left-9.5 px-3.5 py-1.5 text-xs sm:text-sm font-extrabold'
+                          : 'left-8.5 px-3 py-1 text-[11px] font-bold'
+                      } ${
                         isSelected
                           ? 'opacity-100 translate-x-0 bg-slate-900/95 border-slate-700 text-white'
                           : 'opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 bg-slate-900/90 border-slate-700 text-slate-200'
                       }`}
                       style={{
                         borderLeftColor: pin.color,
-                        borderLeftWidth: '3px',
+                        borderLeftWidth: cameraView === 'skeleton' ? '4px' : '3px',
                       }}
                     >
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: pin.color }} />
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`rounded-full ${cameraView === 'skeleton' ? 'w-2.5 h-2.5' : 'w-1.5 h-1.5'}`}
+                          style={{ backgroundColor: pin.color }}
+                        />
                         <span>{pin.title}</span>
                       </div>
                     </div>

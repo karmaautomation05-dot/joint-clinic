@@ -18,17 +18,6 @@ import {
 import { DOCTOR_DATA } from "@/data/doctor";
 import { CLINIC_LOCATIONS, PRIMARY_CONTACT } from "@/data/clinics";
 import DoctorAnimatedCard from "@/components/common/DoctorAnimatedCard";
-import dynamic from "next/dynamic";
-
-const JointAnatomy3D = dynamic(() => import("@/components/common/JointAnatomy3D"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-[460px] sm:h-[520px] rounded-3xl bg-white border border-slate-200 flex flex-col items-center justify-center gap-3 shadow-sm">
-      <div className="w-12 h-12 rounded-full border-2 border-brand-500/20 border-t-brand-600 animate-spin" />
-      <span className="text-xs text-slate-500 font-mono">Loading 3D Joint Reconstruction...</span>
-    </div>
-  ),
-});
 
 export const metadata: Metadata = {
   title: "Best Orthopedic Doctor in Kanpur | Dr. Gaurav Bhargava | Bone & Joint Specialist",
@@ -220,7 +209,7 @@ export default function AboutPage() {
                 </div>
               </div>
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-sans aeo-answer">
-                <strong>Dr. Gaurav Bhargava</strong> is a senior consultant orthopedic doctor, bone specialist, and joint replacement surgeon in Kanpur with over <strong>20 years of clinical experience</strong> and <strong>10,000+ completed procedures</strong>. An alumnus of <strong>Maulana Azad Medical College (MAMC) and Lok Nayak Hospital, New Delhi</strong>, he directs <strong>Joint Clinic (Swaroop Nagar)</strong> for evening specialist OPD consultations and <strong>Bhargava Medical &amp; Trauma Centre - BMTC (Kidwai Nagar)</strong> for morning OPD, modular laminar-airflow joint replacement surgeries, and 24/7 bone fracture trauma emergency care.
+                <strong>Dr. Gaurav Bhargava</strong> is a senior consultant orthopedic doctor, bone specialist, and joint replacement surgeon in Kanpur with over <strong>20 years of clinical experience</strong>, <strong>500+ successful joint surgeries</strong>, and <strong>10,000+ treated patients</strong>. An alumnus of <strong>Maulana Azad Medical College (MAMC) and Lok Nayak Hospital, New Delhi</strong>, he directs <strong>Joint Clinic (Swaroop Nagar)</strong> for evening specialist OPD consultations and <strong>Bhargava Medical &amp; Trauma Centre - BMTC (Kidwai Nagar)</strong> for morning OPD, modular laminar-airflow joint replacement surgeries, and 24/7 bone fracture trauma emergency care.
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-100 text-xs">
                 <div>
@@ -229,7 +218,7 @@ export default function AboutPage() {
                 </div>
                 <div>
                   <span className="text-slate-500 block text-[11px]">Experience</span>
-                  <strong className="text-slate-900 font-bold">20+ Years / 10,000+ Surgeries</strong>
+                  <strong className="text-slate-900 font-bold">20+ Years / 500+ Surgeries</strong>
                 </div>
                 <div>
                   <span className="text-slate-500 block text-[11px]">Surgical Center</span>
@@ -282,22 +271,6 @@ export default function AboutPage() {
               </div>
             </div>
 
-            {/* Interactive 3D Bone & Joint Reconstruction Section */}
-            <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-8 md:p-10 shadow-sm space-y-6">
-              <div>
-                <span className="text-brand-600 font-bold uppercase tracking-widest text-xs mb-2 block">
-                  3D Surgical Technology &amp; Precision
-                </span>
-                <h3 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 leading-tight">
-                  Interactive 3D Knee Joint &amp; Bone Reconstruction
-                </h3>
-                <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                  Rotate the 3D anatomical joint below to inspect the Femur, Tibia, Patella, and the tissue-sparing cobalt-chrome/titanium arthroplasty prosthesis with high-density UHMWPE shock-absorbing bearing cushion.
-                </p>
-              </div>
-
-              <JointAnatomy3D />
-            </div>
 
             {/* Academic & Training Journey */}
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 p-5 sm:p-8 md:p-10 shadow-sm space-y-6">

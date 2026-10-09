@@ -20,8 +20,8 @@ const stats = [
   {
     icon: Activity,
     label: 'Successful Operations',
-    value: '5,000+',
-    numericEnd: 5000,
+    value: '500+',
+    numericEnd: 500,
     suffix: '+',
     unit: 'Procedures',
     detail: 'Knee, Hip & Arthroscopy',
@@ -96,8 +96,8 @@ function StatCard({ stat, idx, triggered }: { stat: typeof stats[number]; idx: n
 
   // Format display value
   const display =
-    stat.numericEnd === 5000
-      ? (count >= 1000 ? (count / 1000).toFixed(0) + ',000' : count.toString()) + '+'
+    stat.numericEnd === 500
+      ? count + '+'
       : stat.numericEnd === 5
       ? count.toFixed(0) + '.0★'
       : count + stat.suffix

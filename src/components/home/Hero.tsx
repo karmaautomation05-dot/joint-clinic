@@ -75,7 +75,7 @@ export default function Hero() {
                   20+
                 </div>
                 <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border-2 border-white bg-accent-500 text-white flex items-center justify-center text-xs font-bold shadow-sm">
-                  5k+
+                  500+
                 </div>
                 <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border-2 border-white bg-brand-700 text-white flex items-center justify-center text-xs font-bold shadow-sm">
                   24h
@@ -86,7 +86,7 @@ export default function Hero() {
               </div>
               <div className="text-left">
                 <div className="flex flex-wrap items-center gap-2 text-sm sm:text-base font-bold text-slate-900 leading-snug mb-0.5">
-                  <span>5,000+ Joint Surgeries</span>
+                  <span>500+ Joint Surgeries</span>
                   <span className="text-[#F18712] font-serif flex items-center text-xs sm:text-sm font-bold">
                     ★ 5.0 (41+ Verified Reviews)
                   </span>

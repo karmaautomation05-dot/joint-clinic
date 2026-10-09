@@ -472,7 +472,7 @@ export default function BodyMapSelector() {
                   <div className="grid grid-cols-3 gap-2 sm:gap-2.5 mb-6">
                     <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 text-center">
                       <div className="text-xs sm:text-sm font-bold text-brand-600 leading-tight">
-                        5,000+
+                        500+
                       </div>
                       <div className="text-[10px] text-slate-500 font-medium mt-0.5">Surgeries</div>
                     </div>

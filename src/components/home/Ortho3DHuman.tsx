@@ -108,18 +108,11 @@ export default function Ortho3DHuman({
   )
 
   const [autoRotate, setAutoRotate] = useState<boolean>(true)
+  const autoRotateRef = useRef<boolean>(true)
 
   // Camera initial full-skeleton view: fits 2.0 unit skeleton head-to-toe
   const FULL_SKELETON_CAM: [number, number, number] = [0, 0.05, 3.20]
   const FULL_SKELETON_TARGET: [number, number, number] = [0, 0.0, 0]
-
-  const transitionRef = useRef({
-    currentCamPos: [...FULL_SKELETON_CAM] as [number, number, number],
-    targetCamPos: [...FULL_SKELETON_CAM] as [number, number, number],
-    currentLookAt: [...FULL_SKELETON_TARGET] as [number, number, number],
-    targetLookAt: [...FULL_SKELETON_TARGET] as [number, number, number],
-    isTransitioning: false,
-  })
 
   const stateRef = useRef<{
     selectJoint?: (id: string | null) => void
@@ -179,16 +172,19 @@ export default function Ortho3DHuman({
       controls.minPolarAngle = Math.PI * 0.10
       controls.maxPolarAngle = Math.PI * 0.90
       controls.target.copy(cameraTarget)
-      controls.autoRotate = autoRotate
-      controls.autoRotateSpeed = 0.85
+      controls.autoRotate = autoRotateRef.current
+      controls.autoRotateSpeed = 1.4
 
       let isInteracting = false
       controls.addEventListener('start', () => {
         isInteracting = true
-        transitionRef.current.isTransitioning = false // Give user immediate orbital control
+        camTransition.active = false
       })
       controls.addEventListener('end', () => {
         isInteracting = false
+        if (autoRotateRef.current && currentActiveJointId === null) {
+          controls.autoRotate = true
+        }
       })
 
       // ── Gradient Studio Reflection Environment (PMREM) ─────────────────────
@@ -316,40 +312,40 @@ export default function Ortho3DHuman({
       // High-resolution Canvas Sprite Badge: Only displayed on hover or when active!
       function makePinSprite(text: string, color: string) {
         const pinCanvas = document.createElement('canvas')
-        pinCanvas.width = 384
-        pinCanvas.height = 96
+        pinCanvas.width = 640
+        pinCanvas.height = 160
         const ctx = pinCanvas.getContext('2d')
         if (ctx) {
-          ctx.shadowColor = 'rgba(0, 0, 0, 0.45)'
-          ctx.shadowBlur = 10
-          ctx.shadowOffsetY = 4
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.65)'
+          ctx.shadowBlur = 16
+          ctx.shadowOffsetY = 6
 
           // Sleek dark frosted glass pill
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.94)'
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.96)'
           ctx.beginPath()
-          ctx.roundRect(8, 12, 368, 72, 36)
+          ctx.roundRect(14, 18, 612, 124, 62)
           ctx.fill()
 
           ctx.shadowBlur = 0
           ctx.shadowOffsetY = 0
           ctx.strokeStyle = color
-          ctx.lineWidth = 3.5
+          ctx.lineWidth = 5
           ctx.beginPath()
-          ctx.roundRect(8, 12, 368, 72, 36)
+          ctx.roundRect(14, 18, 612, 124, 62)
           ctx.stroke()
 
           // Vibrant accent indicator dot
           ctx.fillStyle = color
           ctx.beginPath()
-          ctx.arc(46, 48, 10, 0, Math.PI * 2)
+          ctx.arc(68, 80, 16, 0, Math.PI * 2)
           ctx.fill()
 
-          // Joint title text
+          // Joint title text - Large, bold, crystal-clear!
           ctx.fillStyle = '#ffffff'
-          ctx.font = 'bold 24px system-ui, -apple-system, sans-serif'
+          ctx.font = 'bold 38px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
           ctx.textAlign = 'left'
           ctx.textBaseline = 'middle'
-          ctx.fillText(text, 72, 48)
+          ctx.fillText(text, 104, 80)
         }
         const texture = new THREE.CanvasTexture(pinCanvas)
         texture.minFilter = THREE.LinearFilter
@@ -402,7 +398,7 @@ export default function Ortho3DHuman({
         pinGroup.add(glow)
 
         // Large invisible hit target for effortless clicking & hovering
-        const hitGeo = new THREE.SphereGeometry(0.052, 8, 8)
+        const hitGeo = new THREE.SphereGeometry(0.075, 8, 8)
         const hitMat = new THREE.MeshBasicMaterial({ visible: false })
         const hitSphere = new THREE.Mesh(hitGeo, hitMat)
         hitSphere.userData = { jointId: j.id, isHotspot: true }
@@ -463,11 +459,12 @@ export default function Ortho3DHuman({
 
           setIsLoading(false)
 
-          // If a joint was initially selected, fly in, otherwise full skeleton
+          // If a joint was initially selected, fly in, otherwise enable auto-rotate
           if (activeJointId) {
             flyToJoint(activeJointId)
           } else {
-            resetView()
+            currentActiveJointId = null
+            controls.autoRotate = autoRotateRef.current
           }
         },
         (xhr) => {
@@ -482,7 +479,35 @@ export default function Ortho3DHuman({
       )
 
       // ── Smooth Camera Transition Helpers ──────────────────────────────────
+      let currentActiveJointId: string | null = activeJointId
+
+      const camTransition = {
+        active: false,
+        startPos: new THREE.Vector3(),
+        targetPos: new THREE.Vector3(),
+        startTarget: new THREE.Vector3(),
+        targetLookAt: new THREE.Vector3(),
+        startTime: 0,
+        duration: 0.85,
+      }
+
+      function startCameraTransition(
+        targetPos: [number, number, number],
+        targetLook: [number, number, number],
+        duration = 0.85
+      ) {
+        camTransition.startPos.copy(camera.position)
+        camTransition.targetPos.set(...targetPos)
+        camTransition.startTarget.copy(controls.target)
+        camTransition.targetLookAt.set(...targetLook)
+        camTransition.startTime = clock.getElapsedTime()
+        camTransition.duration = duration
+        camTransition.active = true
+        controls.autoRotate = false
+      }
+
       function flyToJoint(jointId: string | null) {
+        currentActiveJointId = jointId
         if (!jointId) {
           resetView()
           return
@@ -494,19 +519,24 @@ export default function Ortho3DHuman({
         const jointPos = jointCoordinates[jointId]
         if (!jointPos) return
 
-        transitionRef.current.targetCamPos = [
-          jointPos.x + joint.camOffset[0],
-          jointPos.y + joint.camOffset[1],
-          jointPos.z + joint.camOffset[2],
-        ]
-        transitionRef.current.targetLookAt = [jointPos.x, jointPos.y, jointPos.z]
-        transitionRef.current.isTransitioning = true
+        startCameraTransition(
+          [
+            jointPos.x + joint.camOffset[0],
+            jointPos.y + joint.camOffset[1],
+            jointPos.z + joint.camOffset[2],
+          ],
+          [jointPos.x, jointPos.y, jointPos.z],
+          0.85
+        )
       }
 
       function resetView() {
-        transitionRef.current.targetCamPos = [...FULL_SKELETON_CAM]
-        transitionRef.current.targetLookAt = [...FULL_SKELETON_TARGET]
-        transitionRef.current.isTransitioning = true
+        currentActiveJointId = null
+        startCameraTransition(
+          [...FULL_SKELETON_CAM],
+          [...FULL_SKELETON_TARGET],
+          0.85
+        )
       }
 
       function applyTheme(newTheme: SkeletonTheme) {
@@ -535,7 +565,10 @@ export default function Ortho3DHuman({
       stateRef.current.resetView = resetView
       stateRef.current.setTheme = applyTheme
       stateRef.current.setAutoRotate = (enabled: boolean) => {
-        controls.autoRotate = enabled
+        autoRotateRef.current = enabled
+        if (!camTransition.active) {
+          controls.autoRotate = enabled && currentActiveJointId === null
+        }
       }
 
       // ── Raycaster for Direct Clicking & Hovering on 3D Pins ────────────────
@@ -548,7 +581,7 @@ export default function Ortho3DHuman({
       function onPointerDown(e: PointerEvent) {
         pointerDownPos = { x: e.clientX, y: e.clientY }
         hasDragged = false
-        transitionRef.current.isTransitioning = false
+        camTransition.active = false
       }
 
       function onPointerMove(e: PointerEvent) {
@@ -622,35 +655,31 @@ export default function Ortho3DHuman({
         animId = requestAnimationFrame(animate)
 
         const elapsedTime = clock.getElapsedTime()
-        controls.update()
 
-        // Smooth camera lerping when transitioning (only if user is not actively interacting/dragging)
-        const trans = transitionRef.current
-        if (trans.isTransitioning && !isInteracting) {
-          const ease = 0.075
-          camera.position.x += (trans.targetCamPos[0] - camera.position.x) * ease
-          camera.position.y += (trans.targetCamPos[1] - camera.position.y) * ease
-          camera.position.z += (trans.targetCamPos[2] - camera.position.z) * ease
+        // Handle smooth camera fly-to transition
+        if (camTransition.active && !isInteracting) {
+          const elapsed = elapsedTime - camTransition.startTime
+          const rawProgress = Math.min(elapsed / camTransition.duration, 1)
+          // Smooth ease-in-out cubic curve
+          const t =
+            rawProgress < 0.5
+              ? 4 * rawProgress * rawProgress * rawProgress
+              : 1 - Math.pow(-2 * rawProgress + 2, 3) / 2
 
-          cameraTarget.x += (trans.targetLookAt[0] - cameraTarget.x) * ease
-          cameraTarget.y += (trans.targetLookAt[1] - cameraTarget.y) * ease
-          cameraTarget.z += (trans.targetLookAt[2] - cameraTarget.z) * ease
-
+          camera.position.lerpVectors(camTransition.startPos, camTransition.targetPos, t)
+          cameraTarget.lerpVectors(camTransition.startTarget, camTransition.targetLookAt, t)
           camera.lookAt(cameraTarget)
           controls.target.copy(cameraTarget)
 
-          const dist = Math.hypot(
-            trans.targetCamPos[0] - camera.position.x,
-            trans.targetCamPos[1] - camera.position.y,
-            trans.targetCamPos[2] - camera.position.z
-          )
-          if (dist < 0.006) {
-            camera.position.set(...trans.targetCamPos)
-            cameraTarget.set(...trans.targetLookAt)
-            camera.lookAt(cameraTarget)
-            controls.target.copy(cameraTarget)
-            trans.isTransitioning = false
+          if (rawProgress >= 1) {
+            camTransition.active = false
+            if (autoRotateRef.current && currentActiveJointId === null) {
+              controls.autoRotate = true
+            }
           }
+        } else {
+          // Standard OrbitControls update (smooth inertia damping & turntable auto-rotate)
+          controls.update()
         }
 
         // Animate Hotspot Pins
@@ -659,7 +688,7 @@ export default function Ortho3DHuman({
           if (pin) {
             pin.ring.lookAt(camera.position)
 
-            const isSelected = j.id === activeJointId
+            const isSelected = j.id === currentActiveJointId
             const isHovered = j.id === currentHoveredId
 
             // Pulsing radar ring
@@ -669,20 +698,32 @@ export default function Ortho3DHuman({
 
             // Core orb pulse & scale
             const pulse = 1 + Math.sin(elapsedTime * 3 + idx) * (isSelected ? 0.25 : isHovered ? 0.20 : 0.08)
-            pin.orb.scale.setScalar(pulse * (isHovered ? 1.3 : isSelected ? 1.4 : 1.0))
+            pin.orb.scale.setScalar(pulse * (isHovered ? 1.5 : isSelected ? 1.4 : 1.0))
 
             // Only show floating text sprite on HOVER or when ACTIVE!
             // This prevents overlapping text clutter across the skeleton!
             if (isSelected || isHovered) {
-              pin.glow.scale.setScalar(1.6 + Math.sin(elapsedTime * 4) * 0.2)
-              ;(pin.glow.material as THREE.MeshBasicMaterial).opacity = 0.5
-              ;(pin.orb.material as THREE.MeshStandardMaterial).emissiveIntensity = 1.4
+              pin.glow.scale.setScalar(1.8 + Math.sin(elapsedTime * 4) * 0.2)
+              ;(pin.glow.material as THREE.MeshBasicMaterial).opacity = 0.55
+              ;(pin.orb.material as THREE.MeshStandardMaterial).emissiveIntensity = 1.5
 
               pin.sprite.visible = true
-              const targetScaleX = isSelected ? 0.26 : 0.22
-              const targetScaleY = isSelected ? 0.065 : 0.055
-              pin.sprite.scale.x += (targetScaleX - pin.sprite.scale.x) * 0.2
-              pin.sprite.scale.y += (targetScaleY - pin.sprite.scale.y) * 0.2
+
+              // Distance from camera to pin position
+              const dist = camera.position.distanceTo(pin.pinPos)
+              const isFullView = currentActiveJointId === null
+
+              // When in Full Skeleton view, scale up significantly so it is big, bold, and easily readable!
+              const baseHeight = isFullView ? 0.082 : isSelected ? 0.065 : 0.055
+              const targetScaleY = dist * baseHeight
+              const targetScaleX = targetScaleY * 4.0 // 4:1 aspect ratio matching 640x160 canvas
+
+              pin.sprite.scale.x += (targetScaleX - pin.sprite.scale.x) * 0.25
+              pin.sprite.scale.y += (targetScaleY - pin.sprite.scale.y) * 0.25
+
+              // Offset vertically so it floats cleanly above the pin & bone
+              const targetPosY = targetScaleY * 0.85 + 0.035
+              pin.sprite.position.y += (targetPosY - pin.sprite.position.y) * 0.25
             } else {
               pin.glow.scale.setScalar(1.1)
               ;(pin.glow.material as THREE.MeshBasicMaterial).opacity = 0.2
@@ -753,6 +794,7 @@ export default function Ortho3DHuman({
   const toggleAutoRotate = () => {
     const next = !autoRotate
     setAutoRotate(next)
+    autoRotateRef.current = next
     if (stateRef.current.setAutoRotate) {
       stateRef.current.setAutoRotate(next)
     }
@@ -824,18 +866,18 @@ export default function Ortho3DHuman({
           </div>
         ) : hoveredJointInfo ? (
           <div
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border shadow-md backdrop-blur-md transition-all ${
-              isDark ? 'bg-slate-900/90 border-cyan-500/40 text-white' : 'bg-slate-900/85 border-slate-700 text-white'
+            className={`flex items-center gap-2.5 px-4 py-2 rounded-full border-2 shadow-xl backdrop-blur-md transition-all ${
+              isDark ? 'bg-slate-900/95 border-cyan-400/80 text-white shadow-cyan-500/20' : 'bg-slate-900/95 border-teal-400/80 text-white shadow-teal-500/20'
             }`}
           >
             <span
-              className="w-2.5 h-2.5 rounded-full"
+              className="w-3 h-3 rounded-full animate-ping shadow-sm"
               style={{ backgroundColor: hoveredJointInfo.color }}
             />
-            <span className="text-xs font-bold tracking-wide">
+            <span className="text-sm sm:text-base font-extrabold tracking-wide text-white">
               {hoveredJointInfo.label}
             </span>
-            <span className="text-[10px] text-teal-400 font-semibold">
+            <span className="text-xs text-teal-300 font-bold ml-0.5">
               &bull; Click to Inspect
             </span>
           </div>
