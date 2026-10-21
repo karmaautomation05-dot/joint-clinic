@@ -126,6 +126,16 @@ const TYPE_CONFIG: Record<AnatomyType, { label: string; badge: string }> = {
   trauma: { label: 'Bone Fracture Fixation', badge: 'Internal Plate & Screws' },
 }
 
+const JOINT_FRAMING: Record<AnatomyType, { camPos: [number, number, number]; target: [number, number, number] }> = {
+  knee: { camPos: [-0.07, -0.39, 0.65], target: [-0.07, -0.39, 0.005] },
+  hip: { camPos: [-0.09, 0.05, 0.65], target: [-0.09, 0.05, 0.005] },
+  shoulder: { camPos: [-0.18, 0.66, 0.65], target: [-0.18, 0.66, 0.015] },
+  spine: { camPos: [0.005, 0.28, 0.65], target: [0.005, 0.28, 0.005] },
+  sports: { camPos: [-0.07, -0.39, 0.65], target: [-0.07, -0.39, 0.005] },
+  prp: { camPos: [-0.07, -0.39, 0.65], target: [-0.07, -0.39, 0.005] },
+  trauma: { camPos: [-0.11, -0.15, 0.65], target: [-0.11, -0.15, 0.005] },
+}
+
 export interface JointAnatomy3DProps {
   type?: AnatomyType
   title?: string
@@ -229,8 +239,11 @@ export default function JointAnatomy3D({
       scene.background = new THREE.Color(visualTheme === 'radiograph' ? 0x050a14 : 0x181e28)
 
       const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100)
-      const cameraTarget = new THREE.Vector3(-0.07, -0.39, 0.005)
-      camera.position.set(-0.07, -0.39, 0.65)
+      const initialFraming = cameraView === 'skeleton'
+        ? { camPos: [0, 0.05, 2.5] as [number, number, number], target: [0, 0.05, 0] as [number, number, number] }
+        : (JOINT_FRAMING[activeType] || JOINT_FRAMING.knee)
+      const cameraTarget = new THREE.Vector3(...initialFraming.target)
+      camera.position.set(...initialFraming.camPos)
       camera.lookAt(cameraTarget)
 
       // ── OrbitControls with Physics Damping ─────────────────────────────────
@@ -351,17 +364,6 @@ export default function JointAnatomy3D({
         opacity: isRad ? 0.90 : 1.0,
       })
 
-      // ── Anatomical Joint Camera Framing Targets on 3D Human Skeleton ───────
-      const jointFraming: Record<AnatomyType, { camPos: [number, number, number]; target: [number, number, number] }> = {
-        knee: { camPos: [-0.07, -0.39, 0.65], target: [-0.07, -0.39, 0.005] },
-        hip: { camPos: [-0.09, 0.05, 0.65], target: [-0.09, 0.05, 0.005] },
-        shoulder: { camPos: [-0.18, 0.66, 0.65], target: [-0.18, 0.66, 0.015] },
-        spine: { camPos: [0.005, 0.28, 0.65], target: [0.005, 0.28, 0.005] },
-        sports: { camPos: [-0.07, -0.39, 0.65], target: [-0.07, -0.39, 0.005] },
-        prp: { camPos: [-0.07, -0.39, 0.65], target: [-0.07, -0.39, 0.005] },
-        trauma: { camPos: [-0.11, -0.15, 0.65], target: [-0.11, -0.15, 0.005] },
-      }
-
       let pinAnchors: { id: string; mesh: THREE.Mesh; worldPos: THREE.Vector3; color: string; title: string }[] = []
 
       // ── Function to Populate Anatomical Pin Beacons ────────────────────────
@@ -417,13 +419,16 @@ export default function JointAnatomy3D({
         })
       }
 
+      // Populate pins immediately on init
+      rebuildPins(activeType, viewMode)
+
       // ── Function to Focus Camera ──────────────────────────────────────────
       function applyCameraFocus(currentType: AnatomyType, cv: 'joint' | 'skeleton') {
         if (cv === 'skeleton') {
           camera.position.set(0, 0.05, 2.5)
           cameraTarget.set(0, 0.05, 0)
         } else {
-          const framing = jointFraming[currentType] || jointFraming.knee
+          const framing = JOINT_FRAMING[currentType] || JOINT_FRAMING.knee
           camera.position.set(...framing.camPos)
           cameraTarget.set(...framing.target)
         }
@@ -605,19 +610,19 @@ export default function JointAnatomy3D({
 
   return (
     <div
-      className={`w-full rounded-3xl border shadow-xl overflow-hidden my-8 sm:my-12 transition-colors duration-500 ${
+      className={`w-full rounded-3xl border shadow-xl overflow-hidden my-6 sm:my-8 transition-colors duration-500 ${
         isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'
       }`}
     >
       {/* Top Clinical Header Bar */}
       <div
-        className={`p-5 sm:p-7 border-b flex flex-col md:flex-row md:items-center justify-between gap-4 transition-colors duration-500 ${
+        className={`p-5 sm:p-7 border-b flex flex-col xl:flex-row xl:items-center justify-between gap-4 transition-colors duration-500 ${
           isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-slate-50 border-slate-100'
         }`}
       >
-        <div>
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#059B8F] animate-pulse" />
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#059B8F] animate-pulse shrink-0" />
             <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#059B8F]">
               {isRecovery ? 'Clinical Rehabilitation & Bone Healing 3D' : 'Precision 3D Surgical Reconstruction'}
             </span>
@@ -641,7 +646,7 @@ export default function JointAnatomy3D({
         </div>
 
         {/* View Mode & Contrast Theme Selectors */}
-        <div className="flex flex-wrap items-center gap-2 shrink-0 self-start md:self-auto">
+        <div className="flex flex-wrap items-center gap-2 shrink-0 self-start xl:self-auto">
           {/* Camera Framing: Focus Joint vs Full Skeleton */}
           <div
             className={`flex items-center gap-1 p-1 rounded-2xl border shadow-2xs transition-colors ${
@@ -651,7 +656,7 @@ export default function JointAnatomy3D({
             <button
               type="button"
               onClick={() => handleCameraViewChange('joint')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                 cameraView === 'joint'
                   ? 'bg-[#059B8F] text-white shadow-xs'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
@@ -663,7 +668,7 @@ export default function JointAnatomy3D({
             <button
               type="button"
               onClick={() => handleCameraViewChange('skeleton')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                 cameraView === 'skeleton'
                   ? 'bg-[#059B8F] text-white shadow-xs'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
@@ -683,7 +688,7 @@ export default function JointAnatomy3D({
             <button
               type="button"
               onClick={() => handleThemeChange('studio')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                 !isDark
                   ? 'bg-slate-700 text-white shadow-xs'
                   : 'text-slate-400 hover:text-white'
@@ -695,7 +700,7 @@ export default function JointAnatomy3D({
             <button
               type="button"
               onClick={() => handleThemeChange('radiograph')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                 isDark
                   ? 'bg-cyan-600 text-white shadow-xs'
                   : 'text-slate-400 hover:text-white'
@@ -715,7 +720,7 @@ export default function JointAnatomy3D({
             <button
               type="button"
               onClick={() => handleModeChange('surgical')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                 viewMode === 'surgical'
                   ? 'bg-[#059B8F] text-white shadow-xs'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
@@ -726,7 +731,7 @@ export default function JointAnatomy3D({
             <button
               type="button"
               onClick={() => handleModeChange('biological')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                 viewMode === 'biological'
                   ? 'bg-[#059B8F] text-white shadow-xs'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
@@ -771,11 +776,11 @@ export default function JointAnatomy3D({
       )}
 
       {/* 3D Canvas & Interactive Callout Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 relative">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-0 relative">
         {/* WebGL Canvas Container */}
         <div
           ref={containerRef}
-          className={`lg:col-span-8 relative min-h-[440px] sm:min-h-[520px] lg:min-h-[560px] cursor-grab active:cursor-grabbing flex items-center justify-center select-none overflow-hidden transition-colors duration-500 ${
+          className={`xl:col-span-8 relative min-h-[440px] sm:min-h-[520px] xl:min-h-[580px] cursor-grab active:cursor-grabbing flex items-center justify-center select-none overflow-hidden transition-colors duration-500 ${
             isDark ? 'bg-[#050a14]' : 'bg-[#181e28]'
           }`}
         >
@@ -929,7 +934,7 @@ export default function JointAnatomy3D({
 
         {/* Anatomical & Clinical Information Sidebar */}
         <div
-          className={`lg:col-span-4 p-5 sm:p-7 border-t lg:border-t-0 lg:border-l flex flex-col justify-between space-y-6 transition-colors duration-500 ${
+          className={`xl:col-span-4 p-5 sm:p-7 border-t xl:border-t-0 xl:border-l flex flex-col justify-between space-y-6 transition-colors duration-500 ${
             isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'
           }`}
         >

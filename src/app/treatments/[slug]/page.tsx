@@ -16,8 +16,10 @@ import {
   Phone,
   FileCheck,
   Stethoscope,
+  BookOpen,
 } from "lucide-react";
 import { TREATMENTS, TREATMENT_CATEGORIES } from "@/data/treatments";
+import { getRelatedBlogsForTreatment } from "@/data/blogs";
 import { PRIMARY_CONTACT } from "@/data/clinics";
 import dynamic from "next/dynamic";
 import { getAnatomyType } from "@/utils/anatomy";
@@ -118,6 +120,7 @@ export default function TreatmentDetailPage({
   }
 
   const IconComponent = ICON_MAP[treatment.iconName] || Bone;
+  const relatedBlogs = getRelatedBlogsForTreatment(treatment.slug, treatment.category);
 
   const schema = {
     "@context": "https://schema.org",
@@ -236,8 +239,17 @@ export default function TreatmentDetailPage({
         </div>
       </section>
 
+      {/* Interactive 3D Bone & Joint Reconstruction Specific to Treatment (Full-Width Featured Showcase) */}
+      <section className="container -mt-8 sm:-mt-10 relative z-20">
+        <JointAnatomy3D
+          type={getAnatomyType(treatment.slug)}
+          title={`${treatment.title} • 3D Surgical Model`}
+          subtitle={`Interactive 3D visualization for ${treatment.title}. Rotate 360° to inspect bone landmarks, surgical reconstruction, and internal alignment.`}
+        />
+      </section>
+
       {/* Main Content Layout */}
-      <div className="container -mt-8 sm:-mt-10 relative z-20">
+      <div className="container mt-8 sm:mt-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
           {/* Main Article & Procedures */}
           <div className="lg:col-span-8 space-y-6 sm:space-y-8">
@@ -260,13 +272,6 @@ export default function TreatmentDetailPage({
                 <strong>{treatment.title}</strong> is performed by <strong>Dr. Gaurav Bhargava</strong> (Ex-SR Maulana Azad Medical College, New Delhi) at Joint Clinic Swaroop Nagar and BMTC Hospital Kidwai Nagar Kanpur. This treatment is recommended for patients experiencing {treatment.indications.slice(0, 2).map((i) => i.toLowerCase()).join(" or ")}. Typical surgical duration is {treatment.stats.duration}, hospital stay is {treatment.stats.hospitalStay}, and walking is resumed {treatment.stats.walkingResumed}.
               </p>
             </div>
-
-            {/* Interactive 3D Bone & Joint Reconstruction Specific to Treatment */}
-            <JointAnatomy3D
-              type={getAnatomyType(treatment.slug)}
-              title={`${treatment.title} • 3D Surgical Model`}
-              subtitle={`Interactive 3D visualization for ${treatment.title}. Rotate 360° to inspect bone landmarks, surgical reconstruction, and internal alignment.`}
-            />
 
             {/* Overview */}
             <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-4 sm:space-y-5">
@@ -371,6 +376,60 @@ export default function TreatmentDetailPage({
                 </div>
               </section>
             )}
+
+            {/* Related Clinical Blog & Recovery Articles */}
+            {relatedBlogs.length > 0 && (
+              <section className="bg-gradient-to-br from-teal-50/70 to-brand-50/70 rounded-2xl sm:rounded-3xl border border-brand-200/80 p-5 sm:p-8 md:p-10 shadow-sm space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-brand-200/60">
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block mb-1">
+                      Patient Education &bull; Clinical Insights
+                    </span>
+                    <h2 className="text-xl sm:text-2xl font-serif font-bold text-slate-900">
+                      Related Health &amp; Recovery Articles
+                    </h2>
+                  </div>
+                  <Link
+                    href="/blog"
+                    className="text-xs font-bold text-[#059B8F] hover:text-[#0A7C97] flex items-center gap-1 shrink-0"
+                  >
+                    <span>View All Health Blogs</span>
+                    <ArrowRight size={13} />
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {relatedBlogs.map((b) => (
+                    <article
+                      key={b.id}
+                      className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs hover:shadow-md hover:border-brand-300 transition-all flex flex-col justify-between group"
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider text-[#059B8F]">
+                          <span className="px-2.5 py-0.5 rounded-full bg-brand-50 border border-brand-100">{b.category}</span>
+                          <span>&bull;</span>
+                          <span>{b.readTime}</span>
+                        </div>
+                        <h3 className="text-sm sm:text-base font-serif font-bold text-slate-900 group-hover:text-brand-700 transition-colors line-clamp-2">
+                          {b.title}
+                        </h3>
+                        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                          {b.excerpt}
+                        </p>
+                      </div>
+                      <Link
+                        href={`/blog/${b.slug}`}
+                        className="mt-4 pt-3 border-t border-slate-100 text-xs font-bold text-[#059B8F] hover:text-[#0A7C97] flex items-center justify-between group/link"
+                      >
+                        <span>Read Doctor's Clinical Guide</span>
+                        <ArrowRight size={13} className="group-hover/link:translate-x-1 transition-transform" />
+                      </Link>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            )}
+
           </div>
 
           {/* Sidebar CTA & Doctor Quick Info */}
@@ -426,6 +485,35 @@ export default function TreatmentDetailPage({
                   <p className="text-slate-600 text-[11px]">10:00 AM – 02:00 PM (OPD &amp; Modular OTs)</p>
                 </div>
               </div>
+
+              {/* Related Blog Links in Sidebar */}
+              {relatedBlogs.length > 0 && (
+                <div className="pt-4 border-t border-slate-100 space-y-2.5 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5 text-[#059B8F]" />
+                      <span>Related Health Blog</span>
+                    </span>
+                    <span className="text-[10px] font-semibold text-[#059B8F] uppercase">Educational</span>
+                  </div>
+                  {relatedBlogs.slice(0, 2).map((rb) => (
+                    <Link
+                      key={rb.id}
+                      href={`/blog/${rb.slug}`}
+                      className="block p-3 rounded-2xl bg-brand-50/70 hover:bg-brand-50 border border-brand-200/80 hover:border-brand-300 transition-all group"
+                    >
+                      <p className="font-serif font-bold text-slate-900 text-xs group-hover:text-brand-700 line-clamp-2 mb-1">
+                        {rb.title}
+                      </p>
+                      <span className="text-[10px] font-bold text-[#059B8F] flex items-center gap-1">
+                        <span>Read Clinical Article</span>
+                        <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+
             </div>
           </div>
         </div>

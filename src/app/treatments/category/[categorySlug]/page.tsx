@@ -21,6 +21,7 @@ import {
   FileText,
 } from "lucide-react";
 import { TREATMENT_CATEGORIES, TreatmentCategory, TREATMENTS } from "@/data/treatments";
+import { getRelatedBlogsForCategory } from "@/data/blogs";
 import { PRIMARY_CONTACT } from "@/data/clinics";
 import dynamic from "next/dynamic";
 import { getAnatomyType } from "@/utils/anatomy";
@@ -117,6 +118,7 @@ export default function TreatmentCategoryPage({
   };
 
   const otherCategories = TREATMENT_CATEGORIES.filter((c) => c.id !== category.id);
+  const relatedBlogs = getRelatedBlogsForCategory(category.id);
 
   const schema = {
     "@context": "https://schema.org",
@@ -429,6 +431,63 @@ export default function TreatmentCategoryPage({
             Open Recovery Roadmap &rarr;
           </Link>
         </div>
+
+        {/* Related Clinical Articles & Health Blogs for this Category */}
+        {relatedBlogs.length > 0 && (
+          <section className="mt-14 bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-sm space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-slate-200">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block mb-1">
+                  Doctor&apos;s Knowledge Base &bull; {category.name}
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
+                  Clinical Guides &amp; Health Articles
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                  In-depth medical advice and answers by Dr. Gaurav Bhargava regarding {category.name.toLowerCase()}.
+                </p>
+              </div>
+              <Link
+                href="/blog"
+                className="text-xs font-bold text-[#059B8F] hover:text-[#0A7C97] flex items-center gap-1.5 shrink-0"
+              >
+                <span>Browse All Health Blogs</span>
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {relatedBlogs.map((post) => (
+                <article
+                  key={post.id}
+                  className="bg-slate-50/70 hover:bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs hover:shadow-md hover:border-brand-300 transition-all flex flex-col justify-between group"
+                >
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-[#059B8F] uppercase tracking-wider">
+                      <span className="px-2.5 py-0.5 rounded-full bg-brand-50 border border-brand-100">{post.category}</span>
+                      <span>&bull;</span>
+                      <span>{post.readTime}</span>
+                    </div>
+                    <h4 className="text-base font-serif font-bold text-slate-900 group-hover:text-brand-700 transition-colors line-clamp-2">
+                      {post.title}
+                    </h4>
+                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">
+                      {post.excerpt}
+                    </p>
+                  </div>
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="mt-4 pt-3 border-t border-slate-200/80 text-xs font-bold text-[#059B8F] hover:text-[#0A7C97] flex items-center justify-between group/btn"
+                  >
+                    <span>Read Full Guide</span>
+                    <ArrowRight size={13} className="group-hover/btn:translate-x-1 transition-transform" />
+                  </Link>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
 
         {/* BMTC Laminar OT Hospital Assurance */}
         <div className="mt-8 bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-4">

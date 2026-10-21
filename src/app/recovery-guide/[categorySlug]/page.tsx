@@ -23,6 +23,7 @@ import {
 import { RECOVERY_GUIDES, CategoryRecoveryGuide } from "@/data/recoveryGuides";
 import { TREATMENT_CATEGORIES } from "@/data/treatments";
 import { PRIMARY_CONTACT } from "@/data/clinics";
+import { getRelatedBlogsForCategory } from "@/data/blogs";
 import dynamic from "next/dynamic";
 import { getAnatomyType } from "@/utils/anatomy";
 
@@ -134,6 +135,7 @@ export default function DedicatedRecoveryCategoryPage({
   );
 
   const otherGuides = RECOVERY_GUIDES.filter((g) => g.id !== guide.id);
+  const relatedBlogs = getRelatedBlogsForCategory(guide.id);
 
   const schema = {
     "@context": "https://schema.org",
@@ -428,6 +430,62 @@ export default function DedicatedRecoveryCategoryPage({
             </div>
           </section>
         )}
+
+
+        {/* Related Doctor's Health & Recovery Blogs for this Body Part */}
+        {relatedBlogs.length > 0 && (
+          <section className="bg-gradient-to-r from-teal-50/80 to-brand-50/80 rounded-3xl p-6 sm:p-10 border border-brand-200 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-brand-200/60">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-widest text-[#059B8F] block mb-1">
+                  Educational Insights &bull; {guide.category}
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900">
+                  Doctor&apos;s Clinical Guides &amp; Health Articles
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                  Read clinical guides written by Dr. Gaurav Bhargava to support your rehabilitation and joint care.
+                </p>
+              </div>
+              <Link
+                href="/blog"
+                className="text-xs font-bold text-[#059B8F] hover:text-[#0A7C97] flex items-center gap-1.5 shrink-0"
+              >
+                <span>View All Articles</span>
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {relatedBlogs.map((blog) => (
+                <div
+                  key={blog.id}
+                  className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-brand-300 transition-all flex flex-col justify-between group"
+                >
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold text-[#059B8F] px-2.5 py-0.5 rounded-full bg-brand-50 border border-brand-100 inline-block">
+                      {blog.category}
+                    </span>
+                    <h4 className="text-base font-serif font-bold text-slate-900 group-hover:text-brand-700 transition-colors line-clamp-2">
+                      {blog.title}
+                    </h4>
+                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-2">
+                      {blog.excerpt}
+                    </p>
+                  </div>
+                  <Link
+                    href={`/blog/${blog.slug}`}
+                    className="mt-4 pt-3 border-t border-slate-100 text-xs font-bold text-[#059B8F] hover:text-[#0A7C97] flex items-center justify-between group/link"
+                  >
+                    <span>Read Clinical Guide</span>
+                    <ArrowRight size={13} className="group-hover/link:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
 
         {/* Covered Treatments in this Category */}
         {matchingTreatmentCategory && (

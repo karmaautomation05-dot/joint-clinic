@@ -55,6 +55,44 @@ export async function generateMetadata({
   };
 }
 
+
+function getMatchingCategoryForBlog(category: string, slug: string) {
+  const norm = (category + " " + slug).toLowerCase();
+  if (norm.includes("shoulder")) {
+    return {
+      name: "Shoulder & Arm Care",
+      treatmentUrl: "/treatments/category/shoulder-care",
+      recoveryUrl: "/recovery-guide/shoulder-recovery",
+    };
+  }
+  if (norm.includes("knee")) {
+    return {
+      name: "Knee Care & Surgery",
+      treatmentUrl: "/treatments/category/knee-care",
+      recoveryUrl: "/recovery-guide/knee-recovery",
+    };
+  }
+  if (norm.includes("spine") || norm.includes("disc") || norm.includes("back") || norm.includes("spinal")) {
+    return {
+      name: "Spine & Sciatica Care",
+      treatmentUrl: "/treatments/category/spine-care",
+      recoveryUrl: "/recovery-guide/spine-recovery",
+    };
+  }
+  if (norm.includes("arthritis") || norm.includes("joint")) {
+    return {
+      name: "Non-Surgical Joint Care & PRP",
+      treatmentUrl: "/treatments/category/non-surgical",
+      recoveryUrl: "/recovery-guide/prp-recovery",
+    };
+  }
+  return {
+    name: "Orthopaedic Treatments",
+    treatmentUrl: "/treatments",
+    recoveryUrl: "/recovery-guide",
+  };
+}
+
 export default function BlogPostPage({
   params,
 }: {
@@ -67,6 +105,7 @@ export default function BlogPostPage({
   }
 
   const otherBlogs = BLOG_POSTS.filter((p) => p.id !== post.id).slice(0, 3);
+  const matchingCat = getMatchingCategoryForBlog(post.category, post.slug);
 
   const schema = {
     "@context": "https://schema.org",
@@ -270,6 +309,36 @@ export default function BlogPostPage({
                   <Phone className="w-3.5 h-3.5 text-brand-600" />
                   <span>Call: {PRIMARY_CONTACT.phoneDisplay}</span>
                 </a>
+              </div>
+
+              
+              {/* Specialty Treatments & Recovery Redirection */}
+              <div className="pt-4 border-t border-slate-100 space-y-2.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-brand-600" />
+                  <span>Clinical Care &amp; Recovery</span>
+                </h4>
+                <div className="space-y-2">
+                  <Link
+                    href={matchingCat.treatmentUrl}
+                    className="block p-3 rounded-2xl bg-brand-50/80 hover:bg-brand-100/70 border border-brand-200 transition-all text-xs group"
+                  >
+                    <span className="text-[10px] uppercase font-bold text-brand-700 block mb-0.5">Specialty Procedures</span>
+                    <p className="font-serif font-bold text-slate-900 group-hover:text-brand-700 transition-colors">
+                      {matchingCat.name} Treatments &rarr;
+                    </p>
+                  </Link>
+
+                  <Link
+                    href={matchingCat.recoveryUrl}
+                    className="block p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 transition-all text-xs group"
+                  >
+                    <span className="text-[10px] uppercase font-bold text-slate-500 block mb-0.5">Rehabilitation</span>
+                    <p className="font-serif font-bold text-slate-900 group-hover:text-brand-700 transition-colors">
+                      {matchingCat.name} Recovery Roadmap &rarr;
+                    </p>
+                  </Link>
+                </div>
               </div>
 
               {/* Other Related Blogs */}
