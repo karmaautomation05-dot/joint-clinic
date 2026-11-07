@@ -72,7 +72,7 @@ function getMatchingCategoryForBlog(category: string, slug: string) {
       recoveryUrl: "/recovery-guide/knee-recovery",
     };
   }
-  if (norm.includes("spine") || norm.includes("disc") || norm.includes("back") || norm.includes("spinal")) {
+  if (norm.includes("spine") || norm.includes("disc") || norm.includes("back") || norm.includes("spinal") || norm.includes("sciatica")) {
     return {
       name: "Spine & Sciatica Care",
       treatmentUrl: "/treatments/category/spine-care",
